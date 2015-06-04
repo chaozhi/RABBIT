@@ -34,7 +34,9 @@ calFglJunc::usage = "calFglJunc  "
 
 calFglSummary::usage = "calFglSummary  "
 
-pedOrigPrior::usage = "pedOrigPrior  "
+simOrigPrior::usage = "simOrigPrior  "
+
+(*crossover::usage = "crossover  "*)
 
 Begin["`Private`"]
 (* Implementation of the package *)
@@ -254,10 +256,10 @@ nextGeneration[pop_, matingScheme_, size_: 1] :=
         genders = pop[[All,3]];
         Which[ Union[genders] == {0},
             pairs = matingParents[matingScheme, Length[pop]];
-            next = Thread[{-1, -1, 0, pairs,"NA"}],
+            next = Thread[{-1, -1, 0, pairs}],
             Union[genders] == {1,2},
             {pairs,newgenders} = matingParents[matingScheme, genders];
-            next = Thread[{-1, -1, newgenders, pairs,"NA"}],
+            next = Thread[{-1, -1, newgenders, pairs}],
             True,
             Print[genders];
             Print["nextGeneration: there are no male (or female) indiviudals !"];
@@ -306,7 +308,7 @@ setfounderFGL[nFounder_, isInbredFounder_] :=
         ]
     ]
     
-(*any pedigree member = {generation, individual id, gender, {mother id, father id}, genomes};
+(*any pedigree member = {generation, individual id, gender, mother id, father id};
 generation: non-overlapping, starting from 0 for the founder populations; 
             set generation =-1 for overlapping generations.
 gender:1=female,2=male, 0=hermaphrodite;
@@ -316,10 +318,10 @@ All the parents precede their offspring.
 *)
 (*If isOogammy=True, the founder population consists of 1=female, 2=male, female, male, and so on;
 If is Oogammy =False, the gender =0 for all founders*)
-simPedigree[founderFGL_, mateScheme_, isOogamy_] :=
+simPedigree[nFounder_,mateScheme_, isOogamy_] :=
     Module[ {founderpop, popped,i},
-        founderpop = {-1, -1, 0, {0, 0}, #} & /@ founderFGL;
-        founderpop[[All, 2]] = Range[Length[founderFGL]];
+        founderpop = Table[{-1, -1, 0, {0, 0}},{nFounder}];
+        founderpop[[All, 2]] = Range[nFounder];
         If[ isOogamy,
             Do[founderpop[[i ;; ;; 2, 3]] = i, {i, 1, 2}]
         ];
@@ -329,34 +331,40 @@ simPedigree[founderFGL_, mateScheme_, isOogamy_] :=
         i = Length[popped];
         popped[[i, All, 2]] += popped[[i - 1, -1, 2]];
         popped[[All, All, 1]] = Range[0, Length[popped] - 1];
-        Flatten[popped, 1]
+        popped=Flatten[popped, 1];
+        (*Add column heads, and transfer from {generation, individual id, gender, {mother id, father id}} 
+        		   				into {generation, individual id, gender, mother id, father id}*)
+        Join[{{"Generation","Individual","Gender","Mother","Father"}},Flatten[#]&/@popped]
     ]
 
 Options[pedigreePlot] = Options[LayeredGraphPlot];
 pedigreePlot[popped_, opts : OptionsPattern[]] :=
     Module[ {data},
-        data = DeleteCases[popped[[All, {4, 2}]], {{0, 0}, _}];
-        data = Flatten[Thread[#[[1]] -> #[[2]]] & /@ data];
+        data = DeleteCases[popped[[2 ;;, {2, 4, 5}]], {_, 0, 0}];
+        data = Flatten[Thread[#[[2 ;; 3]] -> #[[1]]] & /@ data];
         LayeredGraphPlot[data, Join[Evaluate[FilterRules[{opts}, Options[LayeredGraphPlot]]],
             {VertexLabeling -> True, DirectedEdges -> True}]]
     ]    
 
-
 Options[simMagicFgl] = Options[calFglSummary] = {isLastGeneration->True}
-    (*If isOogamy=True,the last pair of chromosomes are sex chromosomes.*)(*XY for male and XX for female.*)
+(*If isOogamy=True,the last pair of chromosomes are sex chromosomes.*)(*XY for male and XX for female.*)
 (*for each linkage group = {maternally derived chromosome, paternally derived chromosome}*)
 (*If ith individual is female (gender =1), the paternal dervied chromosome is the X chromosome*)
-(*popfgl[[1]] ={popPed, chrLength, interferStrength,isObligate, isOogamy}*)
-simMagicFgl[popPed_, chrLength_, interferStrength_,isObligate_,isOogamy_,opts : OptionsPattern[]] :=
-    Module[ {popfgl = popPed, nFounder, founderfgl, ls, ls2, gender, i},
+(*popfgl[[1]] ={popPed,founderFGL, chrLength, interferStrength,isObligate, isOogamy}*)
+simMagicFgl[popPed_,founderFGL_, chrLength_, interferStrength_,isObligate_,isOogamy_,opts : OptionsPattern[]] :=
+    Module[ {popfgl = Rest[popPed], nFounder,ls, ls2, gender, i},
+    	popfgl = Join[popfgl[[All, ;; 3]], Transpose[{popfgl[[All, 4 ;; 5]], Table[0, {Length[popfgl]}]}], 2];
         nFounder = Count[popfgl[[All, 4]], {0, 0}];
-        founderfgl = popfgl[[;; nFounder, 5]];
-        popfgl[[;; nFounder, 5]] = Table[
-          ls = {{0, founderfgl[[i, 1]]}, {#, -1}} & /@ chrLength;
-          ls2 = {{0, founderfgl[[i, 2]]}, {#, -1}} & /@ chrLength;
+        If[Length[founderFGL]!=nFounder,
+        	Print["Inconsistent number of founders: {nFounder(popPed),nFounder(founderFGL)} =",{nFounder,Length[founderFGL]}];
+        	Abort[]
+		];
+        popfgl[[;; nFounder, -1]] = Table[
+          ls = {{0, founderFGL[[i, 1]]}, {#, -1}} & /@ chrLength;
+          ls2 = {{0, founderFGL[[i, 2]]}, {#, -1}} & /@ chrLength;
           Transpose[{ls, ls2}], {i, nFounder}];
         Do[
-         popfgl[[i, 5]] = Transpose[Map[crossover[#, isObligate, interferStrength] &, popfgl[[popfgl[[i, 4]], 5]], {2}]];
+         popfgl[[i, -1]] = Transpose[Map[crossover[#, isObligate, interferStrength] &, popfgl[[popfgl[[i, 4]], 5]], {2}]];
          If[ isOogamy&&Length[chrLength]>1,
              gender = popfgl[[i, 3]];
              (*popfgl[[i,4,2]] is the father id*)
@@ -365,16 +373,16 @@ simMagicFgl[popPed_, chrLength_, interferStrength_,isObligate_,isOogamy_,opts : 
         If[ TrueQ[OptionValue[isLastGeneration]],
             popfgl = Select[popfgl, First[#] == popfgl[[-1, 1]] &];
         ];
-        Join[{{popPed, chrLength, interferStrength,isObligate, isOogamy}},popfgl]
+        Join[{{popPed,founderFGL, chrLength, interferStrength,isObligate, isOogamy}},popfgl]
     ]
   
-(*any pedigree member = {generation, individual id, gender, {mother id, father id}, genomes}*)
-(*popfgl[[1]] ={popPed, chrLength, interferStrength,isObligate, isOogamy,founderFGL, mateScheme}*)
-simMagicFgl[founderFGL_, mateScheme_,chrLength_,interferStrength_,isObligate_,isOogamy_,opts : OptionsPattern[]] :=
+(*any pedigree member = {generation, individual id, gender, mother id, father id}*)
+(*popfgl[[1]] ={popPed,founderFGL, chrLength, interferStrength,isObligate, isOogamy,founderFGL, mateScheme}*)
+simMagicFgl[mateScheme_?(VectorQ[#, StringQ]&),founderFGL_, chrLength_,interferStrength_,isObligate_,isOogamy_,opts : OptionsPattern[]] :=
     Module[ {popped,popfgl},
-        popped = simPedigree[founderFGL, mateScheme, isOogamy];
-        popfgl = simMagicFgl[popped, chrLength, interferStrength,isObligate, isOogamy,opts];
-        popfgl[[1]] = Join[popfgl[[1]],{founderFGL, mateScheme}];
+        popped = simPedigree[Length[founderFGL], mateScheme, isOogamy];
+        popfgl = simMagicFgl[popped, founderFGL,chrLength, interferStrength,isObligate, isOogamy,opts];
+        popfgl[[1]] = Join[popfgl[[1]],{mateScheme}];
         popfgl
     ] 
     
@@ -477,11 +485,11 @@ toJunction[diplo_] :=
         Map[f, freq, {Depth[freq] - 2}]
     ]
 
-(*popfgl[[1]] ={popPed, chrLength, interferStrength,isObligate, isOogamy}*)
-(*or popfgl[[1]] ={popPed, chrLength, interferStrength,isObligate, isOogamy,founderFGL, mateScheme}*)
+(*popfgl[[1]] ={popPed, founderFGL,chrLength, interferStrength,isObligate, isOogamy}*)
+(*or popfgl[[1]] ={popPed, founderFGL,chrLength, interferStrength,isObligate, isOogamy,founderFGL, mateScheme}*)
 calFglGeno[popfgl_,obligateRescale_:True] :=
     Module[ {popfglgeno = popfgl,geno,chrlen,isObligate,factor,ch},
-        {chrlen, isObligate} = popfglgeno[[1, {2, 4}]];
+        {chrlen, isObligate} = popfglgeno[[1, {3, 5}]];
         geno = toFglGeno[popfglgeno[[2 ;;, -1]]];
         (*correcting for obligate crossover*)
         If[ isObligate&&obligateRescale,
@@ -496,7 +504,7 @@ calFglGeno[popfgl_,obligateRescale_:True] :=
 
 calFglGenoGrid[popfglgeno_, grid_] :=
     Module[ {popgrid = popfglgeno, chrlen},
-        chrlen = popgrid[[1, 2]];
+        chrlen = popgrid[[1, 3]];
         If[ Length[grid] != Length[chrlen],
             Print["The #chromosomes are different between grid and popfglgeno!"];
             Abort[];
@@ -509,9 +517,9 @@ calFglGenoGrid[popfglgeno_, grid_] :=
         popgrid
     ]
     
-calFglJunc[popfglgeno_,opts : OptionsPattern[]] :=
+calFglJunc[popfglgeno_] :=
     Module[ {pop = popfglgeno,res, isOogamy, chrlen, geno, ibd, diplo, junc, ls},
-        isOogamy = pop[[1, 5]];
+        isOogamy = pop[[1, 6]];
         chrlen = pop[[2, -1, All, -1, 1]]/100.;
         geno = pop[[2 ;;, -1]];
         geno = geno[[All, All, All, 2]];
@@ -531,14 +539,15 @@ calFglJunc[popfglgeno_,opts : OptionsPattern[]] :=
         res
     ]    
     
-(*popfgl[[1]] ={popPed, chrLength, interferStrength,isObligate, isOogamy}*)
-(*or popfgl[[1]] ={popPed, chrLength, interferStrength,isObligate, isOogamy,founderFGL, mateScheme}*)
+(*popfgl[[1]] ={popPed, founderFGL,chrLength, interferStrength,isObligate, isOogamy}*)
+(*or popfgl[[1]] ={popPed,founderFGL,chrLength, interferStrength,isObligate, isOogamy,mateScheme}*)
 (*gender:1=female,2=male, 0=hermaphrodite;*)
 calFglSummary[popfgljunc_] :=
-    Module[ {pop = popfgljunc,resAA, tls, res, ls, temp, pos,gender},
+    Module[ {pop = popfgljunc,resAA, tls, chrLength,isOogamy,res, ls, temp, pos,gender},
         resAA = (Total[#]/Length[#]) & /@ SplitBy[Transpose[{pop[[2 ;;, 1]],pop[[2 ;;, -1, 1]]}], First];
         tls = resAA[[All, 1]];
-        If[ pop[[1, 5]] && Length[pop[[2, -1]]] == 2,
+        {chrLength,isOogamy}=pop[[1, {3,6}]];
+        If[ isOogamy && Length[chrLength]>1,
             res = ConstantArray[0, {Length[tls], 4}];
             res[[All, ;; 2]] = resAA;
             ls = Transpose[{pop[[2 ;;, {1, 3}]], pop[[2 ;;, -1, -1]]}];
@@ -555,33 +564,23 @@ calFglSummary[popfgljunc_] :=
         Join[{pop[[1]]}, res]
     ]   
 
-calFglSummary[popPed_, chrLength_,interferStrength_,isObligate_,isOogamy_,sampleSize_, opts : OptionsPattern[]] :=
-    Module[ {popfgl,popfglgeno,popfgljunc,summary,res,i},
+(*pop =popped or matescheme*)
+calFglSummary[pop_, founderFGL_,chrLength_,interferStrength_,isObligate_,isOogamy_,sampleSize_, opts : OptionsPattern[]] :=
+    Module[ {popfgl,popfglgeno,popfgljunc,summary,res,i,obligateRescale=True},
         Monitor[
             res = Sum[
-                popfgl = simMagicFgl[popPed, chrLength, interferStrength, isObligate, isOogamy,opts];
-                popfglgeno = calFglGeno[popfgl,True];
+                popfgl = simMagicFgl[pop, founderFGL,chrLength, interferStrength, isObligate, isOogamy,opts];
+                popfglgeno = calFglGeno[popfgl,obligateRescale];
                 popfgljunc = calFglJunc[popfglgeno];
                 summary = calFglSummary[popfgljunc];
                 Rest[summary], {i, sampleSize}], ProgressIndicator[i, {1, sampleSize}]];
         Join[{Append[First[summary],sampleSize]}, res/sampleSize]
     ]
-    
-calFglSummary[founderFGL_, mateScheme_, chrLength_,interferStrength_,isObligate_,isOogamy_,sampleSize_, opts : OptionsPattern[]] :=
-    Module[ {popfgl,popfglgeno,popfgljunc,summary,res,i},
-        Monitor[
-            res = Sum[
-                popfgl = simMagicFgl[founderFGL, mateScheme, chrLength, interferStrength, isObligate, isOogamy,opts];
-                popfglgeno = calFglGeno[popfgl,True];
-                popfgljunc = calFglJunc[popfglgeno];
-                summary = calFglSummary[popfgljunc];
-                Rest[summary], {i, sampleSize}], ProgressIndicator[i, {1, sampleSize}]];
-        Join[{Append[First[summary],sampleSize]}, res/sampleSize]
-    ]    
        
-pedOrigPrior[popPed_, chrLength_,interferStrength_,isObligate_,isOogamy_,sampleSize_] :=
+(*pop =popped or matescheme*)       
+simOrigPrior[pop_, founderFGL_,chrLength_,interferStrength_,isObligate_,isOogamy_,sampleSize_] :=
     Module[ {summary,i},
-        summary = calFglSummary[popPed, chrLength, interferStrength, isObligate, isOogamy, sampleSize, isLastGeneration -> True];
+        summary = calFglSummary[pop, founderFGL,chrLength, interferStrength, isObligate, isOogamy, sampleSize, isLastGeneration -> True];
         summary = Rest[summary[[-1]]];
         (*{{"finb","J1112","J1121","J1122","J1211","J1213","J1222","J1232"},..} to 
           {{finbred,j1122,j1211,j1213,j1222,j1232},{finbred_mp,j1122mp,j1211mp,j1213mp,j1222mp,j1232mp}}*)

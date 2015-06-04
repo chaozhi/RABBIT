@@ -2,11 +2,11 @@
 
 (* Created by the Wolfram Workbench 30-Nov-2014 *)
 
-BeginPackage["MagicAlgorithm`",{"ContinuousTimeHmm`"}]
+BeginPackage["MagicReconstruct`MagicAlgorithm`",{"ContinuousTimeHmm`"}]
 (* Exported symbols added here with SymbolName::usage *) 
 
-Unprotect @@ Names["MagicAlgorithm`*"];
-ClearAll @@ Names["MagicAlgorithm`*"];
+Unprotect @@ Names["MagicReconstruct`MagicAlgorithm`*"];
+ClearAll @@ Names["MagicReconstruct`MagicAlgorithm`*"];
 
 origLogLiklihood::usage = "origLogLiklihood[startProb, tranProb, dataProb]  "
 
@@ -49,7 +49,7 @@ origPathSampling[startProb_, tranProb_, dataProb_,size_:1] :=
 
 End[]
 
-SetAttributes[#, {Protected,ReadProtected}]&/@ Names["MagicAlgorithm`*"];
+SetAttributes[#, {Protected,ReadProtected}]&/@ Names["MagicReconstruct`MagicAlgorithm`*"];
 
 EndPackage[]
 

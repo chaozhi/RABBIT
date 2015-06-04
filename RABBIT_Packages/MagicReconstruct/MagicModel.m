@@ -2,11 +2,11 @@
 
 (* Created by the Wolfram Workbench 30-Nov-2014 *)
 
-BeginPackage["MagicModel`",{"MagicOrigin`","MagicOriginXY`","MagicSimulate`"}]
+BeginPackage["MagicReconstruct`MagicModel`",{"MagicOrigin`","MagicOriginXY`","MagicSimulate`"}]
 (* Exported symbols added here with SymbolName::usage *) 
 
-Unprotect @@ Names["MagicModel`*"];
-ClearAll @@ Names["MagicModel`*"];
+Unprotect @@ Names["MagicReconstruct`MagicModel`*"];
+ClearAll @@ Names["MagicReconstruct`MagicModel`*"];
 
 magicPriorProcess::usage = "magicPriorProcess  "
 
@@ -91,8 +91,8 @@ maleXTransitionProb = Function[{deltt, nFounder, mapR},
        
 (*for both autosomes and female XX chromosomes*)
 calMarkovProb[deltd_, model_, nFounder_, juncdist_] :=
-    Module[ {startProb, rr, transitionRate, 
-      transitionRate2,transitionRate3,transitionRate4, threshold = 0.1,tranProb,Rm,Rp,inbred,j1122mp,j1211mp,j1213mp,j1222mp,j1232mp},
+    Module[ {startProb, rr, transitionRate, transitionRate2,transitionRate3,transitionRate4, 
+    	threshold = 0.1,tranProb,Rm,Rp,inbred,j1122mp,j1211mp,j1213mp,j1222mp,j1232mp},
         {inbred,j1122mp,j1211mp,j1213mp,j1222mp,j1232mp} = juncdist;
         Rm = 2 j1222mp + j1122mp + j1232mp;
         Rp = 2 j1211mp + j1122mp +j1213mp;
@@ -114,7 +114,8 @@ calMarkovProb[deltd_, model_, nFounder_, juncdist_] :=
           "depModel",
           startProb = Flatten[Outer[List, Range[nFounder], Range[nFounder]], 1];
           startProb = startProb /. {{x_, x_} :> 1./nFounder, {_, _} -> 0};
-          tranProb = Map[depTransitionProb[#, nFounder, Mean[{Rm,Rp}]] &, deltd,{2}];        
+          (*tranProb = Table[depTransitionProb[deltd[[i,j]], nFounder, Mean[{Rm,Rp}]], {i,Length[deltd]},{j,Length[deltd[[i]]]}];*)
+          tranProb = Map[depTransitionProb[#, nFounder, Mean[{Rm,Rp}]] &, deltd,{2}];
         ];
         {startProb, tranProb}
     ]  
@@ -266,7 +267,7 @@ magicSNPLikelihood[founderHaplo_, obsGeno_, epsF_, eps_, posA_, posX_, gender_] 
 
 End[]
 
-SetAttributes[#, {Protected,ReadProtected}]&/@ Names["MagicModel`*"];
+SetAttributes[#, {Protected,ReadProtected}]&/@ Names["MagicReconstruct`MagicModel`*"];
 
 EndPackage[]
 

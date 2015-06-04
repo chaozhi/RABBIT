@@ -17,8 +17,8 @@ Mathematica package for Reconstructing Ancestry Blocks BIT by bit in mapping pop
 ##References
 ##
 
-Zheng, C., Boer, M. P., and Eeuwijk, F. A. 2015. Reconstruction of genome ancestry blocks in multiparental populations. Submitted. 
+Zheng, C., Boer, M. P., and Eeuwijk, F. A. 2015. Reconstruction of genome ancestry blocks in multiparental populations. Genetics. 
 
-Zheng, C. 2015. Modeling X-linked ancestral origins in multiparental populations. G3: Genes | Genomes | Genetics. Early online. 
+Zheng, C. 2015. Modeling X-linked ancestral origins in multiparental populations. G3: Genes | Genomes | Genetics. 5: 777-801. 
 
 Zheng, C., Boer, M. P., and Eeuwijk, F. A. 2014. A general modeling framework for genome ancestral origins in multi-parental populations. Genetics. 198: 87-101.

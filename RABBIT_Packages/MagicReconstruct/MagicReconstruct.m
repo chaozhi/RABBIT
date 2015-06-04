@@ -2,7 +2,7 @@
 
 (* Created by the Wolfram Workbench Mar 18, 2014 *)
 
-BeginPackage["MagicReconstruct`",{"ContinuousTimeHmm`","MagicReconstruct`DataProcess`","MagicModel`","MagicAlgorithm`"}]
+BeginPackage["MagicReconstruct`",{"ContinuousTimeHmm`","MagicReconstruct`DataProcess`","MagicReconstruct`MagicModel`","MagicReconstruct`MagicAlgorithm`"}]
 (* Exported symbols added here with SymbolName::usage *) 
 
 Unprotect @@ Names["MagicReconstruct`*"];
