@@ -22,7 +22,7 @@ Zheng, C., Boer, M. P., and Eeuwijk, F. A. 2014. A general modeling framework fo
 
 Zheng, C. 2015. Modeling X-linked ancestral origins in multiparental populations. G3: Genes | Genomes | Genetics. 5: 777-801. 
 
-Zheng, C., Boer, M. P., and Eeuwijk, F. A. 2015. Reconstruction of genome ancestry blocks in multiparental populations. Genetics. 
+Zheng, C., Boer, M. P., and Eeuwijk, F. A. 2015. Reconstruction of genome ancestry blocks in multiparental populations. Genetics. 200: 1073-1087. 
 
 Zheng, C., Boer, M. P., and Eeuwijk, F. A. 2018. Recursive algorithms for modeling genome blocks in a fixed pedigree. Manuscript.
 
