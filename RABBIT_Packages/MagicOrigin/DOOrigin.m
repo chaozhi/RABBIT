@@ -102,16 +102,17 @@ origSummaryDO[nPower_, preCCfreq_, crossPopSize_, gCross_, crossScheme_] :=
       founderalpha12, founderR, finb, mapR,sumRho, juncRho},
         inigamma12 = {1, 1};
         iniR = nPower - 2;
-        freq[[All, 2]] = Normalize[freq[[All, 2]], Total];
+        {inigamma12,iniR}=N[{inigamma12,iniR}];
+        freq[[All, 2]] = N[Normalize[freq[[All, 2]], Total]];
         founderalpha12 = Total[#[[2]] sibIBDProb2[inigamma12, #[[1]]][[1]] & /@ freq];
         founderR = Total[#[[2]] sibmapExpansion[inigamma12, iniR, #[[1]]] & /@ freq];
-        coalProb = getCoalProb2[crossScheme, crossPopSize];
+        coalProb = N[getCoalProb2[crossScheme, crossPopSize]];
         nStrain = 2^nPower;
         finb = inbredProbDO[founderalpha12, nStrain, coalProb, gCross];
         mapR = mapExpansionDO[founderalpha12, founderR, nStrain, coalProb, gCross];
         sumRho = sumJuncDensityDO[founderalpha12, founderR, nStrain, coalProb,gCross];
         juncRho = juncDensityDO[founderalpha12, founderR, nStrain, coalProb, gCross];
-        N[{finb, mapR, sumRho, juncRho}]
+        {finb, mapR, sumRho, juncRho}
     ]
     
 magicOrigPriorDO[nPower_, preCCfreq_, crossPopSize_, gCross_, crossScheme_]:=

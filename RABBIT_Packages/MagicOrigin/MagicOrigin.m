@@ -46,6 +46,11 @@ magicBasicRate::usage = "magicBasicRate  "
 Begin["`Private`"]
 (* Implementation of the package *)
 
+(*mateScheme[[i]] refers to the mating scheme producing generation t=i=1,...tmax;
+isRandomSelfing[[i]] refers whether the mateScheme[[i]] allows selfing or not;
+popSize[[i]] refers to the population in generation t=i-1=0,...tmax;
+*)
+
 getSelfing::wrongscheme :=
     "Wrong mating scheme `1`!"
 
@@ -93,31 +98,31 @@ getPopSize[scheme_, preSize_] :=
     ]   
                       
 getCoalProb2[scheme_, preSize_] :=
-	Module[{nowsize},
-    Which[
-       StringMatchQ[scheme, "Selfing" ~~ DigitCharacter .. ~~ "-" ~~ DigitCharacter ..],
-       1,
-       StringMatchQ[scheme, "WF-NE"|"RM1-NE"|"RM11-NE"~~ "" | "-" ~~DigitCharacter ...],
-       1/preSize,
-       StringMatchQ[scheme, "RM2-NE"~~ "" | "-" ~~DigitCharacter ...],
-       nowsize=getPopSize[scheme, preSize];
-       1/(2 (nowsize - 1)) + (1 - 1/(nowsize - 1)) 1/preSize,
-       StringMatchQ[scheme, "WF-E"~~ "" | "-" ~~DigitCharacter ...],
-       1/(2 preSize),  
-       StringMatchQ[scheme, "RM1-E"|"RM11-E"|"RM2-E"~~ "" | "-" ~~DigitCharacter ...],
-       1/(2 (preSize-1)),  
-       True,
-       Switch[scheme,
-            "Pairing", 0,
-            "Selfing", 1,
-            "Sibling", 1/2,
-            "HalfDiallel",1/(preSize + 1),
-            "FullDiallel",(2 (preSize - 1) - 1)/(preSize (preSize - 1) - 1) 1/2,
-            _, Print["getCoalProb2::Wrong mating scheme ",scheme];
-               Beep[];
-               Abort[];
-       ]
-    ]
+    Module[ {nowsize},
+        Which[
+           StringMatchQ[scheme, "Selfing" ~~ DigitCharacter .. ~~ "-" ~~ DigitCharacter ..],
+           1,
+           StringMatchQ[scheme, "WF-NE"|"RM1-NE"|"RM11-NE"~~ "" | "-" ~~DigitCharacter ...],
+           1/preSize,
+           StringMatchQ[scheme, "RM2-NE"~~ "" | "-" ~~DigitCharacter ...],
+           nowsize = getPopSize[scheme, preSize];
+           1/(2 (nowsize - 1)) + (1 - 1/(nowsize - 1)) 1/preSize,
+           StringMatchQ[scheme, "WF-E"~~ "" | "-" ~~DigitCharacter ...],
+           1/(2 preSize),  
+           StringMatchQ[scheme, "RM1-E"|"RM11-E"|"RM2-E"~~ "" | "-" ~~DigitCharacter ...],
+           1/(2 (preSize-1)),  
+           True,
+           Switch[scheme,
+                "Pairing", 0,
+                "Selfing", 1,
+                "Sibling", 1/2,
+                "HalfDiallel",1/(preSize + 1),
+                "FullDiallel",(2 (preSize - 1) - 1)/(preSize (preSize - 1) - 1) 1/2,
+                _, Print["getCoalProb2::Wrong mating scheme ",scheme];
+                   Beep[];
+                   Abort[];
+           ]
+        ]
     ]
     
 
@@ -130,11 +135,14 @@ getCoalProb3[scheme_, preSize_] :=
             StringMatchQ[scheme, "WF-NE"|"RM1-NE"|"RM11-NE"~~ "" | "-" ~~DigitCharacter ...],
             1/preSize (1 - 1/preSize),
             StringMatchQ[scheme, "RM2-NE"~~ "" | "-" ~~DigitCharacter ...],
-            nowsize=getPopSize[scheme, preSize];
-            temp = 1-1/(nowsize-2)-(1-2/(nowsize-2))/preSize;
-            temp*=(1 - 1/(nowsize - 1)) 1/preSize;
-            temp+=1/(2 (nowsize - 1)) (1-1/preSize);
-            temp,
+            nowsize = getPopSize[scheme, preSize];
+            If[ nowsize<=2,
+                temp = 0,
+                temp = 1-1/(nowsize-2)-(1-2/(nowsize-2))/preSize;
+                temp*=(1 - 1/(nowsize - 1)) 1/preSize;
+                temp+=1/(2 (nowsize - 1)) (1-1/preSize);
+                temp
+            ],
             StringMatchQ[scheme, "WF-E"~~ ""|"-" ~~DigitCharacter ...],
             1/(2 preSize),  
             StringMatchQ[scheme, "RM1-E"|"RM11-E"|"RM2-E"~~ "" | "-" ~~DigitCharacter ...],
@@ -161,45 +169,51 @@ getCoalProb3[scheme_, preSize_] :=
     ]
 
 (*
-getfounderGamma12[isInbredFounder_] :=
+getfounderIBD12[isInbredFounder_] :=
     {1 - Boole[isInbredFounder],1}    
     
-getfounderGamma123[isInbredFounder_,nFounder_] :=
+getfounderIBD123[isInbredFounder_,nFounder_] :=
     {1 - Boole[isInbredFounder],Boole[nFounder>= 3]}    
 *)
     
-nonIBDProb2[isRandomSelfing_, founderGamma12_,coalProb2_,popSize_] :=
-    Module[ {a, b,selfprob,t},
+nonIBDProb2[isRandomSelfing_, founderIBD12_,coalProb2_,popSize_] :=
+    Module[ {a, b,t,na = "NA"},
          (*calculate non-IBD probability Alpha(12) and Beta(12) by recurrent equation*)
         a = b = Table[0, {Length[coalProb2]}];
-        {a[[1]],b[[1]]} = founderGamma12;
+        {a[[1]],b[[1]]} = founderIBD12;
         Do[
          If[ popSize[[t]] >= 2,
-             b[[t]] = coalProb2[[t]]/2 a[[t - 1]] + (1 - coalProb2[[t]]) b[[t - 1]];
+             b[[t]] = coalProb2[[t]]/2 a[[t - 1]] + (1 - coalProb2[[t]]) b[[t - 1]],
+             b[[t]] = na
          ];
          a[[t]] = If[ isRandomSelfing[[t-1]],
                        (*"WF-*" or "Selfing"*)
-                      selfprob = 1/popSize[[t]];
-                      selfprob/2 a[[t - 1]] + (1 - selfprob) b[[t - 1]],
+                       (*if popSize[[t-1]]==1, coalProb2[[t]]=1*)
+                      coalProb2[[t]]/2 a[[t - 1]] + (1 - coalProb2[[t]]) b[[t - 1]],
                       b[[t - 1]]
-                  ], {t, 2, Length[a]}];
-        (*Alpha(11)=1-Alpha(12)*)
+                  ];
+         0, {t, 2, Length[a]}];
         {a, b}
     ]
 
-nonIBDProb3[isRandomSelfing_, founderGamma123_,coalProb2_, coalProb3_, popSize_] :=
-    Module[ {a, b, t},
+nonIBDProb3[isRandomSelfing_, founderIBD123_,coalProb2_, coalProb3_, popSize_] :=
+    Module[ {a, b, t,na = "NA"},
         (*calculate non-IBD probability a=Alpha(123) and b= Beta(123) by recurrent equation*)
         a = b = Table[0, {Length[coalProb2]}];
-        {a[[1]],b[[1]]} = founderGamma123;
+        {a[[1]],b[[1]]} = founderIBD123;
         Do[
          If[ popSize[[t]] >= 3,
-             b[[t]] = 3/2 coalProb3[[t]] a[[t - 1]] + (1 - coalProb2[[t]]- 2 coalProb3[[t]]) b[[t - 1]];
+             b[[t]] = 3/2 coalProb3[[t]] a[[t - 1]] + (1 - coalProb2[[t]]- 2 coalProb3[[t]]) b[[t - 1]],
+             b[[t]] = na
          ];
-         a[[t]] = If[ isRandomSelfing[[t-1]],
-                      b[[t]],
-                      coalProb2[[t]] a[[t - 1]] + (1 - 2 coalProb2[[t]]) b[[t - 1]]
-                  ], {t, 2, Length[a]}];
+         If[ popSize[[t]] >= 2,
+             a[[t]] = If[ isRandomSelfing[[t-1]],
+                          3/2 coalProb3[[t]] a[[t - 1]] + (1 - coalProb2[[t]]- 2 coalProb3[[t]]) b[[t - 1]] Boole[popSize[[t-1]] >= 3],
+                          coalProb2[[t]] a[[t - 1]] + (1 - 2 coalProb2[[t]]) b[[t - 1]] Boole[popSize[[t-1]] >= 3]
+                      ],
+             a[[t]] = na
+         ];
+         0, {t, 2, Length[a]}];
         {a, b}
     ]
     
@@ -246,29 +260,29 @@ junc1122[isRandomSelfing_, founderJK1122_,coalProb2_, mapR_] :=
         {a, b}
     ]
 
-inbredProb[isRandomSelfing_, founderGamma12_,coalProb2_,popSize_] :=
-    1-First[nonIBDProb2[isRandomSelfing, founderGamma12, coalProb2,popSize]]
+inbredProb[isRandomSelfing_, founderIBD12_,coalProb2_,popSize_] :=
+    1-First[nonIBDProb2[isRandomSelfing, founderIBD12, coalProb2,popSize]]
 
-mapExpansion[isRandomSelfing_,founderGamma12_, founderR_,coalProb2_,popSize_] :=
+mapExpansion[isRandomSelfing_,founderIBD12_, founderR_,coalProb2_,popSize_] :=
     Module[ {alpha12},
-        alpha12 = First[nonIBDProb2[isRandomSelfing, founderGamma12,coalProb2,popSize]];
+        alpha12 = First[nonIBDProb2[isRandomSelfing, founderIBD12,coalProb2,popSize]];
         founderR+Prepend[Most[Accumulate[alpha12]], 0]
     ]
       
           
-sumJuncDensity[isRandomSelfing_, founderGamma12_, founderR_,founderJK1122_,coalProb2_,popSize_] :=
+sumJuncDensity[isRandomSelfing_, founderIBD12_, founderR_,founderJK1122_,coalProb2_,popSize_] :=
     Module[ {mapR,j1122},
-        mapR = mapExpansion[isRandomSelfing, founderGamma12,founderR,coalProb2,popSize];
+        mapR = mapExpansion[isRandomSelfing, founderIBD12,founderR,coalProb2,popSize];
         j1122 = First[junc1122[isRandomSelfing,founderJK1122, coalProb2, mapR]];
         2 mapR - j1122
     ]   
        
     
-juncDensity[isRandomSelfing_, founderGamma12_,founderGamma123_, founderR_,founderJK1122_,founderJK1232_, coalProb2_,coalProb3_, popSize_] :=
+juncDensity[isRandomSelfing_, founderIBD12_,founderIBD123_, founderR_,founderJK1122_,founderJK1232_, coalProb2_,coalProb3_, popSize_] :=
     Module[ {mapR,alpha12, alpha123,j1232,j1222,j1122},
-        mapR = mapExpansion[isRandomSelfing, founderGamma12,founderR,coalProb2,popSize];
-        alpha12 = First[nonIBDProb2[isRandomSelfing, founderGamma12, coalProb2,popSize]];
-        alpha123 = First[nonIBDProb3[isRandomSelfing, founderGamma123,coalProb2, coalProb3, popSize]];
+        mapR = mapExpansion[isRandomSelfing, founderIBD12,founderR,coalProb2,popSize];
+        alpha12 = First[nonIBDProb2[isRandomSelfing, founderIBD12, coalProb2,popSize]];
+        alpha123 = First[nonIBDProb3[isRandomSelfing, founderIBD123,coalProb2, coalProb3, popSize]];
         j1232 = First[junc1232[isRandomSelfing, founderJK1232,coalProb2, alpha123]];
         j1122 = First[junc1122[isRandomSelfing,founderJK1122, coalProb2, mapR]];
         (*alpha121 = (alpha12-alpha123)/2;
@@ -277,7 +291,7 @@ juncDensity[isRandomSelfing_, founderGamma12_,founderGamma123_, founderR_,founde
         {j1122,j1222,j1232}
     ]
 
-origSummary[nFounder_, mateScheme_, founderGamma12_, founderGamma123_, founderR_, founderJK1122_, founderJK1232_] :=
+origSummary[nFounder_, mateScheme_, founderIBD12_, founderIBD123_, founderR_, founderJK1122_, founderJK1232_] :=
     Module[ {isRandomSelfing, nGeneration, popSize, coalProb2, coalProb3, 
       finb, mapR, sumRho, juncRho, t},
         nGeneration = Length[mateScheme] + 1;
@@ -288,34 +302,36 @@ origSummary[nFounder_, mateScheme_, founderGamma12_, founderGamma123_, founderR_
         coalProb3 = ConstantArray[0, nGeneration];
         Do[coalProb2[[t]] = getCoalProb2[mateScheme[[t - 1]], popSize[[t - 1]]];
            coalProb3[[t]] = getCoalProb3[mateScheme[[t - 1]], popSize[[t - 1]]], {t, 2, Length[coalProb2]}];
-        finb = inbredProb[isRandomSelfing, founderGamma12, coalProb2, popSize];
-        mapR = mapExpansion[isRandomSelfing, founderGamma12, founderR, coalProb2, popSize];
-        sumRho = sumJuncDensity[isRandomSelfing, founderGamma12,founderR,founderJK1122, coalProb2, popSize];
+        finb = inbredProb[isRandomSelfing, founderIBD12, coalProb2, popSize];
+        mapR = mapExpansion[isRandomSelfing, founderIBD12, founderR, coalProb2, popSize];
+        sumRho = sumJuncDensity[isRandomSelfing, founderIBD12,founderR,founderJK1122, coalProb2, popSize];
         (*{j1122,j1222,j1232}*)
-        juncRho = juncDensity[isRandomSelfing, founderGamma12, founderGamma123, 
-        	founderR, founderJK1122, founderJK1232, coalProb2, coalProb3, popSize];
+        juncRho = juncDensity[isRandomSelfing, founderIBD12, founderIBD123, 
+            founderR, founderJK1122, founderJK1232, coalProb2, coalProb3, popSize];
         {finb, mapR, sumRho, juncRho}
     ]
 
-origSummary[nFounder_, mateScheme_] :=
-    Module[ {isInbredFounder = True, founderGamma12, founderGamma123, 
+origSummary[nFounder_, mateScheme_,isInbredFounder_:True] :=
+    Module[ {founderIBD12, founderIBD123, 
       founderR, founderJK1122, founderJK1232},
-        founderGamma12 = {1-Boole[isInbredFounder], 1};
-        founderGamma123 = {1-Boole[isInbredFounder], Boole[nFounder >= 3]};
+        founderIBD12 = {1-Boole[isInbredFounder], 1};
+        founderIBD123 = {1-Boole[isInbredFounder], Boole[nFounder >= 3]};
         founderR = 0;
-        founderJK1122 = founderJK1232 = {0, 0};        
-        origSummary[nFounder, mateScheme, founderGamma12, founderGamma123, 
+        founderJK1122 = founderJK1232 = {0, 0};
+        (*{founderIBD12, founderIBD123,founderR, founderJK1122, founderJK1232} = N[{founderIBD12, founderIBD123, 
+         founderR, founderJK1122, founderJK1232}];*)
+        origSummary[nFounder, mateScheme, founderIBD12, founderIBD123, 
          founderR, founderJK1122, founderJK1232]
     ]
 
-magicOrigPrior[nFounder_, mateScheme_]:=
-	Module[{temp,inbred,j1122,j1222,j1232,j1211,j1213},    
-		temp = origSummary[nFounder, mateScheme];
-        {inbred,j1122,j1222,j1232}=N[Prepend[temp[[4, All, -1]], temp[[1, -1]]]];
+magicOrigPrior[nFounder_, mateScheme_,isInbredFounder_:True] :=
+    Module[ {temp,inbred,j1122,j1222,j1232,j1211,j1213},
+        temp = origSummary[nFounder, mateScheme,isInbredFounder];
+        {inbred,j1122,j1222,j1232} = N[Prepend[temp[[4, All, -1]], temp[[1, -1]]]];
         (*{inbred,j1122mp,j1211mp,j1213mp,j1222mp,j1232mp} *)
-        {j1211,j1213}={j1222,j1232};
-        {inbred,j1122,j1211,j1213,j1222,j1232}    
-	]
+        {j1211,j1213} = {j1222,j1232};
+        {inbred,j1122,j1211,j1213,j1222,j1232}
+    ]
       
 magicStationaryProb[nFgl_,inbredf_] :=
     Module[ {prob},

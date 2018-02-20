@@ -2,126 +2,91 @@
 
 (* Created by the Wolfram Workbench Mar 18, 2014 *)
 
-BeginPackage["MagicReconstruct`",{"ContinuousTimeHmm`","MagicReconstruct`DataProcess`","MagicReconstruct`MagicModel`","MagicReconstruct`MagicAlgorithm`"}]
+BeginPackage["MagicReconstruct`",{"MagicDefinition`","ContinuousTimeHmm`","MagicDataPreprocess`",
+    "MagicReconstruct`MagicModel`","MagicReconstruct`MagicLikelihood`",
+    "MagicReconstruct`MagicAlgorithm`"}]
 (* Exported symbols added here with SymbolName::usage *) 
 
 Unprotect @@ Names["MagicReconstruct`*"];
 ClearAll @@ Names["MagicReconstruct`*"];
 
-HMMMethod::usage = "HMMMethod is an option to specify the alogrithm used for Hidden Markov Model, it has to be one of \"origPathSampling\", \"origPosteriorDecoding\", or \"origViterbiDecoding\". "
+magicReconstruct::usage = "magicReconstruct[magicsnp, model, popdesign] performs haplotype reconstruction in multi-parental populations. The magicsnp specifies the input genotypic data matrix or filename. The model specifies whether the maternally and patermally derived chromosomes are indepdent (\"indepModel\"), completely dependent (\"depModel\"), or  modeled jointly (\"jointModel\"). The popdesign speficies the breeding design information in several possible ways: a list of mating schemes from founder population to the last generation, a list of values denoting the junction distribution, or a filename for population pedigree information. "
 
-SampleSize::usage = "SampleSize is an option to specify the sample size when by default Method->origPathSampling. By default, SampleSize->1000."
+reconstructAlgorithm::usage = "reconstructAlgorithm is an option to specify the alogrithm for haplotype reconstruction, it must be be one of \"origPathSampling\", \"origPosteriorDecoding\", or \"origViterbiDecoding\". "
 
-PrintTimeElapsed::usage = "PrintTimeElapsed is an option to secify whether to print time elapsed."
+outputSmooth::usage = "outputSmooth is an option to smooth the posterior probabilities when Method->origPosteriorDecoding by grouping nearby snps so that the length of snp clusters < outputSmooth (in cM) except for singleton clusters. By default, outputSmooth ->0. "
 
-magicReconstruct::usage = "magicReconstruct[magicSNP, model, epsF, eps, popDesign, outputfile] reconstructs the ancestral origins in multi-parental populations. magicSNP is the input marker data, which are analyzed under the model using a HMM algorithm HMMMethod. The parameters epsF and eps refer to the allelic typing errors for founders and sampled individuals, respectively. The parameter popDesign can be either a list of mating schemes of the mapping population until the last generation, or the list of values denoting the junction distribution. The results are saved in outputfile. \n magicReconstruct[magicSNPfile, model, epsF, eps, popDesign, outfile] where the input marker data are privided as the filename magicSNPfile."
+saveAsSummaryMR::usage = "saveAsSummaryMR[resultFile, summaryFile] produces a summary of the resultFile produced by magicReconstruct, and saves in summaryFile."
 
-saveAsSummaryMR::usage = "saveAsSummaryMR[resultFile, summaryFile] produces a summary of the output results from magicReconstruct, and save in summaryFile."
+saveCondProb::usage = "saveCondProb[resultFile, summaryFile,probtype] extracts conditional probabilites of type probtype from the resultFile produced by magicReconstruct, and saves in summaryFile."
 
 getSummaryMR::usage = "getSummaryMR[summaryFile] imports the summaryFile produced by saveAsSummaryMR."
 
-origGenotypes::usage = "origGenotypes[nFounder] gives {{genotypes, diplotypes}, {geno2diplo, diplo2geno}}.  The genotypes and diplotypes are the definitions where the inbred founders are labeled by natural numbers starting from 1,geno2diplo gives the mapping from genotypes to dipotypes, and diplo2geno gives the mapping from diplotypes to genotypes."
+getCondProb::usage = "getCondProb[summaryFile] gives conditional probabilities of L^2 diplotypes for each offspring, where L is the number of FGLs, and summaryFile is the summaryFile produced by saveAsSummaryMR."
 
-bestAncestry::usage = "bestAncestry[prob] gives the ancestral state calls by maximum posterior diplotype/genotype/haplotype probabilities.  "
+toGenoProb::usage = "toGenoProb[diploprob] transfers conditional probabilities from L^2 diplotypes into L(L+1)/2 genotypes for each offspring, where L is the number of FGLs."
 
-toGenoprob::usage = "toGenoprob[diploprob] transfers conditional probabilities from L^2 diplotypes into L(L+1)/2 genotypes, where L is the number of inbred founder."
+toHaploProb::usage = "toHaploProb[genoprob] transfers conditional probabilities from L(L+1)/2 genotypes into L haplotypes for each offspring, where L is the number of FGLs."
 
-toHaploprob::usage = "toHaploprob[genoprob] transfers conditional probabilities from L(L+1)/2 genotypes into L haplotypes, where L is the number of inbred founder."
+toIBDProb::usage = "toIBDProb[genoprob] transfers conditional probabilities from L(L+1)/2 genotypes into one IBD probability for each offspring, where L is the number of FGLs."
 
 calOrigLogl::usage = "calOrigLogl[magicSNP, model, epsF, eps, popDesign] calculates the marginal likelihood. "
 
 calOrigGeneration::usage = "calOrigGeneration[magicSNP, model, epsF, eps, Fmin, popDesignMax] calculates the posterior probabilities of the sample generation. "
 
+calAddKinship::usage = "calAddKinship[haploprobfile, ibdprobfile, outputkinshipfile] calculates kinship matrix from the inputfile of haplotype probability and the inputfile of ibd probability. "
+
+plotAncestryProbGUI::usage = "plotAncestryProbGUI[summaryfile, trueFGLdiplofile] or plotAncestryProbGUI[summaryfile] returns an animate for visualizing posterior probability. The summaryfile is the outputfile returned by saveAsSummaryMR.  "
+
+isPlotGenoProb::usage = "isPlotGenoProb is an option to specify whether to plot genotype probability (True) or haplotype probability (False). "
+
+
 Begin["`Private`"]
 (* Implementation of the package *)
-
-(*diplotypes refer to a single locus, phased genotypes*)
-(*geno2diplo[[i]] refer to the index of the ith genotype, in the diplotypes*)
-origGenotypes[nFounder_] :=
-    Module[ {genotypes,diplotypes,geno2diplo,diplo2geno, i,j},
-        diplotypes = Flatten[Outer[List, Range[nFounder], Range[nFounder]], 1];
-        (*lower triangular matrix*)
-        genotypes = Flatten[Table[{i, j}, {i, nFounder}, {j, i}], 1];
-        diplo2geno = Flatten[Position[genotypes, #, {1}, 1] & /@ (Sort[#, Greater] & /@diplotypes)];
-        geno2diplo = {#[[All, 1]], #[[1, 2]]} & /@ 
-            SplitBy[SortBy[Transpose[{Range[Length[diplotypes]], diplo2geno}], Last],Last];
-        geno2diplo = geno2diplo[[All, 1]];
-        {{genotypes,diplotypes},{geno2diplo,diplo2geno}}
-    ]
-
-(*diploprob[[i,j]]: a list of diplotype probabilities at marker j of linkage group i, for a given indvidual*)
-(*also works if there are no level of linkage groups, also works if there are additonal level of individuals*)    
-toGenoprob[diploprob_] :=
-    Module[ {depth,len,nFounder, geno2diplo, genoprob, f},
-        depth = Depth[diploprob];
-        len = Union[Flatten[Map[Length, diploprob, {depth - 2}]]];
-        nFounder = Sqrt[First[len]];
-        If[ ! (Length[len] == 1 && IntegerQ[nFounder]),
-            Print["toGenoprob: the argument is not an array of diplotype probabilities!"];
-            Abort[]
-        ];
-        geno2diplo = origGenotypes[nFounder][[2,1]];
-        f = Function[{x}, Total[x[[#]] & /@ geno2diplo, {2}]];
-        genoprob = Map[f, diploprob, {depth - 2}];
-        genoprob
-    ]
-
-toHaploprob[genoprob_] :=
-    Module[ {depth, len, nFounder, genotypes, mtx,haploprob,x,i,j},
-        depth = Depth[genoprob];
-        len = Union[Flatten[Map[Length, genoprob, {depth - 2}]]];
-        nFounder = Solve[x (x + 1)/2 == First[len] && x > 0, x][[1, 1, 2]];
-        If[ ! (Length[len] == 1 && IntegerQ[nFounder]),
-            Print["toGenoprob: the argument is not an array of unphased genotype probabilities!"];
-            Abort[]
-        ];
-        genotypes = origGenotypes[nFounder][[1, 1]];
-        mtx = ConstantArray[0, {Length[genotypes], nFounder}];
-        Do[mtx[[i, genotypes[[i, j]]]] += 1, {i, Length[genotypes]}, {j,Dimensions[genotypes][[2]]}];
-        mtx = Transpose[mtx]/Dimensions[genotypes][[2]];
-        haploprob = Map[mtx.# &, genoprob, {depth - 2}];
-        haploprob
-    ]
-
-(*prob[[i,j]]: a list of (haplotype/genotype/diplotype) probabilities at marker j of linkage group i for a given individual*)
-(*return res[[i,j]] ={indices,max}, the positions of the max probability, for prob[[i,j]]*)
-(*also works if there are no level of linkage groups, also works if there are additonal level of individuals*)  
-bestAncestry[prob_] :=
-    Map[{N[Max[#]], Flatten[Position[#, Max[#], {1}, Heads -> False]]} &, Round[prob, 10^(-5)], {Depth[prob] - 2}]
- 
-
+     
 Options[magicReconstruct] = {
-    HMMMethod -> "origPathSampling",
-    SampleSize -> 1000,
-    PrintTimeElapsed ->False
+    founderAllelicError -> 0.005,
+    offspringAllelicError -> 0.005, 
+    isFounderInbred -> True,
+    reconstructAlgorithm -> "origPathSampling",
+    sampleSize -> 1000,
+    sequenceDataOption ->{
+        isOffspringAllelicDepth -> Automatic,
+        minPhredQualScore -> 30
+        },
+    outputSmooth ->0,
+    outputFileID -> "", 
+    isPrintTimeElapsed ->True    
 }
-
+            
 magicReconstruct::wrongMethod :=
-    "The option HMMMethod has to take \"origPathSampling\", \"origPosteriorDecoding\", or \"origViterbiDecoding\"."
+    "The option reconstructAlgorithm has to take \"origPathSampling\", \"origPosteriorDecoding\", or \"origViterbiDecoding\"."
 
 magicReconstruct::wrongModel :=
     "The 2nd model input parameter has to take \"jointModel\", \"indepModel\", or \"depModel\"."
-           
-magicReconstruct[magicSNPfile_String, model_String, epsF_?NonNegative, eps_?NonNegative,
-    popDesign_, outfile_String, opts : OptionsPattern[]] :=
-    Module[ {magicSNP},
-        If[ !MemberQ[{"jointModel","indepModel","depModel"},model],
-            Message[magicReconstruct::wrongModel];
-            Return[$Failed]
-        ];
-        magicSNP = Import[magicSNPfile,"CSV"];
-        SNPValidation[magicSNP];
-        magicReconstruct[magicSNP,model, epsF, eps, popDesign, outfile, opts]
-    ]  
 
-magicReconstruct[magicSNP_List,model_String, epsF_?NonNegative, eps_?NonNegative,
-    popDesign_, outputfile_String, opts : OptionsPattern[]] :=
-    Module[ {algorithmname,samplesize, isprint,starttime,deltd, nFounder,posA,posX,genders,founderid,sampleid,snpMap,outstream,
-            startProb, tranProb, juncdist,startProbAutosome,tranProbAutosome,startProbFemale, tranProbFemale,startProbMale, tranProbMale,
-            founderHaplo, obsGeno, dataProb, res,ind,diplotypes,haplotodiplo,prob},
-        {algorithmname, samplesize,isprint} = OptionValue@{HMMMethod, SampleSize,PrintTimeElapsed};
+magicReconstruct[inputmagicSNP_?(ListQ[#] ||StringQ[#]&),model_String,inputpopDesign_?(ListQ[#] ||StringQ[#]&), opts : OptionsPattern[]] :=
+    Module[ {magicSNP = inputmagicSNP, popDesign = inputpopDesign,isfounderdepth = False,epsF,eps,isfounderinbred,sampleLabel,sampleMarkovProcess, 
+        outputfile,outputid,algorithmname,samplesize, outputsmooth,isprint,isoffspringdepth,minphredscore,starttime,deltd, 
+        nFounder,nFgl,posA,posX,foundergender,offspringgender,founderid,sampleid, snpMap,haploMap,outstream, founderHaplo, 
+        derivedGeno,obsGeno, res,ind, diplotypes,haplotodiplo,printstep,weights,clusters,clusterhaploMap},
+        {epsF,eps} = OptionValue@{founderAllelicError,offspringAllelicError};
+        {isoffspringdepth,minphredscore} = OptionValue[Thread[sequenceDataOption -> {isOffspringAllelicDepth,minPhredQualScore}]];
+        {isfounderinbred,algorithmname, samplesize,outputsmooth,outputid,isprint} = OptionValue@{
+            isFounderInbred,reconstructAlgorithm, sampleSize,outputSmooth,outputFileID,isPrintTimeElapsed};
+        If[ outputid=!="",
+            outputfile = outputid<>"_magicReconstruct.txt",
+            outputfile = "magicReconstruct.txt"
+        ];
+        If[ isprint,
+            starttime = SessionTime[];
+            Print["magicReconstruct. Start date = ",DateString[], "\toutputfile = ",outputfile];
+        ];
+        If[ isprint&&(!isfounderinbred),
+            PrintTemporary["Important: the genotypes of outbred founders are assumed to be phased! If unphased, perform parental linkage phasing using magicImpute!"];
+        ];
         If[ !MemberQ[{"jointModel","indepModel","depModel"},model],
-            Message[magicReconstruct::wrongModel];
+            Print["magicImputeFounder: model has to take \"jointModel\", \"indepModel\", or \"depModel\"."];
             Return[$Failed]
         ];
         If[ MemberQ[{"origPathSampling", "origPosteriorDecoding", "origViterbiDecoding"},algorithmname],
@@ -129,90 +94,116 @@ magicReconstruct[magicSNP_List,model_String, epsF_?NonNegative, eps_?NonNegative
             Message[magicReconstruct::wrongMethod];
             Return[$Failed]
         ];
-        SNPValidation[magicSNP];
-        If[ isprint,
-            starttime = SessionTime[];
-            Print["Start date =",DateString[]];
+        If[ StringQ[magicSNP],
+            If[ !FileExistsQ[magicSNP],
+                Print["File ", magicSNP," does not exist!"];
+                Return[$Failed]
+            ];
+            magicSNP = Import[magicSNP,"CSV",Path->Directory[]];
         ];
-        If[ isprint,
-            Print["Pre-computing data probability...","\toutputfile = ",outputfile]
+        If[ StringQ[popDesign],
+            If[ !FileExistsQ[popDesign],
+                Print["File ", popDesign," does not exist!"];
+                Return[$Failed]
+            ];
+            popDesign = Import[inputpopDesign,"CSV",Path->Directory[]];
         ];
-        {deltd, founderHaplo, obsGeno,genders,posA,posX,nFounder,founderid,sampleid,snpMap} = transformMagicSNP[magicSNP];
-        {juncdist,startProbAutosome, tranProbAutosome,startProbFemale, tranProbFemale,startProbMale, tranProbMale} = 
-            magicPriorProcess[snpMap,model,nFounder,popDesign];
-        startProb = tranProb = Table[0,{Length[posA]+Length[posX]}];
-        If[ posA=!={},
-            {startProb[[posA]], tranProb[[posA]]} = {startProbAutosome, tranProbAutosome};
-        ];
-        If[ posA=!={}&&isprint,
-            Print["Prior {f,j1122,j1211,j1213,j1222,j1232} =  ",First[juncdist]];
-        ];
-        If[ posX=!={}&&isprint,
-            Print["Prior {fmp,j1122mp,j1211mp,j1213mp,j1222mp,j1232mp} = ",Last[juncdist]];
-        ];
-        Put[{model,epsF, eps, popDesign,juncdist,algorithmname,genders,posA,posX,founderid,sampleid,snpMap}, outputfile];
+        {isfounderdepth,isoffspringdepth} = checkOptionValue[magicSNP, isfounderdepth, isoffspringdepth,isfounderinbred,isprint];
+        SNPValidation[magicSNP,isfounderinbred,isfounderdepth,isoffspringdepth];
+        (*founderHapo dimensions {nfounder,nchr,nsnp}*)
+        (*obsGeno dimensions     {noffspring,nchr,nsnp}*)
+        {deltd, founderHaplo, obsGeno,snpMap,haploMap,nFounder,posA,posX,foundergender,offspringgender,
+            founderid,sampleid} = transformMagicSNP[magicSNP,isfounderinbred,isfounderdepth,isoffspringdepth];
+        {sampleLabel, sampleMarkovProcess} = sampleDiscretePriorProcess[nFounder, popDesign, isfounderinbred,model, posA, posX, offspringgender, sampleid,deltd];
+        {clusters,weights,clusterhaploMap} = getClusterhaploMap[haploMap,outputsmooth];
         Quiet[Close[outputfile]];
+        Put[outputfile];
         outstream = OpenAppend[outputfile];
-        diplotypes = origGenotypes[nFounder][[1, 2]];
+        Write[outstream,{model,epsF,eps,popDesign,outputfile,algorithmname, samplesize,outputsmooth,isprint,isfounderinbred,isoffspringdepth,
+            foundergender,offspringgender,posA,posX,founderid,sampleid,snpMap,founderHaplo, obsGeno,clusters,weights,clusterhaploMap}];
+        nFgl = nFounder (1 + Boole[! isfounderinbred]);
+        diplotypes = origGenotype[nFgl][[1, 2]];
         haplotodiplo = Flatten[Position[Equal @@ # & /@ diplotypes, True]];
-        Monitor[        
-            Do[
-             If[ isprint,
-                 PrintTemporary["Time elapsed = "<>ToString[Round[SessionTime[] - starttime,0.1]]<>" Seconds. \tStart analyzing line "<>ToString[ind]<>" of "<>ToString[Length[obsGeno]]];
+        printstep = 10^Max[0, IntegerLength[Length[sampleid]] - 2];
+        (*derivedGeno dimensions {nchr,nsnp,ngenotype,nfounder}*)
+        derivedGeno = getDerivedGenotype[founderHaplo, ToLowerCase[model]==="depmodel",True];
+        Monitor[Do[
+             If[ isprint&&Mod[ind,printstep]==0,
+                 PrintTemporary["Time elapsed = "<>ToString[Round[SessionTime[] - starttime,0.1]]<>" Seconds. \tStart analyzing "<>sampleid[[ind]]<>"--"<>ToString[ind]<>"th of "<>ToString[Length[obsGeno]]];
              ];
-             Switch[genders[[ind]],
-                 "Female",
-                 {startProb[[posX]], tranProb[[posX]]} = {startProbFemale, tranProbFemale},
-                 "Male",
-                 {startProb[[posX]], tranProb[[posX]]} = {startProbMale, tranProbMale}                 
-             ];
-             dataProb = magicSNPLikelihood[founderHaplo, obsGeno[[ind]], epsF, eps, posA, posX, genders[[ind]]];
-             res = If[ algorithmname === "origPathSampling",
-                       origalgorithm[startProb, tranProb, dataProb, samplesize],
-                       origalgorithm[startProb, tranProb, dataProb]
-                   ];
-             If[ genders[[ind]] == "Male",
-                 Switch[
-                  algorithmname,
-                  "origPosteriorDecoding",
-                  prob = ConstantArray[0, ReplacePart[Dimensions[res[[posX, 2]]], -1 -> Length[diplotypes]]];
-                  prob[[All, All, haplotodiplo]] = res[[posX, 2]];
-                  res[[posX, 2]] = prob,
-                  "origViterbiDecoding",
-                  res[[posX, 2, ;; -2, 2]] = haplotodiplo[[#]] & /@ res[[posX, 2, ;; -2, 2]],
-                  "origPathSampling",
-                  res[[posX, 2, All, ;; -2, 2]] = Map[haplotodiplo[[#]] &, res[[posX, 2, All, ;; -2, 2]], {2}],
-                  _,
-                  Print["Wrong HMMMethod " <> algorithmname <> "!"];
-                  ]
-             ];
-             PutAppend[res, outstream], {ind, Length[obsGeno]}];
-             , ProgressIndicator[ind, {1, Length[obsGeno]}]
-         ];
+             res = individualReconstruct[ind,model,founderHaplo, derivedGeno,obsGeno,epsF, eps,minphredscore, posA, posX, offspringgender,
+                                        sampleLabel,sampleMarkovProcess,clusters,weights,haplotodiplo,diplotypes,
+                                        isoffspringdepth,algorithmname,outputsmooth,samplesize];
+             Write[outstream,res], {ind, Length[obsGeno]}];
+                0, ProgressIndicator[ind, {1, Length[obsGeno]}]];
         Close[outstream];
         If[ isprint,
-            Print["Done! Finished date =",DateString[], ". \tTime elapsed = ", Round[SessionTime[] - starttime,0.1], " Seconds."]
+            Print["Done! Finished date =",DateString[], ". \tTime elapsed = ", Round[SessionTime[] - starttime,0.1], " Seconds."];
         ];
+        outputfile
     ]
-
-calOrigLogl[magicSNP_List, model_String, epsF_?NonNegative, eps_?NonNegative, popDesign_] :=
-    Module[ {founderHaplo, obsGeno, ind,deltd,nFounder,founderid,sampleid,snpMap,genders,posA,posX,dataProb, logl,
-        startProb,tranProb, juncdist,startProbAutosome, tranProbAutosome,startProbFemale, tranProbFemale,startProbMale, tranProbMale},
-        {deltd, founderHaplo, obsGeno,genders,posA,posX,nFounder,founderid,sampleid,snpMap} = transformMagicSNP[magicSNP];
-        {juncdist,startProbAutosome, tranProbAutosome,startProbFemale, tranProbFemale,startProbMale, tranProbMale} = 
-            magicPriorProcess[snpMap,model,nFounder,popDesign];
-        startProb = tranProb = Table[0,{Length[posA]+Length[posX]}];
-        If[ posA=!={},
-            {startProb[[posA]], tranProb[[posA]]} = {startProbAutosome, tranProbAutosome};
+         
+individualReconstruct[ind_,model_,founderHaplo_, derivedGeno_,obsGeno_,epsF_, eps_, minphredscore_,posA_, posX_, offspringgender_,
+    sampleLabel_,sampleMarkovProcess_,clusters_,weights_,haplotodiplo_,diplotypes_,
+    isoffspringdepth_,algorithmname_,outputsmooth_,samplesize_] :=
+    Module[ {haplocode,diplocode,startProb,tranProb,dataProb,res,temp,prob,i,j},
+    (*haplocode is a permutation of founder genome labels, natural integers starting from 1.*)
+             (*haplocode refers to reordering of haploid states; diplocode refers to reordering of diploid states*)
+             (*ind+1, +1 refers to the column titles ={sampleid, priorlabel(gender/memberID), funnelcode,haplocode,diplocode}*)
+        {haplocode,diplocode} = sampleLabel[[ind+1,4;;5]];
+        {startProb,tranProb} = sampleLabel[[ind+1,2]]/.sampleMarkovProcess;
+        If[ !OrderedQ[haplocode],
+            {startProb,tranProb} = relabelMarkovProcess[{startProb,tranProb}, haplocode,diplocode];
         ];
+        If[ isoffspringdepth,
+            dataProb = lineMagicLikelihoodGBS[model,founderHaplo, derivedGeno,obsGeno[[ind]], epsF, eps,minphredscore, posA, posX, offspringgender[[ind]]],
+            dataProb = lineMagicLikelihood[model,founderHaplo, obsGeno[[ind]], epsF, eps, posA, posX, offspringgender[[ind]]];
+        ];
+        res = If[ algorithmname === "origPathSampling",
+                  origalgorithm[startProb, tranProb, dataProb, samplesize],
+                  origalgorithm[startProb, tranProb, dataProb]
+              ];
+        res = Normal[res];
+        If[ algorithmname === "origPosteriorDecoding"&&outputsmooth>0,
+            temp = res[[All, 2]];
+            res[[All, 2]] = Table[Total[temp[[i, clusters[[i, j]]]] weights[[i, j]]], {i, Length[clusters]}, {j,Length[clusters[[i]]]}];
+            res[[All, 2]] = N[Round[res[[All, 2]], 10^(-5)]];
+        ];
+        If[ offspringgender[[ind]] == "Male"&&(ToLowerCase[model]=!="depmodel"),
+            Switch[
+             algorithmname,
+             "origPosteriorDecoding",
+             prob = ConstantArray[0, ReplacePart[Dimensions[res[[posX, 2]]], -1 -> Length[diplotypes]]];
+             prob[[All, All, haplotodiplo]] = Normal[res[[posX, 2]]];
+             res[[posX, 2]] = prob,
+             "origViterbiDecoding",
+             res[[posX, 2, ;; -2, 2]] = haplotodiplo[[#]] & /@ res[[posX, 2, ;; -2, 2]],
+             "origPathSampling",
+             res[[posX, 2, All, ;; -2, 2]] = Map[haplotodiplo[[#]] &, res[[posX, 2, All, ;; -2, 2]], {2}],
+             _,
+             Print["Wrong reconstructAlgorithm " <> algorithmname <> "!"];
+            ]
+        ];
+        res
+    ]    
+      
+calOrigLogl[inputmagicSNP_List, model_String, epsF_?NonNegative, eps_?NonNegative, inputpopDesign_List] :=
+    Module[ {magicSNP = inputmagicSNP, popDesign = inputpopDesign,isfounderinbred = True,isfounderdepth = False,isoffspringdepth = False,
+        deltd, founderHaplo, obsGeno,foundergender,offspringgender,posA,posX,
+        nFounder,founderid,sampleid,snpMap,haploMap,logl,sampleLabel, sampleMarkovProcess,startProb,tranProb,haplocode,diplocode,dataProb,ind},
+        {deltd, founderHaplo, obsGeno,snpMap,haploMap,nFounder,posA,posX,foundergender,offspringgender,
+            founderid,sampleid} = transformMagicSNP[magicSNP,isfounderinbred,isfounderdepth,isoffspringdepth];
+        {sampleLabel, sampleMarkovProcess} = sampleDiscretePriorProcess[popDesign, nFounder,isfounderinbred, model, posA, posX, offspringgender, sampleid, deltd];
         logl = Table[
-          dataProb = magicSNPLikelihood[founderHaplo, obsGeno[[ind]], epsF, eps, posA, posX, genders[[ind]]];
-          Switch[genders[[ind]],
-                 "Female",
-                 {startProb[[posX]], tranProb[[posX]]} = {startProbFemale, tranProbFemale},
-                 "Male",
-                 {startProb[[posX]], tranProb[[posX]]} = {startProbMale, tranProbMale}                 
-             ];
+          (*haplocode is a permutation of founder genome labels, natural integers starting from 1.*)
+          (*haplocode refers to reordering of haploid states; diplocode refers to reordering of diploid states*)
+          (*ind+1, +1 refers to the column titles ={sampleid, priorlabel(gender/memberID), funnelcode,haplocode,diplocode}*)          
+          {haplocode,diplocode} = sampleLabel[[ind+1,4;;5]];
+          {startProb,tranProb} = sampleLabel[[ind+1,2]]/.sampleMarkovProcess;
+          If[ !OrderedQ[haplocode],
+              {startProb,tranProb} = relabelMarkovProcess[{startProb,tranProb}, haplocode,diplocode];
+          ];
+          dataProb = lineMagicLikelihood[model,founderHaplo, obsGeno[[ind]], epsF, eps, posA, posX, offspringgender[[ind]]];
           origLogLiklihood[startProb, tranProb, dataProb], {ind,Length[obsGeno]}];
         logl
     ]
@@ -247,148 +238,434 @@ calOrigGeneration[magicSNP_List, model_String, epsF_?NonNegative,
             lls = Transpose[Join[{id, Table[{"SchemeIndex", "PosteriorProb"}, {Length[id]}]}, Transpose[lls]]]
         ]
     ]
-  
-csvExport[file_,list_] :=
-    Module[ {ls,str},
-        ls = Riffle[StringReplace[ToString[#], {"{" | "}" -> ""}] & /@ list, "\n"];
-        Put[file];
-        str = OpenAppend[file];
-        WriteString[str, Sequence @@ ls];
-        Close[str];
+
+toIBDProb[genoprob_] :=
+    Module[ {depth, len, nFounder, genotypes, pos,inbred,x,vec},
+        depth = Depth[genoprob];
+        len = Union[Flatten[Map[Last[Dimensions[#]] &, genoprob, {depth - 3}]]];
+        nFounder = Solve[x (x + 1)/2 == First[len] && x > 0, x][[1, 1, 2]];
+        If[ ! (Length[len] == 1 && IntegerQ[nFounder]),
+            Print["toIBDProb: the argument is not an array of unphased genotype probabilities!"];
+            Abort[]
+        ];
+        genotypes = origGenotype[nFounder][[1, 1]];
+        pos = Flatten[Position[genotypes, {x_, x_}]];
+        vec = SparseArray[{}, {Length[genotypes]}];
+        vec[[pos]] = 1;
+        inbred = Map[vec.Transpose[#] &, genoprob, {depth - 3}];
+        N[Round[inbred, 10^(-5)]]
+    ]  
+
+toHaploProb[genoprob_] :=
+    Module[ {depth, len, nFounder, genotypes, mtx,haploprob,x,i,j},
+        depth = Depth[genoprob];
+        len = Union[Flatten[Map[Last[Dimensions[#]] &, genoprob, {depth - 3}]]];
+        nFounder = Solve[x (x + 1)/2 == First[len] && x > 0, x][[1, 1, 2]];
+        If[ ! (Length[len] == 1 && IntegerQ[nFounder]),
+            Print["toGenoProb: the argument is not an array of unphased genotype probabilities!"];
+            Abort[]
+        ];
+        genotypes = origGenotype[nFounder][[1, 1]];
+        mtx = ConstantArray[0, {Length[genotypes], nFounder}];
+        Do[mtx[[i, genotypes[[i, j]]]] += 1, {i, Length[genotypes]}, {j,Dimensions[genotypes][[2]]}];
+        mtx = Transpose[mtx]/Dimensions[genotypes][[2]];
+        haploprob = Map[Transpose[mtx.Transpose[#]] &, genoprob, {depth - 3}];
+        N[Round[haploprob,10^(-5)]]
     ]
-    
-saveAsSummaryMR[resultFile_String?FileExistsQ, summaryFile_String] :=
-    Module[ {res, model, epsF, eps, popDesign,juncdist, genders, posA, posX, nFounder, algorithmname, chrid,logl,logl2,
-      founderid, sampleid, snpmap, genotypes, diplotypes, genoID, genotypes2, haploID, haplotypes2, 
-      genoprob, haploprob, rowID, genoprob2, haploprob2, diploID, diplotypes2, path, summary, diplotohaplo,key = "MagicReconstruct-Summary"},
+  
+(*diploprob[[i,j]]: a list of diplotype probabilities at marker j of linkage group i, for a given indvidual*)
+(*also works if there are no level of linkage groups, also works if there are additonal level of individuals*)    
+toGenoProb[diploprob_] :=
+    Module[ {depth,len,nFounder, geno2diplo, i, mtx},
+        depth = Depth[diploprob];
+        len = Union[Flatten[Map[Last[Dimensions[#]] &, diploprob, {depth - 3}]]];
+        nFounder = Sqrt[First[len]];
+        If[ ! (Length[len] == 1 && IntegerQ[nFounder]),
+            Print["toGenoProb: the argument is not an array of diplotype probabilities!"];
+            Abort[]
+        ];
+        geno2diplo = origGenotype[nFounder][[2, 1]];
+        mtx = SparseArray[{}, {nFounder (nFounder + 1)/2, nFounder^2}];
+        Do[mtx[[i, geno2diplo[[i]]]] = 1, {i, Length[mtx]}];
+        Map[Transpose[mtx.Transpose[#]] &, diploprob, {depth - 3}]
+    ]
+
+(*return diploprob with dimensions: {noffspring, nlinkagegroup,nsnp,nstate=nfgl^2, nfgl (depmodel/maleX)}*)
+getCondProb[resultFile_String?FileExistsQ] :=
+    Module[ {res},
         res = ReadList[resultFile];
-        {model,epsF, eps, popDesign,juncdist,algorithmname,genders,posA,posX,founderid,sampleid,snpmap} = res[[1]];
+        res[[2 ;;, All, 2]]
+    ]
+
+saveAsSummaryMR[resultFile_String?FileExistsQ, summaryFile_String] :=
+    Module[ {res, model,epsF, eps, popDesign,outputid,algorithmname, samplesize,outputsmooth,isprint,isfounderinbred,isoffspringdepth,foundergender,offspringgender,posA,posX,
+        founderid,sampleid,snpMap,founderHaplo, obsGeno,clusters,weights,clusterhaploMap,clustersnpMap, nFounder,chrid,logl,logl2,genotypes, diplotypes, genoID, genotypes2, haploID, haplotypes2, 
+      rowID, genoprob2, haploprob2,ibdprob2, diploID, diplotypes2, path, summary, diplotohaplo,key = "magicReconstruct-Summary",outfile},
+        PrintTemporary["Time used in reading "<>resultFile<>": "
+            <>ToString[Round[AbsoluteTiming[
+         res = ReadList[resultFile];][[1]],0.01]]<>" seconds. "<>DateString[]];
+        {model,epsF,eps,popDesign,outputid,algorithmname, samplesize,outputsmooth,isprint,isfounderinbred,isoffspringdepth,
+            foundergender,offspringgender,posA,posX,founderid,sampleid,snpMap,founderHaplo, obsGeno,clusters,weights,clusterhaploMap} = res[[1]];
+        clustersnpMap = clusterhaploMap[[;;3]];
         nFounder = Length[founderid];
-        {genotypes, diplotypes} = origGenotypes[nFounder][[1]];
+        {genotypes, diplotypes} = origGenotype[nFounder][[1]];
         diplotohaplo = Replace[diplotypes, {{x_, x_} :> x, {_, _} -> 0}, {1}];
         haploID = "haplotype" <> ToString[#] & /@ Range[nFounder];
         haplotypes2 = Transpose[{haploID, Range[nFounder], founderid}];
         haplotypes2 = Join[{{"Haplotype", "Code", "founder"}}, haplotypes2];
         genoID = "genotype" <> ToString[#] & /@ Range[Length[genotypes]];
         genotypes2 = Transpose[{genoID,
-           StringJoin[#[[1]], "---", #[[2]]] & /@ Map[ToString, genotypes, {2}],
-           StringJoin[#[[1]], "---", #[[2]]] & /@ Map[founderid[[#]] &, genotypes, {2}]}];
+           toDelimitedString[genotypes,"|"],
+           toDelimitedString[Map[founderid[[#]] &, genotypes, {2}],"|"]}];
         genotypes2 = Join[{{"Genotype", "Code", "founder"}}, genotypes2];
         diploID = "diplotype" <> ToString[#] & /@ Range[Length[diplotypes]];
         diplotypes2 = Transpose[{diploID,
-           StringJoin[#[[1]], "---", #[[2]]] & /@ Map[ToString, diplotypes, {2}],
-           StringJoin[#[[1]], "---", #[[2]]] & /@ Map[founderid[[#]] &, diplotypes, {2}]}];
+           toDelimitedString[diplotypes,"|"],
+           toDelimitedString[Map[founderid[[#]] &, diplotypes, {2}],"|"]}];
         diplotypes2 = Join[{{"Diplotype", "Code", "founder"}}, diplotypes2];
-        chrid = Split[snpmap[[2, 2 ;;]]][[All, 1]];
+        chrid = Split[clusterhaploMap[[2, 2 ;;]]][[All, 1]];
         logl = res[[2 ;;, All, 1]];
         logl2 = Join[Transpose[{Prepend[sampleid, "Lines/Chr"]}],Prepend[logl, chrid], 2];
         Switch[
-         algorithmname, 
-         "origPosteriorDecoding",
-         genoprob = toGenoprob[res[[2 ;;, All, 2]]];
-         (*geno2diplo = origGenotypes[nFounder][[2, 1]];
-         genoprob = res[[2 ;;, All, 2]];         
-         Do[
-           ls = Transpose[genoprob[[All, chr]], {2, 3, 1}];
-           genoprob[[All, chr]] = Transpose[Total[ls[[#]]] & /@ geno2diplo, {3, 1, 2}], {chr,Dimensions[genoprob][[2]]}];*)
+             algorithmname, 
+             "origPosteriorDecoding",
+             If[ MatchQ[ToLowerCase[model], "depmodel"],
+                 haploprob2 = res[[2 ;;, All, 2]];
+                 rowID = Flatten[Outer[StringJoin[#1, "_", #2] &, sampleid, haploID]];
+                 haploprob2 = Flatten[Transpose[Flatten[#, 1]] & /@ haploprob2, 1];
+                 haploprob2 = Join[clustersnpMap,Join[Transpose[{rowID}], haploprob2, 2]];
+                 ibdprob2 = genoprob2 = {None};,
+                 PrintTemporary["Time used in transforming from diplotprob to genoprob: "
+                     <>ToString[Round[AbsoluteTiming[genoprob2 = toGenoProb[res[[2 ;;, All, 2]]];][[1]],0.01]]<>" seconds. "<>DateString[]];
+                 ClearAll[res];
+                 PrintTemporary["Time used in transforming from genoprob to haploprob: "
+                     <>ToString[Round[AbsoluteTiming[haploprob2 = toHaploProb[genoprob2];][[1]],0.01]]<>" seconds. "<>DateString[]];
+                 PrintTemporary["Time used in transforming from haploprob to ibdprob: "
+                     <>ToString[Round[AbsoluteTiming[ibdprob2 = toIBDProb[genoprob2];][[1]],0.01]]<>" seconds. "<>DateString[]];
+                 (*to add row/col labels for genoprob2,haploprob2,and ibdprob2*)
+                 rowID = Flatten[Outer[StringJoin[#1, "_", #2] &, sampleid, genoID]];
+                 genoprob2 = Flatten[Transpose[Flatten[#, 1]] & /@ genoprob2, 1];
+                 genoprob2 = Join[clustersnpMap,Join[Transpose[{rowID}], genoprob2, 2]];
+                 rowID = Flatten[Outer[StringJoin[#1, "_", #2] &, sampleid, haploID]];
+                 haploprob2 = Flatten[Transpose[Flatten[#, 1]] & /@ haploprob2, 1];
+                 haploprob2 = Join[clustersnpMap,Join[Transpose[{rowID}], haploprob2, 2]];
+                 rowID = #1 <> "_IBDProbability" & /@ sampleid;
+                 ibdprob2[[Flatten[Position[offspringgender, "Male"]], posX]] *= 0;
+                 ibdprob2 = Flatten[#] & /@ ibdprob2;
+                 ibdprob2 = Join[clustersnpMap, Join[Transpose[{rowID}], ibdprob2, 2]];
+             ];
+             (*export*)
+             summary = Join[{{key, "founderhaplo","Genetic map and founder hapolotypes"}}, clusterhaploMap,
+               {{key, "logl","Ln marginal likelihood"}}, logl2,
+               {{key, "genotype","Genotypes in order"}}, genotypes2,
+               {{key, "genoprob","Conditonal genotype probability"}}, genoprob2,
+               {{key, "haplotype","haplotypes in order"}}, haplotypes2,
+               {{key, "haploprob","Conditonal haplotype probability"}}, haploprob2,
+               {{key, "ibdprob","Conditonal IBD probability"}}, ibdprob2];
+             (* Export[summaryFile, ExportString[summary, "CSV"], "Table"],*)
+             (*MapThread[PrintTemporary["Time used in exporting "<>#1<>":"
+                 <>ToString[Round[AbsoluteTiming[csvExport[#1,#2];][[1]],0.01]]
+                 <>" seconds. "<>DateString[]]&, 
+                     {StringDrop[summaryFile, -4] <> # <> ".csv" & /@ {"_founderhaplo","_genoprob","_haploprob", "_ibdprob"},
+                     {clusterhaploMap,genoprob2,haploprob2,ibdprob2}}];*)
+             PrintTemporary["Time used in exporting "<>summaryFile<>":"
+                 <>ToString[Round[AbsoluteTiming[outfile = csvExport[summaryFile,summary];][[1]],0.01]]
+                 <>" seconds. "<>DateString[]],
+             "origViterbiDecoding",
+             path = res[[2 ;;, All, 2]];
+             ClearAll[res];
+             path = Map[CtStringFormat[#, "-"] &, path, {2}];
+             path = StringJoin[Riffle[#, "||"]] & /@ path;
+             path = Join[{{"Lines", "ViterbiPath"}}, Transpose[{sampleid, path}]];
+             (*export*)
+             summary = Join[{{key,"founderhaplo","Genetic map and founder hapolotypes"}}, clusterhaploMap, 
+                 {{key,"logl", "Ln marginal likelihood"}}, logl2,
+                 {{key, "haplotype","haplotypes in order"}}, haplotypes2,
+                 {{key, "diplotype","diplotypes in order"}}, If[ model === "depModel",
+                                                     {None},
+                                                     diplotypes2
+                                                 ],
+               {{key, "viterbipath","Viterbi path of "<>If[ model === "depModel",
+                                              "haplotypes",
+                                              "diplotypes"
+                                          ]}}, path];
+             (* Export[summaryFile, ExportString[summary, "CSV"], "Table"],*)
+             outfile = csvExport[summaryFile,summary],
+             "origPathSampling",
+             path = res[[2 ;;, All, 2]];
+             ClearAll[res];
+             path = Map[CtStringFormat[#, "-"] &, path, {3}];
+             path = Transpose[#] & /@ path;
+             path = Map[StringJoin[Riffle[#, "|"]] &, path, {2}];
+             path = Map[StringJoin[Riffle[#, "||"]] &, path, {1}];
+             path = Join[{{"Lines", "SampledPaths"}}, Transpose[{sampleid, path}]];
+             (*export*)
+             summary = Join[{{key,"founderhaplo","Genetic map and founder hapolotypes"}}, clusterhaploMap, 
+               {{key,"logl", "Ln marginal likelihood"}}, logl2,
+               {{key, "haplotype","haplotypes in order"}}, haplotypes2,
+               {{key, "diplotype","diplotypes in order"}}, If[ model === "depModel",
+                                                   {None},
+                                                   diplotypes2
+                                               ],
+               {{key, "viterbipath","Sampled paths of "<>If[ model === "depModel",
+                                               "haplotypes",
+                                               "diplotypes"
+                                           ]}}, path];
+             (* Export[summaryFile, ExportString[summary, "CSV"], "Table"],*)
+             outfile = csvExport[summaryFile,summary],
+             _,
+             Print["Wrong " <> resultFile <> "!"];
+             outfile = Abort[]
+         ];
+        outfile
+    ]    
+    
+saveCondProb[resultFile_String?FileExistsQ, summaryFile_String, probtype_String:"genotype"] :=
+    Module[ {res,model,epsF,eps,popDesign,outputid,algorithmname, samplesize,outputsmooth,isprint,isfounderinbred,isoffspringdepth,
+            foundergender,offspringgender,posA,posX,founderid,sampleid,snpMap,founderHaplo, obsGeno,clusters,weights,clusterhaploMap,
+            clustersnpMap,nFounder,genotypes, diplotypes,diplotohaplo,haploID,haplotypes2,genoID,genotypes2,diploID,diplotypes2,chrid,
+            logl,logl2,diploprob,diploprob2,genoprob2,haploprob2,rowID,summary,key = "magicReconstruct-Summary",outfile},
+        If[ ! MatchQ[probtype, "diplotype" | "genotype" | "haplotype"],
+            Print["The probtype must be diplotype, genotype, or haplotype! wrong probtype of ", probtype, "!"];
+        ];
+        PrintTemporary["Time used in reading "<>resultFile<>": "
+            <>ToString[Round[AbsoluteTiming[
+         res = ReadList[resultFile];][[1]],0.01]]<>" seconds. "<>DateString[]];
+        {model,epsF,eps,popDesign,outputid,algorithmname, samplesize,outputsmooth,isprint,isfounderinbred,isoffspringdepth,
+            foundergender,offspringgender,posA,posX,founderid,sampleid,snpMap,founderHaplo, obsGeno,clusters,weights,clusterhaploMap} = res[[1]];
+        If[ ! MatchQ[algorithmname, "origPosteriorDecoding"],
+            Print["Conditional probabilities can be extracted only for the case of origPosteriorDecoding, but not for ", algorithmname, "!"];
+            Abort[]
+        ];
+        If[ MatchQ[ToLowerCase[model], 
+            "depmodel"] && (! MatchQ[probtype, "haplotype"]),
+            Print["Conditional ", probtype, " probabilities are not available for ", model];
+            Abort[];
+        ];
+        clustersnpMap = clusterhaploMap[[;;3]];
+        nFounder = Length[founderid];
+        {genotypes, diplotypes} = origGenotype[nFounder][[1]];
+        diplotohaplo = Replace[diplotypes, {{x_, x_} :> x, {_, _} -> 0}, {1}];
+        haploID = "haplotype" <> ToString[#] & /@ Range[nFounder];
+        haplotypes2 = Transpose[{haploID, Range[nFounder], founderid}];
+        haplotypes2 = Join[{{"Haplotype", "Code", "founder"}}, haplotypes2];
+        genoID = "genotype" <> ToString[#] & /@ Range[Length[genotypes]];
+        genotypes2 = Transpose[{genoID,
+           toDelimitedString[genotypes,"|"],
+           toDelimitedString[Map[founderid[[#]] &, genotypes, {2}],"|"]}];
+        genotypes2 = Join[{{"Genotype", "Code", "founder"}}, genotypes2];
+        diploID = "diplotype" <> ToString[#] & /@ Range[Length[diplotypes]];
+        diplotypes2 = Transpose[{diploID,
+           toDelimitedString[diplotypes,"|"],
+           toDelimitedString[Map[founderid[[#]] &, diplotypes, {2}],"|"]}];
+        diplotypes2 = Join[{{"Diplotype", "Code", "founder"}}, diplotypes2];
+        chrid = Split[clusterhaploMap[[2, 2 ;;]]][[All, 1]];
+        logl = res[[2 ;;, All, 1]];
+        logl2 = Join[Transpose[{Prepend[sampleid, "Lines/Chr"]}],Prepend[logl, chrid], 2];
+        Switch[probtype,
+         "diplotype",
+         diploprob2 = res[[2 ;;, All, 2]];
          ClearAll[res];
-         haploprob = toHaploprob[genoprob];
-         (*to output haplotypes2 and genotypes2,*)
-         (*to output genoprob2 and haploprob2*)
-         If[ model === "depModel",
-             genoprob2 = {None},
+         rowID = Flatten[Outer[StringJoin[#1, "_", #2] &, sampleid, diploID]];
+         diploprob2 = Flatten[Transpose[Flatten[#, 1]] & /@ diploprob2, 1];
+         diploprob2 = Join[clustersnpMap, Join[Transpose[{rowID}], diploprob2, 2]];
+         summary = Join[{{key,"Genetic map and founder hapolotypes"}}, clusterhaploMap, 
+         	{{key, "Ln marginal likelihood"}}, logl2,
+         	{{key, "Diplotypes in order"}}, diplotypes2, 
+         	{{key, "Conditonal diplotype probability"}},diploprob2],
+         "genotype" | "haplotype",
+         diploprob = res[[2 ;;, All, 2]];
+         ClearAll[res];
+         PrintTemporary["Time used in transforming from diplotprob to genoprob: "
+                     <>ToString[Round[AbsoluteTiming[genoprob2 = toGenoProb[diploprob];][[1]],0.01]]<>" seconds. "<>DateString[]];
+         If[ MatchQ[probtype, "haplotype"],
+             rowID = Flatten[Outer[StringJoin[#1, "_", #2] &, sampleid, haploID]];
+             If[ MatchQ[probtype, "haplotype"],
+	         	PrintTemporary["Time used in transforming from genoprob to haploprob: "
+	                     <>ToString[Round[AbsoluteTiming[haploprob2 = toHaploProb[genoprob2];][[1]],0.01]]<>" seconds. "<>DateString[]];
+	         ];  
+	         ClearAll[genoprob2];
+             haploprob2 = Flatten[Transpose[Flatten[#, 1]] & /@ haploprob2, 1];
+             haploprob2 =Join[clustersnpMap, Join[Transpose[{rowID}], haploprob2, 2]];
+             summary = Join[{{key,"founderhaplo","Genetic map and founder hapolotypes"}}, clusterhaploMap, 
+             	{{key, "logl","Ln marginal likelihood"}}, logl2,
+             	{{key, "halotype", "haplotypes in order"}},haplotypes2, 
+             	{{key, "haploprob","Conditonal haplotype probability"}},haploprob2],
              rowID = Flatten[Outer[StringJoin[#1, "_", #2] &, sampleid, genoID]];
-             genoprob2 = Flatten[Transpose[Flatten[#, 1]] & /@ genoprob, 1];
-             genoprob2 = Join[snpmap,Join[Transpose[{rowID}], genoprob2, 2]];
+             genoprob2 = Flatten[Transpose[Flatten[#, 1]] & /@ genoprob2, 1];
+             genoprob2 =Join[clustersnpMap, Join[Transpose[{rowID}], genoprob2, 2]];
+             summary =Join[{{key,"founderhaplo","Genetic map and founder hapolotypes"}}, clusterhaploMap, 
+             	{{key, "logl","Ln marginal likelihood"}}, logl2,
+             	{{key, "genotype","Genotypes in order"}}, genotypes2, 
+             	{{key, "genoprob", "Conditonal genotype probability"}},genoprob2]
          ];
-         rowID = Flatten[Outer[StringJoin[#1, "_", #2] &, sampleid, haploID]];
-         haploprob2 = Flatten[Transpose[Flatten[#, 1]] & /@ haploprob, 1];
-         haploprob2 = Join[snpmap,Join[Transpose[{rowID}], haploprob2, 2]];         
-         (*export*)
-         summary = Join[{{key, "Genetic map of biallelic markers"}}, snpmap,
-           {{key, "Ln marginal likelihood"}}, logl2,
-           {{key, "Genotypes in order"}}, genotypes2,
-           {{key, "Conditonal genotype probability"}}, genoprob2,
-           {{key, "haplotypes in order"}}, haplotypes2,
-           {{key, "Conditonal haplotype probability"}}, haploprob2];
-         (* Export[summaryFile, ExportString[summary, "CSV"], "Table"],*)
-         csvExport[summaryFile,summary],
-         "origViterbiDecoding",
-         path = res[[2 ;;, All, 2]];
-         ClearAll[res];
-         If[ model === "depModel",
-             path[[All, All, ;; -2, 2]] = Map[diplotohaplo[[#]] &, path[[All, All, ;; -2, 2]], {2}];
          ];
-         path = Map[CtStringFormat[#, "-"] &, path, {2}];
-         path = StringJoin[Riffle[#, "||"]] & /@ path;
-         path = Join[{{"Lines", "ViterbiPath"}}, Transpose[{sampleid, path}]];
-         (*export*)
-         summary = Join[{{key,"Genetic map of biallelic markers"}}, snpmap, 
-             {{key, "Ln marginal likelihood"}}, logl2,
-             {{key, "haplotypes in order"}}, haplotypes2,
-             {{key, "diplotypes in order"}}, diplotypes2,
-           {{key, "Viterbi path of "<>If[ model === "depModel",
-                                          "haplotypes",
-                                          "diplotypes"
-                                      ]}}, path];
-         (* Export[summaryFile, ExportString[summary, "CSV"], "Table"],*)
-         csvExport[summaryFile,summary],
-         "origPathSampling",
-         path = res[[2 ;;, All, 2]];
-         ClearAll[res];
-         If[ model === "depModel",
-             path[[All, All, All, ;; -2, 2]] = Map[diplotohaplo[[#]] &, path[[All, All, All, ;; -2, 2]], {3}];
-         ];
-         path = Map[CtStringFormat[#, "-"] &, path, {3}];
-         path = Transpose[#] & /@ path;
-         path = Map[StringJoin[Riffle[#, "|"]] &, path, {2}];
-         path = Map[StringJoin[Riffle[#, "||"]] &, path, {1}];
-         path = Join[{{"Lines", "SampledPaths"}}, Transpose[{sampleid, path}]];
-         (*export*)
-         summary = Join[{{key,"Genetic map of biallelic markers"}}, snpmap, 
-           {{key, "Ln marginal likelihood"}}, logl2,
-           {{key, "haplotypes in order"}}, haplotypes2,
-           {{key, "diplotypes in order"}}, diplotypes2,
-           {{key, "Sampled paths of "<>If[ model === "depModel",
-                                           "haplotypes",
-                                           "diplotypes"
-                                       ]}}, path];
-         (* Export[summaryFile, ExportString[summary, "CSV"], "Table"],*)
-         csvExport[summaryFile,summary],
-         _,
-         Print["Wrong " <> resultFile <> "!"];
-         Abort[]
-         ]
+        PrintTemporary[
+         "Time used in exporting " <> summaryFile <> ":" <> 
+          ToString[Round[AbsoluteTiming[
+          	  If[Length[First[clusterhaploMap]]<5000,          	
+              	outfile = csvExport[summaryFile, summary],
+              	outfile = csvExport2[summaryFile, summary]
+          	  ];
+              ][[1]], 0.01]] <>" seconds. " <> DateString[]];
+        outfile
     ]    
 
-(*http://stackoverflow.com/questions/7525782/import-big-files-arrays-with-mathematica*)
-readTable[file_String?FileExistsQ, format_String, chunkSize_: 1000] :=
-    Module[ {stream, dataChunk, result, linkedList, add},
-        SetAttributes[linkedList, HoldAllComplete];
-        add[ll_, value_] :=
-            linkedList[ll, value];
-        stream = StringToStream[Import[file, "String"]];
-        Internal`WithLocalSettings[Null,(*main code*)
-            result = linkedList[];
-            While[dataChunk =!= {}, 
-             dataChunk = ImportString[StringJoin[Riffle[ReadList[stream, "String", chunkSize], "\n"]], format];
-             result = add[result, dataChunk];
-            ];
-            result = Flatten[result, Infinity, linkedList],(*clean-up*)
-         Close[stream]
-         ];
-        Join @@ result
-    ]
-    
 getSummaryMR[summaryFile_String?FileExistsQ] :=
-    Module[ {res, description,key = "MagicReconstruct-Summary"},
+    Module[ {res, description,key = "magicReconstruct-Summary"},
         res = readTable[summaryFile, "CSV"];
         res = Partition[Split[res, #1[[1]] != key && #2[[1]] != key &], 2];
         description = Flatten[#] & /@ res[[All, 1]];
         res = Join[{description}, res[[All, 2]]];
         res
     ]
-     
+    
+calAddKinship[haploprobfile_String?FileExistsQ, ibdprobfile_String?FileExistsQ, outputkinshipfile_String] :=
+    Module[ {starttime,haploprob, ibdprob, noffspring, nfgl, kinship, offspringid, i, j},
+        starttime = SessionTime[];
+        PrintTemporary["Time elapsed = "<>ToString[Round[SessionTime[] - starttime,0.1]]<>" Seconds. Reading " <> haploprobfile];
+        haploprob = readTable[haploprobfile,"CSV"];
+        PrintTemporary["Time elapsed = "<>ToString[Round[SessionTime[] - starttime,0.1]]<>" Seconds. Reading " <> ibdprobfile];
+        ibdprob = readTable[ibdprobfile,"CSV"];
+        offspringid = StringJoin @@ # & /@ (StringSplit[ibdprob[[4 ;;, 1]],"_"][[All, ;; -2]]);
+        noffspring = Length[ibdprob] - 3;
+        nfgl = (Length[haploprob] - 3)/noffspring;
+        (*weights = Normalize[Flatten[Differences[#] & /@ SplitBy[Transpose[haploprob[[2 ;; 3, 2 ;;]]], First][[All, All,2]]], Total];*)
+        (*weights = Last[Dimensions[haploprob]] - 1 - Length[Split[haploprob[[2, 2 ;;]]]];*)
+        (*weights = Table[1/weights, {weights}];*)
+        PrintTemporary["Time elapsed = "<>ToString[Round[SessionTime[] - starttime,0.1]]<>" Seconds. Transforming ibdprob..."];
+        (*The resulting ibdprob dimensions: {nchr,noffspring,nsnp}*)
+        ibdprob = Transpose[#] & /@ (SplitBy[Transpose[ibdprob[[All, 2 ;;]]], #[[2]] &][[All, All, 4 ;;]]);
+        PrintTemporary["Time elapsed = "<>ToString[Round[SessionTime[] - starttime,0.1]]<>" Seconds. Transforming haploprob..."];
+        (*The resulting haploprob dimensions: {nchr,noffspring,nsnp,nfgl}*)
+        haploprob = Map[Transpose, Partition[Transpose[#], nfgl] & /@ (SplitBy[Transpose[haploprob[[All, 2 ;;]]], #[[2]] &][[All, All,4 ;;]]), {2}];
+        PrintTemporary["Time elapsed = "<>ToString[Round[SessionTime[] - starttime,0.1]]<>" Seconds. Calculating kinship..."];
+        kinship = ConstantArray[0, {noffspring, noffspring}];
+        Monitor[
+         Do[kinship[[i, j]] = kinship[[j, i]] = 
+            Mean[Flatten[Total[haploprob[[All, i]] haploprob[[All, j]], {3}][[All, ;; -2]]]], {i, noffspring}, {j,i + 1, noffspring}];
+         Do[kinship[[i, i]] = (Mean[Flatten[ibdprob[[All, i, ;; -2]]]] + 1)/2, {i,noffspring}];
+         0, ProgressIndicator[i, {1, noffspring}]];
+        kinship *= 2;
+        kinship = Join[Transpose[{Prepend[offspringid, "IndividualID"]}],Join[{offspringid}, kinship], 2];
+        csvExport[outputkinshipfile,kinship];
+    ]  
+
+Options[plotAncestryProbGUI] = Join[{isPlotGenoProb -> Automatic,linkageGroupSet->All},Options[ListPlot],Options[ListAnimate]];
+
+plotAncestryProbGUI[summaryfile_String?FileExistsQ, opts : OptionsPattern[]] :=
+    plotAncestryProbGUI[summaryfile,None,opts]
+
+getchrsetdata[data_, chrset_] :=
+    If[ data === None,
+        None,
+        Rest[getsubMagicSNP[Join[{{None, None}}, data], chrset, All]]
+    ]
+  
+plotAncestryProbGUI[summaryfile_String?FileExistsQ, inputtruefgldiplo_?(ListQ[#] ||StringQ[#]||#===None&),opts : OptionsPattern[]] :=
+    Module[ {summary, nfounder, noffspring, truefgldiplo = inputtruefgldiplo, 
+      isgeno,chrsubset, diplorule, truegeno, gg, pos, condprob, ls, types, label,line},
+        {isgeno,chrsubset} = OptionValue@{isPlotGenoProb,linkageGroupSet};
+        If[ StringQ[truefgldiplo],
+            If[ ! FileExistsQ[truefgldiplo],
+                Print["File ", truefgldiplo, " does not exist!"];
+                Return[$Failed]
+            ];
+            truefgldiplo = Import[truefgldiplo, "CSV", Path -> Directory[]];
+        ];
+        truefgldiplo = getsubMagicSNP[truefgldiplo,chrsubset,All];
+        summary = getSummaryMR[summaryfile];
+        (*{"Genetic map and founder hapolotypes", "Conditonal genotype probability", 
+        "Conditonal haplotype probability", "Conditonal IBD probability"}*)
+        summary[[{2, 5, 7, 8}]] = getchrsetdata[#, chrsubset] & /@ summary[[{2, 5, 7, 8}]];
+        If[ isgeno === Automatic,
+            isgeno = ! MatchQ[summary[[5, 1, 1]], "None" | None]
+        ];
+        If[ MatchQ[summary[[5, 1, 1]], "None" | None] && TrueQ[isgeno],
+            Print["Genotype probabilities do not exist!"];
+            Return[$Failed]
+        ];
+        nfounder = Length[summary[[6, 2 ;;, 2]]];
+        noffspring = (Length[summary[[7]]] - 3)/nfounder;
+        If[ isgeno,
+            (*visualize genotype probability*)
+            types = origGenotype[nfounder];
+            If[ truefgldiplo =!= None,
+                truegeno = truefgldiplo[[nfounder + 5 ;;, 2 ;;]] /. 
+                   Thread[Range[Length[types[[2, 2]]]] -> types[[2, 2]]];
+            ];
+            gg = Table[
+              pos = Span @@ {4 + Length[types[[1, 1]]] (line - 1),3 + Length[types[[1, 1]]] line};
+              condprob = summary[[5, pos, 2 ;;]];
+              label = "Offspring " <> ToString[line] <>". GrayLevel=posterior probability, ";
+              If[ truefgldiplo =!= None,
+                  label = label <>"red X =true genotype.",
+                  label = label <> "vertical line=chromosome boundary.";
+              ];
+              Show[
+               MatrixPlot[Reverse[condprob],FrameLabel -> {"Genotype", "SNP index"}, 
+                ColorFunctionScaling -> False, MaxPlotPoints -> Infinity, AspectRatio -> 1/2.5, 
+                DataRange -> {{1, Dimensions[condprob][[2]]}, {1, Length[condprob]}}],
+               If[ truefgldiplo =!= None,
+                   ListPlot[Transpose[{Range[Length[truegeno[[line]]]],truegeno[[line]]}], 
+                    PlotRange -> {{1, Dimensions[condprob][[2]]}, {1, Length[condprob]}}, PlotRangePadding -> 0, 
+                    PlotMarkers -> {"\[Times]", 10}, PlotStyle -> Red],
+                   ListPlot[{1}, PlotMarkers -> {Automatic, 0}]
+               ],
+               ListLinePlot[Thread[{#, {0.3, Length[condprob] + 0.7}}] & /@Accumulate[Tally[summary[[5, 2, 2 ;;]]][[All, 2]]],
+                PlotStyle -> Directive[Dashed, Thick, Brown]],
+               Sequence @@ FilterRules[{opts}, Options[ListPlot]],
+               FrameTicks -> {{Transpose[{Range[Length[types[[1, 1]]]],types[[1, 1]]}], None}, {Automatic, None}},
+               ImageSize -> 1000, Frame -> True, PlotLabel -> label,
+               LabelStyle -> Directive[FontSize -> 14, Black, FontFamily -> "Helvetica"]
+               ], {line, noffspring}],
+            (*visualize haplotype probability*)
+            If[ truefgldiplo =!= None,
+                diplorule = Flatten[Outer[List, Range[nfounder], Range[nfounder]], 1];
+                diplorule = Thread[Range[Length[diplorule]] -> diplorule];
+                truegeno = truefgldiplo[[nfounder + 5 ;;, 2 ;;]] /. diplorule;
+            ];
+            gg = Table[
+              pos = Span @@ {4 + nfounder (line - 1), 3 + nfounder line};
+              condprob = summary[[7, pos, 2 ;;]];
+              label = "Offspring " <> ToString[line] <>". GrayLevel=Posterior Probability, ";
+              If[ truefgldiplo =!= None,
+                  label = label <>"\!\(\*
+					StyleBox[\"red\",\nFontColor->RGBColor[1, 0, 0]]\)\!\(\*
+					StyleBox[\" \",\nFontColor->RGBColor[1, 0, 0]]\)\!\(\*
+					StyleBox[\"X\",\nFontColor->RGBColor[1, 0, 0]]\) =true IBD genotype, "<>"\!\(\*
+					StyleBox[\"blue\",\nFontColor->RGBColor[0, 0, 1]]\)\!\(\*
+					StyleBox[\" \",\nFontColor->RGBColor[0, 0, 1]]\)\!\(\*
+					StyleBox[\"O\",\nFontColor->RGBColor[0, 0, 1]]\)\!\(\*
+					StyleBox[\" \",\nFontColor->RGBColor[0, 0, 1]]\)=true non-IBD genotype.",
+                  label = label <> "certical line=chromosome boundary.";
+              ];
+              Show[
+               MatrixPlot[Reverse[condprob], FrameLabel -> {"Haplotype", "SNP index"}, 
+                ColorFunctionScaling -> False, MaxPlotPoints -> Infinity, 
+                AspectRatio -> 1/2.5, DataRange -> {{1, Dimensions[condprob][[2]]}, {1,Length[condprob]}}],
+               If[ truefgldiplo =!= None,
+                   {ls = truegeno[[line]] /. {i_, i_} :> i;
+                    ls = Transpose[{Range[Length[ls]], ls}];
+                    ListPlot[Select[ls, MatchQ[#, {_, _Integer}] &],PlotRange -> {{1, Dimensions[condprob][[2]]}, {1,Length[condprob]}}, 
+                        PlotRangePadding -> 0,PlotMarkers -> {"\[Times]", 10}, PlotStyle -> Red],
+                    ls = Select[ls, MatchQ[#, {_, _List}] &];
+                    ls = Flatten[Thread[#] & /@ ls, 1];
+                    ListPlot[ls, PlotRange -> {{1, Dimensions[condprob][[2]]}, {1,Length[condprob]}}, PlotRangePadding -> 0, 
+                     PlotMarkers -> {"\[EmptyCircle]", 14}, PlotStyle -> Blue]},
+                   ListPlot[{1}, PlotMarkers -> {Automatic, 0}]
+               ],
+               ListLinePlot[Thread[{#, {0.3, Length[condprob] + 0.7}}] & /@Accumulate[Tally[summary[[2, 2, 2 ;;]]][[All, 2]]],
+                PlotStyle -> Directive[Dashed, Thick, Brown]],
+               Sequence @@ FilterRules[{opts}, Options[ListPlot]],
+               ImageSize -> 1000, Frame -> True, PlotLabel -> label,
+               LabelStyle -> Directive[FontSize -> 14, Black, FontFamily -> "Helvetica"]
+               ], {line, noffspring}]
+        ];
+        ListAnimate[gg, Sequence @@ FilterRules[{opts}, Options[ListAnimate]], 
+         AnimationRunning -> True, AnimationDirection -> ForwardBackward, DefaultDuration -> 2 noffspring]
+    ]
+      
 End[]
 
 SetAttributes[#, {Protected,ReadProtected}]&/@ Names["MagicReconstruct`*"];

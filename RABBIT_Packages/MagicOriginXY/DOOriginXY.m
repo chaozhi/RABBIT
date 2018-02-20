@@ -127,18 +127,19 @@ sumJuncDensityDOXY[founderAlpha12mp_,founderR_,nStrain_,coalProb_, gCross_] :=
 origSummaryDOXY[nPower_, preCCfreq_, crossPopSize_, gCross_, crossScheme_] :=
     Module[ {freq = preCCfreq, inibeta12, iniR, founderAlpha12mp, 
       founderR, nStrain, coalProb, finb, mapR, sumRho, juncRho},
-        freq[[All, 2]] = Normalize[freq[[All, 2]], Total];
+        freq[[All, 2]] = N[Normalize[freq[[All, 2]], Total]];
         inibeta12 = Take[pairIBDProbXY2[], 2];
         iniR = pairmapExpansionXY[nPower - 2];
+        {inibeta12,iniR}=N[{inibeta12,iniR}];
         founderAlpha12mp = Total[#[[2]] sibIBDProbXY2[inibeta12, #[[1]]][[2]] & /@ freq];
         founderR = Total[#[[2]] sibmapExpansionXY[inibeta12, iniR, #[[1]]] & /@ freq];
         nStrain = 2^nPower;
-        coalProb = First[getCoalProbXY2[crossScheme, crossPopSize, crossPopSize]];
+        coalProb = N[First[getCoalProbXY2[crossScheme, crossPopSize, crossPopSize]]];
         finb = inbredProbDOXY[founderAlpha12mp, nStrain, coalProb, gCross];
         mapR = mapExpansionDOXY[founderAlpha12mp, founderR, nStrain, coalProb, gCross];
         sumRho = sumJuncDensityDOXY[founderAlpha12mp, founderR, nStrain, coalProb,gCross];
         juncRho = juncDensityDOXY[founderAlpha12mp, founderR, nStrain, coalProb,gCross];
-        N[{finb, mapR, sumRho, juncRho}]
+        {finb, mapR, sumRho, juncRho}
     ]    
 
 magicOrigPriorDOXY[nPower_, preCCfreq_, crossPopSize_, gCross_, crossScheme_]:=

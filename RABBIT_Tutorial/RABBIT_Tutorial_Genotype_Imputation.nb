@@ -1,0 +1,673 @@
+(* Content-type: application/vnd.wolfram.mathematica *)
+
+(*** Wolfram Notebook File ***)
+(* http://www.wolfram.com/nb *)
+
+(* CreatedBy='Mathematica 11.0' *)
+
+(*CacheID: 234*)
+(* Internal cache information:
+NotebookFileLineBreakTest
+NotebookFileLineBreakTest
+NotebookDataPosition[       158,          7]
+NotebookDataLength[     25425,        665]
+NotebookOptionsPosition[     21651,        541]
+NotebookOutlinePosition[     22955,        580]
+CellTagsIndexPosition[     22877,        575]
+WindowFrame->Normal*)
+
+(* Beginning of Notebook Content *)
+Notebook[{
+
+Cell[CellGroupData[{
+Cell[BoxData[
+ TogglerBox[2, {1->
+  OverlayBox[{
+   TagBox[GridBox[{
+      {
+       GraphicsBox[RasterBox[CompressedData["
+1:eJxTTMoPSmNiYGAo5gASQYnljkVFiZXBAkBOaF5xZnpeaopnXklqemqRRRIz
+UFAKiEGSLED8//9/gvjRo0fsN27cELp69arY+fPnpZExPn137tzhBqrRBGJ/
+ID4CxMfRMTZ9L168YL5w4YIaUD4AiC8C8Qcg/gvE/9AxFreC7PQD4gtA/BGq
+7j8ujKz3+fPnLFC9b6H24dSHTf/FixfVofYSpRdZPzSsAqBuJkovsn5oOF8k
+5F9s+h88eMBBjt0w/devXxcGso+S4m9k/ZcuXRKHpgeS3A7TD0wrkpToPw9J
+ywOmn1L3Uxp+lMYfpemH0vRLjfwDjQey8y9a+fGOWDPwlF+gsPhEKDywlZ8g
+d0D9EniexPITGd++fZv3PBnlN6764zxa3QHCAIDESDs=
+         "], {{0, 26}, {16, 0}}, {0, 255},
+         ColorFunction->RGBColor],
+        BaseStyle->"ImageGraphics",
+        ImageSize->Magnification[1],
+        ImageSizeRaw->{16, 26},
+        PlotRange->{{0, 16}, {0, 26}}], 
+       GraphicsBox[RasterBox[CompressedData["
+1:eJzt2V1vVFUUBuBGTfTSSygthYYKNHyVinrrpbcYfwBEJN5gUkyMfw9KKaVw
+KCkQKCW1RNIQKg1gEE3QtdN10pMRZCaBzNQ+kzxt5nzstfeZfbPOu/vkD8e/
+e6+vr+/sR/Hn+ImfvpyYOPHz1x/Hl2/OnP3+9JlT33515sdTp09NfHHy/TjY
+H6592Nf3QfyvqmpHBwbCYNr5GoMNAw2d1AEAADa3/obtLba1aJ7rb4xR9x1D
+YVfYHYbDnjASPgn7wv4wGg6Eg+FQOByOhLEwnj4Nx8Jn6fM21dcfyzHq8cay
+xuGseTDnMJpz2pdzHMk5D+caduWa6v6p+czafU71s6p1+/cGAADYqt52/9va
+++6tXt331j3v0TTeoj5e966v6lv3Vv/uWfWr9LJm9tzMpN+UW3eaVV9s00yY
+CzfC7bAQFhvuhjt57maYD9er9c+VcDlcCtMd1AQAADafqXQhTabz6VyL+vhk
+Xl/uLX1D6UFmw9VwrVrvL0o/cqta7ztKD3Iv/BLuh1/DSngYHoXfwlp4Ep6F
+38Pz8Ed4Ef5Mf71Gff5F3vM8x3iWY65ljUdZcyXncD/ndC/neDvnfCPXcC3X
+NJtrnG48r3afU/2s6uc11QO/OwAAwFbzLvrfksWVjK30kSV3KxncUlgOD6qN
+vnc1PK42+t7iaaq/r+U1q9VG3/ogx1rKse9krfmsrV+l15R9WDLmkjWXzLl8
+yvuVsmdLJl3eu5R9XN7BNLPrhTxX3seUvT3TQc2Xbfr7LWq3JgAAwH95m33K
+u9Dt5wMAAMDmp2dlK+vGnu/2+yQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAYPN42aZu
+1AQAAAAAAICtrNsZIXRTN/b8xTbNhLlwI9wOC2Gx4W64k+duhvlwvVr/XAmX
+w6Uw3UFNAAAAAAAA6EVT6UKaTOfTuRb18cm8vtxbcrOSwc2Gq9V6FlcytlvV
+eu5WMrilsBwehJXwMKyGx2EtPElPU/19La9ZzXtWcozlHHMxa9zKmnM5h9mc
+03Rjfe2uq15bvb6pHvid2NzKPiwZc8maS+ZcPiWDLnu2ZNIlmy77uGTVzex6
+Ic+VbLvs7ZkOau7owEAYTDtfY7BhoKGTOgAAAAAAANDr+hu2t9jWonmuvzFG
+nbsNhd1hOOwJI2Fv2B9Gw4FwMBwKR8JYOJrGW9THx/LaQ3nvgRxrf449krWG
+s/ZQtZH3NdfY7rrqtdW6/fvw/9LMnpuZ9Jty646y6n8AhCP7tg==
+         "], {{0, 26}, {2000, 0}}, {0, 255},
+         ColorFunction->RGBColor],
+        BaseStyle->"ImageGraphics",
+        ImageSize->Magnification[1],
+        ImageSizeRaw->{2000, 26},
+        PlotRange->{{0, 2000}, {0, 26}}], 
+       GraphicsBox[RasterBox[CompressedData["
+1:eJy9lktLQkEUxyVdCBIELaxctYq+QduWbcKMPoCSRRsDC6JPp+Lj4vuq+EBc
+iBtFfIYrpU7nPzQiN++9vmrgp/dx5j8z55w5c099z56HPYvF8mLnH4/37TIY
+9L7fHvDNXeDl6THgv78KvPof/cELn5UfnjBHjI3J5/OudVBV9bhUKjmbzaad
+iCxmcB9lAxKMmzmv1+v7JvpfG/DJjJkic8NrOut0OlYdfdoCjPXBqMx1q9Vy
+7FhfgvX0MUa73bYZ6edyuTnrvPsZQ4Wv9PTRL5vNroTOGIiJu9FoOLT6UjuT
+yVAqlaJkMin+0+m0YPEZbHTGQDwKyKtl+ugHjdFoRIVCgeLxOCUSCQGua7Ua
+9Xo9YQNbozXI/aHVZ//RcDik2WxG5XKZwuGwANdo0JfrNIhDvFqtHi7zD+YW
+i8VoMBgIvWKxKEDrdrtiHbAxiAF8pHAf5zJ9+Bca0WiUxuMxydbv98U64CvY
+wNZgTyioI9r8QR/EEvrQUhRlrh8Kheb6sDHTZ1xG84ePMP/pdPpr/tvoL/of
+Mcb9Jv7X+mcxP2X+QCMSiYh5VyoVMQbXMbP81I2vzM/JZCLyX+a+BPmPvbFN
+fmr36pr713B/rVp7THy/tD6Y1cjF5zrahvVtB5jW5y21B/kVzpc1kecjfK53
+Pu7kfNfO+x+/T/70++ob7NUEtQ==
+         "], {{0, 26}, {24, 0}}, {0, 255},
+         ColorFunction->RGBColor],
+        BaseStyle->"ImageGraphics",
+        ImageSize->Magnification[1],
+        ImageSizeRaw->{24, 26},
+        PlotRange->{{0, 24}, {0, 26}}]}
+     },
+     AutoDelete->False,
+     GridBoxItemSize->{"Columns" -> {Automatic, 
+         Scaled[0.6], Automatic}},
+     GridBoxSpacings->{"Columns" -> {{0}}, "Rows" -> {{0}}}],
+    "Grid"], 
+   PaneBox[
+    StyleBox[
+     RowBox[{
+     "Background", " ", "images", " ", "and", " ", "text", " ", "colors", " ",
+       "have", " ", "been", " ", "adjusted", " ", "for", " ", "editing", " ", 
+      RowBox[{"purposes", "."}]}],
+     LineBreakWithin->False,
+     FontFamily->"Helvetica",
+     FontSize->12,
+     FontColor->GrayLevel[0.4]],
+    Alignment->Center,
+    ImageSize->Scaled[0.5],
+    ScrollPosition->{0., 0.}]},
+   Alignment->{Center, Center}], 2->""}, "1"]], "SlideShowNavigationBar", \
+"FirstSlide",
+ CellMargins->{{0, 0}, {0, 0}},
+ CellFrameLabelMargins->2,
+ CellSize->{Inherited, 30},
+ CellChangeTimes->{3.712565939837493*^9},
+ TextAlignment->Center,
+ CellTags->"SlideShowHeader"],
+
+Cell["Genotype imputation in multiparental populations", "Title",
+ CellChangeTimes->{{3.559948352753993*^9, 3.559948353292842*^9}, {
+  3.7124882074672294`*^9, 3.712488257611842*^9}, {3.7124882877808585`*^9, 
+  3.712488296549735*^9}, {3.712488336603134*^9, 3.712488370680542*^9}, {
+  3.712489620732885*^9, 3.71248963942955*^9}, {3.7125557167013073`*^9, 
+  3.7125557196296005`*^9}, {3.712563313075924*^9, 3.7125633155081673`*^9}, {
+  3.7126610975799522`*^9, 3.7126611003792324`*^9}}],
+
+Cell["\<\
+Chaozhi Zheng
+Wageningen University and Research
+1 Sept 2017\
+\>", "Subtitle",
+ CellChangeTimes->{{3.7124883846327324`*^9, 3.712488417762045*^9}, {
+   3.712545847614869*^9, 3.7125458501343193`*^9}, 3.7126627700864563`*^9}]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell["", "SlideShowNavigationBar",
+ CellTags->"SlideShowHeader"],
+
+Cell[CellGroupData[{
+
+Cell["Outlines", "Section",
+ CellChangeTimes->{{3.7125552567970357`*^9, 3.7125552616695232`*^9}, {
+  3.7125712529518266`*^9, 3.712571286152534*^9}, {3.7126611120037813`*^9, 
+  3.712661115612142*^9}}],
+
+Cell[CellGroupData[{
+
+Cell["Selection a mapping population", "Item",
+ CellChangeTimes->{{3.712555267725128*^9, 3.712555289584906*^9}, {
+   3.7126611251328897`*^9, 3.7126611285322294`*^9}, {3.7126611838469357`*^9, 
+   3.712661186926244*^9}, {3.7129983334790506`*^9, 3.7129983558098755`*^9}, 
+   3.712998435762632*^9, {3.712998742239147*^9, 3.712998754318355*^9}}],
+
+Cell["Simulate genomic data", "Item",
+ CellChangeTimes->{{3.712555267725128*^9, 3.712555289584906*^9}, {
+   3.7126611251328897`*^9, 3.7126611285322294`*^9}, {3.7126611838469357`*^9, 
+   3.712661186926244*^9}, {3.7129983334790506`*^9, 3.7129983558098755`*^9}, 
+   3.712998435762632*^9}],
+
+Cell["Genotype imputation and error correction", "Item",
+ CellChangeTimes->{{3.712555267725128*^9, 3.712555289584906*^9}, {
+  3.7126611251328897`*^9, 3.7126611285322294`*^9}, {3.7126611838469357`*^9, 
+  3.712661186926244*^9}, {3.7129983334790506`*^9, 3.7129983539036846`*^9}, {
+  3.712998491934827*^9, 3.712998491935827*^9}, {3.7129985569191*^9, 
+  3.712998560887497*^9}}],
+
+Cell["Imputation accuracy", "Item",
+ CellChangeTimes->{{3.712555267725128*^9, 3.712555289584906*^9}, {
+  3.7126611251328897`*^9, 3.7126611285322294`*^9}, {3.7126611838469357`*^9, 
+  3.712661186926244*^9}, {3.7129983334790506`*^9, 3.7129983539036846`*^9}, {
+  3.712998492676901*^9, 3.7129985260304265`*^9}}]
+}, Open  ]]
+}, Open  ]]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell["", "SlideShowNavigationBar",
+ CellTags->"SlideShowHeader"],
+
+Cell[CellGroupData[{
+
+Cell["Load MagicImpute", "Section",
+ CellChangeTimes->{{3.712488572095068*^9, 3.7124885903118896`*^9}, {
+  3.712661193454692*^9, 3.712661195566903*^9}}],
+
+Cell[TextData[{
+ "First set directory to the directory of the Mathematica packages.\nThen \
+load the package by functions ",
+ StyleBox["Needs ",
+  FontWeight->"Bold"],
+ "or",
+ StyleBox[" Get",
+  FontWeight->"Bold"],
+ ". \nUse  the directory of the current notebook as the work directory. "
+}], "Text",
+ CellChangeTimes->{{3.7124888322006674`*^9, 3.7124889533967857`*^9}, {
+   3.71248902506355*^9, 3.712489064024446*^9}, {3.7124891199146256`*^9, 
+   3.7124891306116953`*^9}, {3.7124893770521326`*^9, 3.712489387308158*^9}, 
+   3.712489952048137*^9, {3.713007989420546*^9, 3.713008001036708*^9}}],
+
+Cell[BoxData[{
+ StyleBox[
+  RowBox[{
+   RowBox[{"SetDirectory", "[", 
+    RowBox[{"FileNameJoin", "[", 
+     RowBox[{"{", 
+      RowBox[{
+       RowBox[{"ParentDirectory", "[", 
+        RowBox[{"NotebookDirectory", "[", "]"}], "]"}], ",", 
+       "\"\<RABBIT_Packages\>\""}], "}"}], "]"}], "]"}], ";"}], 
+  "Input"], "\n", 
+ StyleBox[
+  RowBox[{"Get", "[", "\"\<MagicImpute`\>\"", "]"}], 
+  "Input"], "\[IndentingNewLine]", 
+ StyleBox[
+  RowBox[{"SetDirectory", "[", 
+   RowBox[{"NotebookDirectory", "[", "]"}], "]"}], "Input"]}], "Input",
+ InitializationCell->True,
+ CellChangeTimes->{{3.71248867121898*^9, 3.7124887092455773`*^9}, 
+   3.712488977430787*^9, 3.7124890112081647`*^9, {3.71256286852497*^9, 
+   3.7125628711568317`*^9}, {3.7125631980172358`*^9, 
+   3.7125632034967833`*^9}, {3.7125677993085375`*^9, 
+   3.7125678104446507`*^9}, {3.7125706076727066`*^9, 3.71257060791273*^9}, {
+   3.7125706573308487`*^9, 3.712570679802483*^9}, {3.712909488643896*^9, 
+   3.712909488867919*^9}, {3.712909519403965*^9, 3.712909519564981*^9}, {
+   3.7130004153224187`*^9, 3.7130004169385805`*^9}, 3.713000493132764*^9, {
+   3.7130079840760117`*^9, 3.71300798455606*^9}, {3.713008309104037*^9, 
+   3.713008309888115*^9}}],
+
+Cell["Get help information on functions or options by ?", "Text",
+ CellChangeTimes->{{3.7130080497435703`*^9, 3.713008086431429*^9}, {
+  3.713008186931653*^9, 3.7130082336931095`*^9}}],
+
+Cell[BoxData[
+ RowBox[{"?", "\"\<MagicImpute`*\>\""}]], "Input",
+ InitializationCell->True,
+ CellChangeTimes->{{3.712934846712282*^9, 3.7129348579594064`*^9}, {
+  3.713008092239805*^9, 3.7130081398583546`*^9}, {3.713008197516507*^9, 
+  3.7130082015645103`*^9}, {3.7130083174316654`*^9, 3.7130083181757393`*^9}}]
+}, Open  ]]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell["", "SlideShowNavigationBar",
+ CellTags->"SlideShowHeader"],
+
+Cell[CellGroupData[{
+
+Cell["Help on magicImpute", "Section",
+ CellChangeTimes->{{3.7130921512364073`*^9, 3.713092158052885*^9}}],
+
+Cell[BoxData[
+ RowBox[{"?", "magicImpute"}]], "Input",
+ InitializationCell->True,
+ CellChangeTimes->{{3.712663673719577*^9, 3.712663681343135*^9}, {
+  3.712663744258601*^9, 3.7126637472609015`*^9}, {3.712663965250413*^9, 
+  3.7126639654334316`*^9}, {3.713092161877267*^9, 3.7130921631413937`*^9}}],
+
+Cell[BoxData[{
+ RowBox[{"Options", "[", "magicImpute", "]"}], "\[IndentingNewLine]", 
+ RowBox[{"?", "imputingThreshold"}]}], "Input",
+ InitializationCell->True,
+ CellChangeTimes->{{3.712663673719577*^9, 3.712663681343135*^9}, {
+  3.712663744258601*^9, 3.7126637472609015`*^9}, {3.712663965250413*^9, 
+  3.7126639654334316`*^9}, {3.7130921688287582`*^9, 3.7130921790055714`*^9}}],
+
+Cell[BoxData[
+ RowBox[{"?", "imputingThreshold"}]], "Input",
+ CellChangeTimes->{{3.7136104254162197`*^9, 3.7136104410807247`*^9}}]
+}, Open  ]]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell["", "SlideShowNavigationBar",
+ CellTags->"SlideShowHeader"],
+
+Cell[CellGroupData[{
+
+Cell["Select an example population", "Section",
+ CellChangeTimes->{{3.71249011950283*^9, 3.712490125815257*^9}, 
+   3.7124902747564926`*^9, {3.7124904175931325`*^9, 3.712490419097283*^9}, {
+   3.712661370861351*^9, 3.7126614045026927`*^9}}],
+
+Cell[BoxData[{
+ RowBox[{
+  RowBox[{"codels", "=", 
+   RowBox[{"{", 
+    RowBox[{
+    "\"\<2wayril-self6\>\"", ",", "\"\<f2\>\"", ",", "\"\<cp\>\"", ",", 
+     "\"\<8wayril-self4\>\""}], "}"}]}], ";"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{"popcode", "=", 
+   RowBox[{"codels", "[", 
+    RowBox[{"[", 
+     RowBox[{"-", "1"}], "]"}], "]"}]}], ";"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{"imagesizels", "=", 
+   RowBox[{"{", 
+    RowBox[{"100", ",", "200", ",", "200", ",", "500"}], "}"}]}], 
+  ";"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{"pedls", "=", 
+   RowBox[{"Table", "[", "\[IndentingNewLine]", 
+    RowBox[{
+     RowBox[{
+      RowBox[{"pedigree", "=", 
+       RowBox[{"compilePopPedigree", "[", 
+        RowBox[{"codels", "[", 
+         RowBox[{"[", "i", "]"}], "]"}], "]"}]}], ";", "\[IndentingNewLine]", 
+      RowBox[{"Column", "[", 
+       RowBox[{"{", 
+        RowBox[{
+         RowBox[{"\"\<popcode = \>\"", "<>", 
+          RowBox[{"codels", "[", 
+           RowBox[{"[", "i", "]"}], "]"}]}], ",", 
+         RowBox[{"pedigreePlot", "[", 
+          RowBox[{"pedigree", ",", 
+           RowBox[{"ImageSize", "\[Rule]", 
+            RowBox[{"imagesizels", "[", 
+             RowBox[{"[", "i", "]"}], "]"}]}]}], "]"}]}], "}"}], "]"}]}], ",", 
+     RowBox[{"{", 
+      RowBox[{"i", ",", 
+       RowBox[{"Length", "[", "codels", "]"}]}], "}"}]}], "]"}]}], 
+  ";"}], "\[IndentingNewLine]", 
+ RowBox[{"TabView", "[", 
+  RowBox[{
+   RowBox[{"Transpose", "[", 
+    RowBox[{"{", 
+     RowBox[{"codels", ",", 
+      RowBox[{"Thread", "[", 
+       RowBox[{
+        RowBox[{"{", 
+         RowBox[{
+         "\"\<2-way RIL\>\"", ",", "\"\<F2\>\"", ",", "\"\<CP\>\"", ",", 
+          "\"\<8-way RIL\>\""}], "}"}], "\[Rule]", "pedls"}], "]"}]}], "}"}], 
+    "]"}], ",", 
+   RowBox[{"Dynamic", "[", "popcode", "]"}], ",", 
+   RowBox[{"ImageSize", "\[Rule]", "Automatic"}]}], "]"}]}], "Input",
+ InitializationCell->True,
+ CellChangeTimes->{{3.712661438120638*^9, 3.7126617876452365`*^9}, {
+  3.7126618596886153`*^9, 3.712661982331455*^9}, {3.7126620570465097`*^9, 
+  3.712662097015083*^9}, {3.712662132705038*^9, 3.7126621525536146`*^9}, {
+  3.712662188651019*^9, 3.712662196476802*^9}, {3.7126622378371053`*^9, 
+  3.712662288662362*^9}, {3.712662376257676*^9, 3.712662376545705*^9}, {
+  3.713092235842444*^9, 3.71309226290434*^9}, {3.713092361639577*^9, 
+  3.713092368228236*^9}, {3.713249610161755*^9, 3.713249611837719*^9}, {
+  3.713416893499175*^9, 3.7134169274825745`*^9}}]
+}, Open  ]]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell["", "SlideShowNavigationBar",
+ CellTags->"SlideShowHeader"],
+
+Cell[CellGroupData[{
+
+Cell["Simulate genomic data", "Section",
+ CellChangeTimes->{{3.712662679315811*^9, 3.7126626850999875`*^9}, {
+  3.712896900846073*^9, 3.7128969248946676`*^9}}],
+
+Cell[BoxData[{
+ RowBox[{
+  RowBox[{"missfrac", "=", "0.2"}], ";"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{"simpedinforfile", "=", 
+   RowBox[{"simPedigreeInfor", "[", 
+    RowBox[{"popcode", ",", 
+     RowBox[{"sampleSize", "\[Rule]", "100"}], ",", 
+     RowBox[{"outputFileID", "\[Rule]", "\"\<Example\>\""}]}], "]"}]}], 
+  ";"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{"datafiles", "=", 
+   RowBox[{"magicGeneDropping", "[", 
+    RowBox[{
+    "\"\<Arabidopsis_MAGIC_19FounderHaplo.csv\>\"", ",", "simpedinforfile", 
+     ",", 
+     RowBox[{"outputFileID", "\[Rule]", "\"\<Example\>\""}], ",", 
+     RowBox[{"isFounderInbred", "\[Rule]", 
+      RowBox[{"popcode", "=!=", "\"\<cp\>\""}]}], ",", 
+     RowBox[{"founderGenotypeMissing", "\[Rule]", "missfrac"}], ",", 
+     RowBox[{"offspringGenotypeMissing", "\[Rule]", "missfrac"}], ",", 
+     RowBox[{"dropMonomorphic", "\[Rule]", "True"}], ",", 
+     RowBox[{"isPrintTimeElapsed", "\[Rule]", "True"}]}], "]"}]}], 
+  ";"}]}], "Input",
+ InitializationCell->True,
+ CellChangeTimes->{
+  3.712564381266658*^9, {3.71256441858858*^9, 3.7125644462295413`*^9}, 
+   3.7125645761070924`*^9, {3.712564691408186*^9, 3.7125647008221273`*^9}, {
+   3.712564782826892*^9, 3.712564783520961*^9}, {3.7125654896048*^9, 
+   3.712565493218958*^9}, {3.712565543278351*^9, 3.712565544740497*^9}, 
+   3.712566514407346*^9, {3.712659546532776*^9, 3.7126595599897127`*^9}, {
+   3.7126595962859325`*^9, 3.7126596177268724`*^9}, {3.712659667491228*^9, 
+   3.7126597379492292`*^9}, 3.712659768838303*^9, {3.712659821792576*^9, 
+   3.7126598386806517`*^9}, {3.712659903906947*^9, 3.712659904240981*^9}, {
+   3.7126628745140514`*^9, 3.712662882067405*^9}, {3.71266293699708*^9, 
+   3.712662986703043*^9}, {3.7126633210133905`*^9, 3.712663328114896*^9}, {
+   3.7126637290654907`*^9, 3.712663730953475*^9}, {3.7126640143310947`*^9, 
+   3.7126640727201157`*^9}, {3.7126641129691253`*^9, 3.712664129215144*^9}, {
+   3.7126644421067657`*^9, 3.712664453075461*^9}, {3.7128970789572115`*^9, 
+   3.712897102182519*^9}, {3.712897554590945*^9, 3.7128976645298862`*^9}, {
+   3.712900084097345*^9, 3.712900106360965*^9}, {3.7129781602892976`*^9, 
+   3.712978160873356*^9}, 3.7129782413473616`*^9, {3.7129782842290306`*^9, 
+   3.7129782970075054`*^9}, {3.7130007011026535`*^9, 3.713000701292673*^9}, {
+   3.713000732439372*^9, 3.7130007456214857`*^9}, 3.7130086792453685`*^9, {
+   3.713242781003995*^9, 3.7132427812180166`*^9}, {3.713243033516958*^9, 
+   3.7132430742604065`*^9}, {3.71324473942507*^9, 3.7132447483439617`*^9}, {
+   3.7132453338554935`*^9, 3.713245341399043*^9}, {3.7132496343593655`*^9, 
+   3.713249634598389*^9}, {3.713417111960575*^9, 3.7134171121695747`*^9}, {
+   3.7134984349748116`*^9, 3.713498484338211*^9}, {3.713498515433811*^9, 
+   3.7134985156798115`*^9}, 3.713499599164611*^9, 3.7165223299315968`*^9, 
+   3.716522620968223*^9, 3.716522719410636*^9}]
+}, Open  ]]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell["", "SlideShowNavigationBar",
+ CellTags->"SlideShowHeader"],
+
+Cell[CellGroupData[{
+
+Cell["Genotype imputation", "Section",
+ CellChangeTimes->{{3.7126636539740114`*^9, 3.712663662743085*^9}}],
+
+Cell[BoxData[{
+ RowBox[{
+  RowBox[{"genodatafile", "=", 
+   RowBox[{"Last", "[", "datafiles", "]"}]}], ";", 
+  RowBox[{"Print", "[", 
+   RowBox[{"\"\<Population code = \>\"", ",", "popcode"}], "]"}], 
+  ";"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{
+   RowBox[{"model", " ", "=", "\"\<jointModel\>\""}], ";"}], " ", 
+  RowBox[{"(*", "\"\<depModel\>\"", "*)"}]}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{"outputfiles", "=", 
+   RowBox[{"magicImpute", "[", 
+    RowBox[{"genodatafile", ",", "model", ",", "simpedinforfile", ",", 
+     RowBox[{"isFounderInbred", "\[Rule]", 
+      RowBox[{"popcode", "=!=", "\"\<cp\>\""}]}], ",", 
+     RowBox[{"outputFileID", "\[Rule]", "\"\<Example\>\""}], ",", 
+     RowBox[{"isPrintTimeElapsed", "\[Rule]", "True"}]}], "]"}]}], 
+  ";"}]}], "Input",
+ InitializationCell->True,
+ CellChangeTimes->{{3.712663691743569*^9, 3.7126638013156853`*^9}, {
+   3.712663898648593*^9, 3.712663911567878*^9}, {3.71266414119394*^9, 
+   3.71266414349617*^9}, {3.71289712852654*^9, 3.7128972121698666`*^9}, {
+   3.712897245403577*^9, 3.712897333738555*^9}, {3.712897689436355*^9, 
+   3.712897689931003*^9}, 3.7128977946798058`*^9, {3.712978389722511*^9, 
+   3.7129784018977146`*^9}, {3.713006780873597*^9, 3.7130067840257072`*^9}, {
+   3.713093039204546*^9, 3.7130930685098705`*^9}, {3.7132432217718973`*^9, 
+   3.7132432272262387`*^9}, {3.713243446907137*^9, 3.713243465450576*^9}, {
+   3.713688620934819*^9, 3.7136886224278193`*^9}, {3.7165227291896133`*^9, 
+   3.7165227449057837`*^9}}]
+}, Open  ]]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell["", "SlideShowNavigationBar",
+ CellTags->"SlideShowHeader"],
+
+Cell[CellGroupData[{
+
+Cell["Visualize genotype imputation/correction", "Section",
+ CellChangeTimes->{{3.7131831527697597`*^9, 3.7131831985589595`*^9}}],
+
+Cell[BoxData[{
+ RowBox[{"Print", "[", 
+  RowBox[{"{", 
+   RowBox[{
+    RowBox[{"datafiles", "[", 
+     RowBox[{"[", "4", "]"}], "]"}], ",", 
+    RowBox[{"outputfiles", "[", 
+     RowBox[{"[", "2", "]"}], "]"}], ",", 
+    RowBox[{"datafiles", "[", 
+     RowBox[{"[", "3", "]"}], "]"}]}], "}"}], "]"}], "\[IndentingNewLine]", 
+ RowBox[{"TabView", "[", 
+  RowBox[{"Table", "[", 
+   RowBox[{
+    RowBox[{
+     RowBox[{"\"\<Chr \>\"", "<>", 
+      RowBox[{"ToString", "[", "i", "]"}]}], "->", 
+     RowBox[{"plotErrorPatternGUI", "[", 
+      RowBox[{
+       RowBox[{"datafiles", "[", 
+        RowBox[{"[", "4", "]"}], "]"}], ",", 
+       RowBox[{"outputfiles", "[", 
+        RowBox[{"[", "2", "]"}], "]"}], ",", 
+       RowBox[{"datafiles", "[", 
+        RowBox[{"[", "3", "]"}], "]"}], ",", 
+       RowBox[{"linkageGroupSet", "\[Rule]", 
+        RowBox[{"{", "i", "}"}]}]}], "]"}]}], ",", 
+    RowBox[{"{", 
+     RowBox[{"i", ",", "5"}], "}"}]}], "]"}], "]"}]}], "Input",
+ InitializationCell->True,
+ CellChangeTimes->{{3.7131832100299597`*^9, 3.7131832466197596`*^9}, {
+   3.7131833263231597`*^9, 3.7131833283911595`*^9}, {3.7131835086589594`*^9, 
+   3.71318352782576*^9}, {3.7131835734873595`*^9, 3.7131836500979595`*^9}, {
+   3.713242325908041*^9, 3.713242388947732*^9}, {3.7132424302290435`*^9, 
+   3.7132424363334494`*^9}, {3.7132425786350255`*^9, 
+   3.7132425789790597`*^9}, {3.7132495507554274`*^9, 3.713249574204568*^9}, 
+   3.7132496578981133`*^9, {3.7134168485949745`*^9, 3.713416849234975*^9}, 
+   3.713417054454175*^9, 3.7134312706516304`*^9, {3.7134980182892113`*^9, 
+   3.713498021224211*^9}, {3.713498084979811*^9, 3.7134981359606113`*^9}, {
+   3.7134995056334114`*^9, 3.713499505993411*^9}, {3.713499559447011*^9, 
+   3.7134995596140113`*^9}}]
+}, Open  ]]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell["", "SlideShowNavigationBar",
+ CellTags->"SlideShowHeader"],
+
+Cell[CellGroupData[{
+
+Cell["Refereces", "Section",
+ CellChangeTimes->{{3.6272780402448635`*^9, 3.627278046697541*^9}}],
+
+Cell["\<\
+Zheng, C., Boer, M. P., and Eeuwijk, F. A. 2018.  Accurate genotype \
+imputation in multiparental populations from low-coverage sequence. \
+Manuscript. \
+\>", "Item",
+ CellChangeTimes->{{3.627278059699891*^9, 3.627278085784587*^9}, {
+   3.627281116497564*^9, 3.627281116497564*^9}, 3.6396560568286266`*^9, {
+   3.6422337076948814`*^9, 3.642233711804964*^9}, {3.7130075128337927`*^9, 
+   3.713007513076817*^9}, {3.713007560396738*^9, 3.7130075715734544`*^9}, 
+   3.713007618824366*^9, {3.728112324252781*^9, 3.728112324572813*^9}}]
+}, Open  ]]
+}, Open  ]]
+},
+WindowSize->{1920, 980},
+WindowMargins->{{-9, Automatic}, {Automatic, 0}},
+TaggingRules->{"SlideShow" -> True},
+FrontEndVersion->"11.0 for Microsoft Windows (64-bit) (July 28, 2016)",
+StyleDefinitions->FrontEnd`FileName[{"SlideShow"}, "Sapphire.nb", 
+  CharacterEncoding -> "UTF-8"]
+]
+(* End of Notebook Content *)
+
+(* Internal cache information *)
+(*CellTagsOutline
+CellTagsIndex->{
+ "SlideShowHeader"->{
+  Cell[580, 22, 4356, 95, 82, "SlideShowNavigationBar",
+   CellTags->"SlideShowHeader"],
+  Cell[5692, 138, 64, 1, 81, "SlideShowNavigationBar",
+   CellTags->"SlideShowHeader"],
+  Cell[7378, 180, 64, 1, 81, "SlideShowNavigationBar",
+   CellTags->"SlideShowHeader"],
+  Cell[9983, 248, 64, 1, 81, "SlideShowNavigationBar",
+   CellTags->"SlideShowHeader"],
+  Cell[11041, 279, 64, 1, 81, "SlideShowNavigationBar",
+   CellTags->"SlideShowHeader"],
+  Cell[13916, 358, 64, 1, 81, "SlideShowNavigationBar",
+   CellTags->"SlideShowHeader"],
+  Cell[17110, 423, 64, 1, 81, "SlideShowNavigationBar",
+   CellTags->"SlideShowHeader"],
+  Cell[18870, 467, 64, 1, 81, "SlideShowNavigationBar",
+   CellTags->"SlideShowHeader"],
+  Cell[20895, 520, 64, 1, 81, "SlideShowNavigationBar",
+   CellTags->"SlideShowHeader"]}
+ }
+*)
+(*CellTagsIndex
+CellTagsIndex->{
+ {"SlideShowHeader", 22055, 553}
+ }
+*)
+(*NotebookFileOutline
+Notebook[{
+Cell[CellGroupData[{
+Cell[580, 22, 4356, 95, 82, "SlideShowNavigationBar",
+ CellTags->"SlideShowHeader"],
+Cell[4939, 119, 481, 6, 504, "Title"],
+Cell[5423, 127, 232, 6, 226, "Subtitle"]
+}, Open  ]],
+Cell[CellGroupData[{
+Cell[5692, 138, 64, 1, 81, "SlideShowNavigationBar",
+ CellTags->"SlideShowHeader"],
+Cell[CellGroupData[{
+Cell[5781, 143, 199, 3, 131, "Section"],
+Cell[CellGroupData[{
+Cell[6005, 150, 340, 4, 59, "Item"],
+Cell[6348, 156, 285, 4, 59, "Item"],
+Cell[6636, 162, 372, 5, 59, "Item"],
+Cell[7011, 169, 306, 4, 59, "Item"]
+}, Open  ]]
+}, Open  ]]
+}, Open  ]],
+Cell[CellGroupData[{
+Cell[7378, 180, 64, 1, 81, "SlideShowNavigationBar",
+ CellTags->"SlideShowHeader"],
+Cell[CellGroupData[{
+Cell[7467, 185, 152, 2, 131, "Section"],
+Cell[7622, 189, 594, 13, 123, "Text"],
+Cell[8219, 204, 1214, 27, 120, "Input",
+ InitializationCell->True],
+Cell[9436, 233, 184, 2, 59, "Text"],
+Cell[9623, 237, 311, 5, 61, "Input",
+ InitializationCell->True]
+}, Open  ]]
+}, Open  ]],
+Cell[CellGroupData[{
+Cell[9983, 248, 64, 1, 81, "SlideShowNavigationBar",
+ CellTags->"SlideShowHeader"],
+Cell[CellGroupData[{
+Cell[10072, 253, 106, 1, 131, "Section"],
+Cell[10181, 256, 297, 5, 61, "Input",
+ InitializationCell->True],
+Cell[10481, 263, 378, 6, 91, "Input",
+ InitializationCell->True],
+Cell[10862, 271, 130, 2, 45, "Input"]
+}, Open  ]]
+}, Open  ]],
+Cell[CellGroupData[{
+Cell[11041, 279, 64, 1, 81, "SlideShowNavigationBar",
+ CellTags->"SlideShowHeader"],
+Cell[CellGroupData[{
+Cell[11130, 284, 240, 3, 131, "Section"],
+Cell[11373, 289, 2494, 63, 236, "Input",
+ InitializationCell->True]
+}, Open  ]]
+}, Open  ]],
+Cell[CellGroupData[{
+Cell[13916, 358, 64, 1, 81, "SlideShowNavigationBar",
+ CellTags->"SlideShowHeader"],
+Cell[CellGroupData[{
+Cell[14005, 363, 159, 2, 131, "Section"],
+Cell[14167, 367, 2894, 50, 178, "Input",
+ InitializationCell->True]
+}, Open  ]]
+}, Open  ]],
+Cell[CellGroupData[{
+Cell[17110, 423, 64, 1, 81, "SlideShowNavigationBar",
+ CellTags->"SlideShowHeader"],
+Cell[CellGroupData[{
+Cell[17199, 428, 106, 1, 131, "Section"],
+Cell[17308, 431, 1513, 30, 149, "Input",
+ InitializationCell->True]
+}, Open  ]]
+}, Open  ]],
+Cell[CellGroupData[{
+Cell[18870, 467, 64, 1, 81, "SlideShowNavigationBar",
+ CellTags->"SlideShowHeader"],
+Cell[CellGroupData[{
+Cell[18959, 472, 129, 1, 131, "Section"],
+Cell[19091, 475, 1755, 39, 91, "Input",
+ InitializationCell->True]
+}, Open  ]]
+}, Open  ]],
+Cell[CellGroupData[{
+Cell[20895, 520, 64, 1, 81, "SlideShowNavigationBar",
+ CellTags->"SlideShowHeader"],
+Cell[CellGroupData[{
+Cell[20984, 525, 96, 1, 131, "Section"],
+Cell[21083, 528, 540, 9, 91, "Item"]
+}, Open  ]]
+}, Open  ]]
+}
+]
+*)
+

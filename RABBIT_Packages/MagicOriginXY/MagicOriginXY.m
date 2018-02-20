@@ -268,30 +268,33 @@ origSummaryXY[nFounder_, mateScheme_, founderGamma12_, founderGamma123_, founder
         juncRho = juncDensityXY[founderGamma12, founderGamma123, founderR, founderJ1122, founderJ1232, coalProb2, coalProb3];
         {finb, mapR, sumRho, juncRho}
     ]
-    
-origSummaryXY[nFounder_,mateScheme_] :=
+   
+origSummaryXY[nFounder_,mateScheme_,isInbredFounder_:True] :=
     Module[ {founderGamma12, founderGamma123, founderR, founderJK1122, 
-      founderJK1232},
-        founderGamma12 = {0, 1, 1, 1};
-        founderGamma123 = Join[{0, 0}, {1, 1, 1, 1} If[ nFounder >= 3,
+      founderJK1232,boole},
+        boole=Boole[!isInbredFounder];
+        founderGamma12 ={boole,1, 1, 1}; 
+        founderGamma123 = Join[{boole, boole}, {1, 1, 1, 1} If[ nFounder >= 3,
                                                         1,
                                                         0
                                                     ]];
         founderR = Table[0, {2}];
         founderJK1122 = Table[0, {4}];
         founderJK1232 = Table[0, {6}];
+        (*{founderGamma12, founderGamma123,founderR, founderJK1122, founderJK1232}
+            = N[{founderGamma12, founderGamma123,founderR, founderJK1122, founderJK1232}];*)
         (*{inbred,mapR, sumRho,junction} from origSummary*)
         origSummaryXY[nFounder, mateScheme, founderGamma12, founderGamma123,
           founderR, founderJK1122, founderJK1232]
     ]      
 
-magicOrigPriorXY[nFounder_, mateScheme_]:=
-	Module[{temp},    
-		temp = origSummaryXY[nFounder, mateScheme];
+magicOrigPriorXY[nFounder_, mateScheme_,isInbredFounder_:True] :=
+    Module[ {temp},
+        temp = origSummaryXY[nFounder, mateScheme,isInbredFounder];
         (*juncdist={finb_mp,j1122mp,j1211mp,j1213mp,j1222mp,j1232mp}*)
-        N[Prepend[temp[[4, All, -1]], temp[[1, -1]]]]    
-	]
-	        
+        N[Prepend[temp[[4, All, -1]], temp[[1, -1]]]]
+    ]
+            
 magicStationaryProbXY[nFgl_,inbredf_] :=
     Module[ {prob},
         prob = Flatten[Outer[List, Range[nFgl], Range[nFgl]], 1];

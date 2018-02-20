@@ -1,0 +1,1028 @@
+(* Content-type: application/vnd.wolfram.mathematica *)
+
+(*** Wolfram Notebook File ***)
+(* http://www.wolfram.com/nb *)
+
+(* CreatedBy='Mathematica 11.0' *)
+
+(*CacheID: 234*)
+(* Internal cache information:
+NotebookFileLineBreakTest
+NotebookFileLineBreakTest
+NotebookDataPosition[       158,          7]
+NotebookDataLength[     37827,       1020]
+NotebookOptionsPosition[     33407,        875]
+NotebookOutlinePosition[     34712,        914]
+CellTagsIndexPosition[     34634,        909]
+WindowFrame->Normal*)
+
+(* Beginning of Notebook Content *)
+Notebook[{
+
+Cell[CellGroupData[{
+Cell[BoxData[
+ TogglerBox[2, {1->
+  OverlayBox[{
+   TagBox[GridBox[{
+      {
+       GraphicsBox[RasterBox[CompressedData["
+1:eJxTTMoPSmNiYGAo5gASQYnljkVFiZXBAkBOaF5xZnpeaopnXklqemqRRRIz
+UFAKiEGSLED8//9/gvjRo0fsN27cELp69arY+fPnpZExPn137tzhBqrRBGJ/
+ID4CxMfRMTZ9L168YL5w4YIaUD4AiC8C8Qcg/gvE/9AxFreC7PQD4gtA/BGq
+7j8ujKz3+fPnLFC9b6H24dSHTf/FixfVofYSpRdZPzSsAqBuJkovsn5oOF8k
+5F9s+h88eMBBjt0w/devXxcGso+S4m9k/ZcuXRKHpgeS3A7TD0wrkpToPw9J
+ywOmn1L3Uxp+lMYfpemH0vRLjfwDjQey8y9a+fGOWDPwlF+gsPhEKDywlZ8g
+d0D9EniexPITGd++fZv3PBnlN6764zxa3QHCAIDESDs=
+         "], {{0, 26}, {16, 0}}, {0, 255},
+         ColorFunction->RGBColor],
+        BaseStyle->"ImageGraphics",
+        ImageSize->Magnification[1],
+        ImageSizeRaw->{16, 26},
+        PlotRange->{{0, 16}, {0, 26}}], 
+       GraphicsBox[RasterBox[CompressedData["
+1:eJzt2V1vVFUUBuBGTfTSSygthYYKNHyVinrrpbcYfwBEJN5gUkyMfw9KKaVw
+KCkQKCW1RNIQKg1gEE3QtdN10pMRZCaBzNQ+kzxt5nzstfeZfbPOu/vkD8e/
+e6+vr+/sR/Hn+ImfvpyYOPHz1x/Hl2/OnP3+9JlT33515sdTp09NfHHy/TjY
+H6592Nf3QfyvqmpHBwbCYNr5GoMNAw2d1AEAADa3/obtLba1aJ7rb4xR9x1D
+YVfYHYbDnjASPgn7wv4wGg6Eg+FQOByOhLEwnj4Nx8Jn6fM21dcfyzHq8cay
+xuGseTDnMJpz2pdzHMk5D+caduWa6v6p+czafU71s6p1+/cGAADYqt52/9va
+++6tXt331j3v0TTeoj5e966v6lv3Vv/uWfWr9LJm9tzMpN+UW3eaVV9s00yY
+CzfC7bAQFhvuhjt57maYD9er9c+VcDlcCtMd1AQAADafqXQhTabz6VyL+vhk
+Xl/uLX1D6UFmw9VwrVrvL0o/cqta7ztKD3Iv/BLuh1/DSngYHoXfwlp4Ep6F
+38Pz8Ed4Ef5Mf71Gff5F3vM8x3iWY65ljUdZcyXncD/ndC/neDvnfCPXcC3X
+NJtrnG48r3afU/2s6uc11QO/OwAAwFbzLvrfksWVjK30kSV3KxncUlgOD6qN
+vnc1PK42+t7iaaq/r+U1q9VG3/ogx1rKse9krfmsrV+l15R9WDLmkjWXzLl8
+yvuVsmdLJl3eu5R9XN7BNLPrhTxX3seUvT3TQc2Xbfr7LWq3JgAAwH95m33K
+u9Dt5wMAAMDmp2dlK+vGnu/2+yQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAYPN42aZu
+1AQAAAAAAICtrNsZIXRTN/b8xTbNhLlwI9wOC2Gx4W64k+duhvlwvVr/XAmX
+w6Uw3UFNAAAAAAAA6EVT6UKaTOfTuRb18cm8vtxbcrOSwc2Gq9V6FlcytlvV
+eu5WMrilsBwehJXwMKyGx2EtPElPU/19La9ZzXtWcozlHHMxa9zKmnM5h9mc
+03Rjfe2uq15bvb6pHvid2NzKPiwZc8maS+ZcPiWDLnu2ZNIlmy77uGTVzex6
+Ic+VbLvs7ZkOau7owEAYTDtfY7BhoKGTOgAAAAAAANDr+hu2t9jWonmuvzFG
+nbsNhd1hOOwJI2Fv2B9Gw4FwMBwKR8JYOJrGW9THx/LaQ3nvgRxrf449krWG
+s/ZQtZH3NdfY7rrqtdW6/fvw/9LMnpuZ9Jty646y6n8AhCP7tg==
+         "], {{0, 26}, {2000, 0}}, {0, 255},
+         ColorFunction->RGBColor],
+        BaseStyle->"ImageGraphics",
+        ImageSize->Magnification[1],
+        ImageSizeRaw->{2000, 26},
+        PlotRange->{{0, 2000}, {0, 26}}], 
+       GraphicsBox[RasterBox[CompressedData["
+1:eJy9lktLQkEUxyVdCBIELaxctYq+QduWbcKMPoCSRRsDC6JPp+Lj4vuq+EBc
+iBtFfIYrpU7nPzQiN++9vmrgp/dx5j8z55w5c099z56HPYvF8mLnH4/37TIY
+9L7fHvDNXeDl6THgv78KvPof/cELn5UfnjBHjI3J5/OudVBV9bhUKjmbzaad
+iCxmcB9lAxKMmzmv1+v7JvpfG/DJjJkic8NrOut0OlYdfdoCjPXBqMx1q9Vy
+7FhfgvX0MUa73bYZ6edyuTnrvPsZQ4Wv9PTRL5vNroTOGIiJu9FoOLT6UjuT
+yVAqlaJkMin+0+m0YPEZbHTGQDwKyKtl+ugHjdFoRIVCgeLxOCUSCQGua7Ua
+9Xo9YQNbozXI/aHVZ//RcDik2WxG5XKZwuGwANdo0JfrNIhDvFqtHi7zD+YW
+i8VoMBgIvWKxKEDrdrtiHbAxiAF8pHAf5zJ9+Bca0WiUxuMxydbv98U64CvY
+wNZgTyioI9r8QR/EEvrQUhRlrh8Kheb6sDHTZ1xG84ePMP/pdPpr/tvoL/of
+Mcb9Jv7X+mcxP2X+QCMSiYh5VyoVMQbXMbP81I2vzM/JZCLyX+a+BPmPvbFN
+fmr36pr713B/rVp7THy/tD6Y1cjF5zrahvVtB5jW5y21B/kVzpc1kecjfK53
+Pu7kfNfO+x+/T/70++ob7NUEtQ==
+         "], {{0, 26}, {24, 0}}, {0, 255},
+         ColorFunction->RGBColor],
+        BaseStyle->"ImageGraphics",
+        ImageSize->Magnification[1],
+        ImageSizeRaw->{24, 26},
+        PlotRange->{{0, 24}, {0, 26}}]}
+     },
+     AutoDelete->False,
+     GridBoxItemSize->{"Columns" -> {Automatic, 
+         Scaled[0.6], Automatic}},
+     GridBoxSpacings->{"Columns" -> {{0}}, "Rows" -> {{0}}}],
+    "Grid"], 
+   PaneBox[
+    StyleBox[
+     RowBox[{
+     "Background", " ", "images", " ", "and", " ", "text", " ", "colors", " ",
+       "have", " ", "been", " ", "adjusted", " ", "for", " ", "editing", " ", 
+      RowBox[{"purposes", "."}]}],
+     LineBreakWithin->False,
+     FontFamily->"Helvetica",
+     FontSize->12,
+     FontColor->GrayLevel[0.4]],
+    Alignment->Center,
+    ImageSize->Scaled[0.5],
+    ScrollPosition->{0., 0.}]},
+   Alignment->{Center, Center}], 2->""}, "1"]], "SlideShowNavigationBar", \
+"FirstSlide",
+ CellMargins->{{0, 0}, {0, 0}},
+ CellFrameLabelMargins->2,
+ CellSize->{Inherited, 30},
+ CellChangeTimes->{3.712565939837493*^9},
+ TextAlignment->Center,
+ CellTags->"SlideShowHeader"],
+
+Cell["Simulation of genomic data in multiparental populations", "Title",
+ CellChangeTimes->{{3.559948352753993*^9, 3.559948353292842*^9}, {
+  3.7124882074672294`*^9, 3.712488257611842*^9}, {3.7124882877808585`*^9, 
+  3.712488296549735*^9}, {3.712488336603134*^9, 3.712488370680542*^9}, {
+  3.712489620732885*^9, 3.71248963942955*^9}, {3.7125557167013073`*^9, 
+  3.7125557196296005`*^9}, {3.712563313075924*^9, 3.7125633155081673`*^9}}],
+
+Cell["\<\
+Chaozhi Zheng
+Wageningen University and Research
+1 Sep 2017\
+\>", "Subtitle",
+ CellChangeTimes->{{3.7124883846327324`*^9, 3.712488417762045*^9}, {
+  3.712545847614869*^9, 3.7125458501343193`*^9}}]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell["", "SlideShowNavigationBar",
+ CellTags->"SlideShowHeader"],
+
+Cell[CellGroupData[{
+
+Cell["Simulation by gene dropping", "Section",
+ CellChangeTimes->{{3.7125552567970357`*^9, 3.7125552616695232`*^9}, {
+  3.7125712529518266`*^9, 3.712571286152534*^9}}],
+
+Cell[CellGroupData[{
+
+Cell["Population information", "Item",
+ CellChangeTimes->{{3.712555267725128*^9, 3.712555289584906*^9}, {
+  3.712921886611416*^9, 3.7129218878993406`*^9}, {3.7129227203779154`*^9, 
+  3.712922723042182*^9}}],
+
+Cell[CellGroupData[{
+
+Cell["Population coding for common design", "Subitem",
+ CellChangeTimes->{{3.7125553007110186`*^9, 3.712555357696907*^9}}],
+
+Cell["Inter-crossing via random mating", "Subitem",
+ CellChangeTimes->{{3.7125553007110186`*^9, 3.7125553875932913`*^9}}],
+
+Cell["User pre-defined design pedigree", "Subitem",
+ CellChangeTimes->{{3.7125553007110186`*^9, 3.7125554011626477`*^9}, {
+  3.71292189659621*^9, 3.712921898332179*^9}}]
+}, Open  ]],
+
+Cell["Simulate population-level pedigree", "Item",
+ CellChangeTimes->{{3.712921906733019*^9, 3.7129219384851866`*^9}}],
+
+Cell["Simulate genomic data", "Item",
+ CellChangeTimes->{{3.7129226750079994`*^9, 3.71292268277017*^9}}],
+
+Cell[CellGroupData[{
+
+Cell["Dropping FGL on the simulated pedigree", "Subitem",
+ CellChangeTimes->{{3.712555267725128*^9, 3.7125552915261*^9}, {
+  3.7125554117865057`*^9, 3.712555431238043*^9}, {3.7129219487096033`*^9, 
+  3.7129219538299108`*^9}}],
+
+Cell["Replacing FGL by founder haplotypes", "Subitem",
+ CellChangeTimes->{{3.712555267725128*^9, 3.7125552915261*^9}, {
+  3.7125554117865057`*^9, 3.7125554677192893`*^9}}],
+
+Cell["Simulated genotype missing and errors", "Subitem",
+ CellChangeTimes->{{3.712555267725128*^9, 3.7125552915261*^9}, {
+  3.7125554117865057`*^9, 3.7125555030920167`*^9}, {3.7125568609188538`*^9, 
+  3.7125568711586733`*^9}}]
+}, Open  ]]
+}, Open  ]]
+}, Open  ]]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell["", "SlideShowNavigationBar",
+ CellTags->"SlideShowHeader"],
+
+Cell[CellGroupData[{
+
+Cell["Load MagicGeneDropping", "Section",
+ CellChangeTimes->{{3.712488572095068*^9, 3.7124885903118896`*^9}}],
+
+Cell[TextData[{
+ "First set directory to the directory of the Mathematica packages.\nThen \
+load the package by functions ",
+ StyleBox["Needs ",
+  FontWeight->"Bold"],
+ "or",
+ StyleBox[" Get",
+  FontWeight->"Bold"],
+ ". \nUse  the directory of the current notebook as the work directory. "
+}], "Text",
+ CellChangeTimes->{{3.7124888322006674`*^9, 3.7124889533967857`*^9}, {
+   3.71248902506355*^9, 3.712489064024446*^9}, {3.7124891199146256`*^9, 
+   3.7124891306116953`*^9}, {3.7124893770521326`*^9, 3.712489387308158*^9}, 
+   3.712489952048137*^9, {3.713007989420546*^9, 3.713008001036708*^9}}],
+
+Cell[BoxData[{
+ StyleBox[
+  RowBox[{
+   RowBox[{"SetDirectory", "[", 
+    RowBox[{"FileNameJoin", "[", 
+     RowBox[{"{", 
+      RowBox[{
+       RowBox[{"ParentDirectory", "[", 
+        RowBox[{"NotebookDirectory", "[", "]"}], "]"}], ",", 
+       "\"\<RABBIT_Packages\>\""}], "}"}], "]"}], "]"}], ";"}], 
+  "Input"], "\n", 
+ StyleBox[
+  RowBox[{"Get", "[", "\"\<MagicGeneDropping`\>\"", "]"}], 
+  "Input"], "\[IndentingNewLine]", 
+ StyleBox[
+  RowBox[{"SetDirectory", "[", 
+   RowBox[{"NotebookDirectory", "[", "]"}], "]"}], "Input"]}], "Input",
+ InitializationCell->True,
+ CellChangeTimes->{{3.71248867121898*^9, 3.7124887092455773`*^9}, 
+   3.712488977430787*^9, 3.7124890112081647`*^9, {3.71256286852497*^9, 
+   3.7125628711568317`*^9}, {3.7125631980172358`*^9, 
+   3.7125632034967833`*^9}, {3.7125677993085375`*^9, 
+   3.7125678104446507`*^9}, {3.7125706076727066`*^9, 3.71257060791273*^9}, {
+   3.7125706573308487`*^9, 3.712570679802483*^9}, {3.712909488643896*^9, 
+   3.712909488867919*^9}, {3.712909519403965*^9, 3.712909519564981*^9}, {
+   3.7130004153224187`*^9, 3.7130004169385805`*^9}, 3.713000493132764*^9, {
+   3.7130079840760117`*^9, 3.71300798455606*^9}}],
+
+Cell["Get help information on functions or options by ?", "Text",
+ CellChangeTimes->{{3.7130080497435703`*^9, 3.713008086431429*^9}, {
+  3.713008186931653*^9, 3.7130082336931095`*^9}}],
+
+Cell[BoxData[
+ RowBox[{"?", "\"\<MagicGeneDropping`*\>\""}]], "Input",
+ InitializationCell->True,
+ CellChangeTimes->{{3.712934846712282*^9, 3.7129348579594064`*^9}, {
+  3.713008092239805*^9, 3.7130081398583546`*^9}, {3.713008197516507*^9, 
+  3.7130082015645103`*^9}}]
+}, Open  ]]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell["", "SlideShowNavigationBar",
+ CellTags->"SlideShowHeader"],
+
+Cell[CellGroupData[{
+
+Cell["Common experimental crosses", "Section",
+ CellChangeTimes->{{3.71249011950283*^9, 3.712490125815257*^9}, 
+   3.7124902747564926`*^9, {3.7124904175931325`*^9, 3.712490419097283*^9}}],
+
+Cell["Coding for common experimental crosses", "Text",
+ CellChangeTimes->{{3.712490422089582*^9, 3.7124905225323987`*^9}, {
+  3.7124905674622784`*^9, 3.7124906162249355`*^9}, {3.712490724524333*^9, 
+  3.712490724852366*^9}, {3.712490846480893*^9, 3.7124908646256995`*^9}, {
+  3.7124909935181427`*^9, 3.712491064289007*^9}, {3.712551999609805*^9, 
+  3.7125520017368135`*^9}}],
+
+Cell[BoxData[{
+ RowBox[{
+  RowBox[{"ls", "=", 
+   RowBox[{"{", 
+    RowBox[{
+    "\"\<K generations of backcrss+S generations of selfing\>\"", ",", 
+     "\"\<K-way RIL by S generations of selfing\>\"", ",", 
+     "\"\<K-way RIL by S generations of sibling\>\""}], "}"}]}], 
+  ";"}], "\[IndentingNewLine]", 
+ RowBox[{"TableForm", "[", 
+  RowBox[{"ls", ",", 
+   RowBox[{"TableHeadings", "\[Rule]", 
+    RowBox[{"{", 
+     RowBox[{
+      RowBox[{"{", 
+       RowBox[{
+       "\"\<bcK-selfS\>\"", ",", "\"\<Kwayril-selfS\>\"", ",", 
+        "\"\<Kwayril-sibS\>\""}], "}"}], ",", "None"}], "}"}]}]}], 
+  "]"}]}], "Input",
+ CellOpen->False,
+ CellChangeTimes->{{3.7125517123831806`*^9, 3.7125519882340755`*^9}, {
+  3.712552380063486*^9, 3.7125523832148013`*^9}}],
+
+Cell[BoxData[{
+ RowBox[{
+  RowBox[{"names", "=", 
+   RowBox[{"{", 
+    RowBox[{"\"\<#backcross\>\"", ",", "\"\<#selfing\>\""}], "}"}]}], 
+  ";"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{"manbc", "=", 
+   RowBox[{"Manipulate", "[", "\[IndentingNewLine]", 
+    RowBox[{
+     RowBox[{
+      RowBox[{"code", "=", 
+       RowBox[{"\"\<bc\>\"", "<>", 
+        RowBox[{"ToString", "[", "k", "]"}], "<>", "\"\<-self\>\"", "<>", 
+        RowBox[{"ToString", "[", "s", "]"}]}]}], ";", "\[IndentingNewLine]", 
+      RowBox[{"pedigree", "=", 
+       RowBox[{"compilePopPedigree", "[", "code", "]"}]}], ";", 
+      "\[IndentingNewLine]", 
+      RowBox[{"label", "=", 
+       RowBox[{"Style", "[", 
+        RowBox[{"code", ",", "Black", ",", "15", ",", 
+         RowBox[{"FontFamily", "\[Rule]", "\"\<Helvetica\>\""}]}], "]"}]}], 
+      ";", "\[IndentingNewLine]", 
+      RowBox[{"pedigreePlot", "[", 
+       RowBox[{"pedigree", ",", 
+        RowBox[{"ImageSize", "\[Rule]", 
+         RowBox[{
+          RowBox[{"50", " ", "k"}], "+", "30"}]}], ",", 
+        RowBox[{"PlotLabel", "\[Rule]", "label"}]}], "]"}]}], ",", 
+     RowBox[{"{", 
+      RowBox[{
+       RowBox[{"{", 
+        RowBox[{"k", ",", "1", ",", 
+         RowBox[{"names", "[", 
+          RowBox[{"[", "1", "]"}], "]"}]}], "}"}], ",", "1", ",", "6", ",", 
+       "1"}], "}"}], ",", 
+     RowBox[{"{", 
+      RowBox[{
+       RowBox[{"{", 
+        RowBox[{"s", ",", "3", ",", 
+         RowBox[{"names", "[", 
+          RowBox[{"[", "2", "]"}], "]"}]}], "}"}], ",", "0", ",", "10", ",", 
+       "1"}], "}"}]}], "]"}]}], ";"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{"names", "=", 
+   RowBox[{"{", 
+    RowBox[{"\"\<#founder\>\"", ",", "\"\<#selfing\>\""}], "}"}]}], 
+  ";"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{"kls", "=", 
+   RowBox[{"2", "^", 
+    RowBox[{"Range", "[", 
+     RowBox[{"1", ",", "5", ",", "1"}], "]"}]}]}], 
+  ";"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{"manrilself", "=", 
+   RowBox[{"Manipulate", "[", "\[IndentingNewLine]", 
+    RowBox[{
+     RowBox[{
+      RowBox[{"code", "=", 
+       RowBox[{
+        RowBox[{"ToString", "[", "k", "]"}], "<>", "\"\<wayril-self\>\"", "<>", 
+        RowBox[{"ToString", "[", "s", "]"}]}]}], ";", "\[IndentingNewLine]", 
+      RowBox[{"pedigree", "=", 
+       RowBox[{"compilePopPedigree", "[", "code", "]"}]}], ";", 
+      "\[IndentingNewLine]", 
+      RowBox[{"label", "=", 
+       RowBox[{"Style", "[", 
+        RowBox[{"code", ",", "Black", ",", "15", ",", 
+         RowBox[{"FontFamily", "\[Rule]", "\"\<Helvetica\>\""}]}], "]"}]}], 
+      ";", "\[IndentingNewLine]", 
+      RowBox[{"pedigreePlot", "[", 
+       RowBox[{"pedigree", ",", 
+        RowBox[{"ImageSize", "\[Rule]", 
+         RowBox[{
+          RowBox[{"50", " ", "k"}], "+", "30"}]}], ",", 
+        RowBox[{"PlotLabel", "\[Rule]", "label"}]}], "]"}]}], ",", 
+     RowBox[{"{", 
+      RowBox[{
+       RowBox[{"{", 
+        RowBox[{"k", ",", 
+         RowBox[{"kls", "[", 
+          RowBox[{"[", "3", "]"}], "]"}], ",", 
+         RowBox[{"names", "[", 
+          RowBox[{"[", "1", "]"}], "]"}]}], "}"}], ",", "kls"}], "}"}], ",", 
+     RowBox[{"{", 
+      RowBox[{
+       RowBox[{"{", 
+        RowBox[{"s", ",", "3", ",", 
+         RowBox[{"names", "[", 
+          RowBox[{"[", "2", "]"}], "]"}]}], "}"}], ",", "0", ",", "10", ",", 
+       "1"}], "}"}]}], "]"}]}], ";"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{"names", "=", 
+   RowBox[{"{", 
+    RowBox[{"\"\<#founder\>\"", ",", "\"\<#sibling\>\""}], "}"}]}], 
+  ";"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{"kls", "=", 
+   RowBox[{"2", "^", 
+    RowBox[{"Range", "[", 
+     RowBox[{"1", ",", "5", ",", "1"}], "]"}]}]}], 
+  ";"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{"manrilsib", "=", 
+   RowBox[{"Manipulate", "[", "\[IndentingNewLine]", 
+    RowBox[{
+     RowBox[{
+      RowBox[{"code", "=", 
+       RowBox[{
+        RowBox[{"ToString", "[", "k", "]"}], "<>", "\"\<wayril-sib\>\"", "<>", 
+        RowBox[{"ToString", "[", "s", "]"}]}]}], ";", "\[IndentingNewLine]", 
+      RowBox[{"pedigree", "=", 
+       RowBox[{"compilePopPedigree", "[", "code", "]"}]}], ";", 
+      "\[IndentingNewLine]", 
+      RowBox[{"label", "=", 
+       RowBox[{"Style", "[", 
+        RowBox[{"code", ",", "Black", ",", "15", ",", 
+         RowBox[{"FontFamily", "\[Rule]", "\"\<Helvetica\>\""}]}], "]"}]}], 
+      ";", "\[IndentingNewLine]", 
+      RowBox[{"pedigreePlot", "[", 
+       RowBox[{"pedigree", ",", 
+        RowBox[{"ImageSize", "\[Rule]", 
+         RowBox[{
+          RowBox[{"50", " ", "k"}], "+", "30"}]}], ",", 
+        RowBox[{"PlotLabel", "\[Rule]", "label"}]}], "]"}]}], ",", 
+     RowBox[{"{", 
+      RowBox[{
+       RowBox[{"{", 
+        RowBox[{"k", ",", 
+         RowBox[{"kls", "[", 
+          RowBox[{"[", "3", "]"}], "]"}], ",", 
+         RowBox[{"names", "[", 
+          RowBox[{"[", "1", "]"}], "]"}]}], "}"}], ",", "kls"}], "}"}], ",", 
+     RowBox[{"{", 
+      RowBox[{
+       RowBox[{"{", 
+        RowBox[{"s", ",", "3", ",", 
+         RowBox[{"names", "[", 
+          RowBox[{"[", "2", "]"}], "]"}]}], "}"}], ",", "1", ",", "10", ",", 
+       "1"}], "}"}]}], "]"}]}], ";"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{"manls", "=", 
+   RowBox[{"{", 
+    RowBox[{"manbc", ",", "manrilself", ",", "manrilsib"}], "}"}]}], 
+  ";"}], "\[IndentingNewLine]", 
+ RowBox[{"TabView", "[", 
+  RowBox[{
+   RowBox[{"Thread", "[", 
+    RowBox[{
+     RowBox[{"{", 
+      RowBox[{
+      "\"\<Backcross+selfing\>\"", ",", "\"\<RIL by selfing\>\"", ",", 
+       "\"\<RIL by sibling\>\""}], "}"}], "\[Rule]", "manls"}], "]"}], ",", 
+   "2", ",", 
+   RowBox[{"ImageSize", "\[Rule]", "All"}]}], "]"}]}], "Input",
+ CellOpen->False,
+ InitializationCell->True,
+ CellChangeTimes->{{3.7125511598925285`*^9, 3.71255119684521*^9}, {
+  3.7125512404149475`*^9, 3.7125514723442535`*^9}, {3.7125515805394397`*^9, 
+  3.7125515858599715`*^9}, {3.7125627751462727`*^9, 3.7125627963149815`*^9}}]
+}, Open  ]]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell["", "SlideShowNavigationBar",
+ CellTags->"SlideShowHeader"],
+
+Cell[CellGroupData[{
+
+Cell["Experimental crosses by random mating", "Section",
+ CellChangeTimes->{{3.7125521903117847`*^9, 3.7125521982395773`*^9}}],
+
+Cell["\<\
+Here is an example of  multi-parental populations with inter-crossing via \
+random mating.   \
+\>", "Text",
+ CellChangeTimes->{{3.712553935445662*^9, 3.712553988559558*^9}, {
+  3.712554768891386*^9, 3.7125548031806107`*^9}}],
+
+Cell[BoxData[{
+ RowBox[{
+  RowBox[{"popsize", "=", "20"}], ";"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{"nFounder", "=", "10"}], ";"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{"s", "=", "3"}], ";"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{"mateScheme", "=", 
+   RowBox[{"Join", "[", 
+    RowBox[{
+     RowBox[{"Table", "[", 
+      RowBox[{
+       RowBox[{"\"\<RM1-NE-\>\"", "<>", 
+        RowBox[{"ToString", "[", "popsize", "]"}]}], ",", 
+       RowBox[{"{", "1", "}"}]}], "]"}], ",", 
+     RowBox[{"Table", "[", 
+      RowBox[{"\"\<RM1-E\>\"", ",", 
+       RowBox[{"{", "3", "}"}]}], "]"}], ",", 
+     RowBox[{"Table", "[", 
+      RowBox[{"\"\<Selfing\>\"", ",", 
+       RowBox[{"{", "s", "}"}]}], "]"}]}], "]"}]}], 
+  ";"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{"pedigree", "=", 
+   RowBox[{"simPedigree", "[", 
+    RowBox[{"nFounder", ",", "False", ",", "mateScheme"}], "]"}]}], 
+  ";"}], "\[IndentingNewLine]", 
+ RowBox[{"Export", "[", 
+  RowBox[{"\"\<Example_Pedigree.csv\>\"", ",", "pedigree"}], "]"}]}], "Input",
+ CellChangeTimes->{{3.714275785579804*^9, 3.7142758645986853`*^9}}],
+
+Cell[BoxData[{
+ RowBox[{
+  RowBox[{"popsizels", "=", 
+   RowBox[{"{", 
+    RowBox[{"10", ",", "20"}], "}"}]}], ";"}], "\[IndentingNewLine]", 
+ RowBox[{"Manipulate", "[", "\[IndentingNewLine]", 
+  RowBox[{
+   RowBox[{
+    RowBox[{"mateScheme", "=", 
+     RowBox[{"Join", "[", 
+      RowBox[{
+       RowBox[{"Table", "[", 
+        RowBox[{
+         RowBox[{"\"\<RM1-NE-\>\"", "<>", 
+          RowBox[{"ToString", "[", "popsize", "]"}]}], ",", 
+         RowBox[{"{", "1", "}"}]}], "]"}], ",", 
+       RowBox[{"Table", "[", 
+        RowBox[{"\"\<RM1-E\>\"", ",", 
+         RowBox[{"{", "3", "}"}]}], "]"}], ",", 
+       RowBox[{"Table", "[", 
+        RowBox[{"\"\<Selfing\>\"", ",", 
+         RowBox[{"{", "s", "}"}]}], "]"}]}], "]"}]}], ";", 
+    "\[IndentingNewLine]", 
+    RowBox[{"pedigree", "=", 
+     RowBox[{"simPedigree", "[", 
+      RowBox[{"nFounder", ",", "False", ",", "mateScheme"}], "]"}]}], ";", 
+    "\[IndentingNewLine]", 
+    RowBox[{"pedigreePlot", "[", 
+     RowBox[{"pedigree", ",", 
+      RowBox[{"ImageSize", "\[Rule]", 
+       RowBox[{"If", "[", 
+        RowBox[{
+         RowBox[{"popsize", "\[Equal]", "10"}], ",", "Large", ",", "Full"}], 
+        "]"}]}], ",", 
+      RowBox[{"PlotLabel", "->", "mateScheme"}]}], "]"}]}], ",", 
+   RowBox[{"{", 
+    RowBox[{
+     RowBox[{"{", 
+      RowBox[{"popsize", ",", 
+       RowBox[{"popsizels", "[", 
+        RowBox[{"[", "1", "]"}], "]"}], ",", "\"\<Popsize\>\""}], "}"}], ",", 
+     "popsizels"}], "}"}], ",", 
+   RowBox[{"{", 
+    RowBox[{
+     RowBox[{"{", 
+      RowBox[{"nFounder", ",", "4", ",", "\"\<#founder\>\""}], "}"}], ",", 
+     "2", ",", "10"}], "}"}], ",", 
+   RowBox[{"{", 
+    RowBox[{
+     RowBox[{"{", 
+      RowBox[{"s", ",", "3", ",", "\"\<#selfing\>\""}], "}"}], ",", "0", ",", 
+     "6", ",", "1"}], "}"}]}], "]"}], "\[IndentingNewLine]"}], "Input",
+ CellOpen->False,
+ InitializationCell->True,
+ CellChangeTimes->{{3.712553234917201*^9, 3.712553254326142*^9}, {
+  3.7125533458496675`*^9, 3.7125533985473175`*^9}, {3.712553445692222*^9, 
+  3.7125534460372567`*^9}, {3.712553572498262*^9, 3.7125536805416436`*^9}, {
+  3.7125537224318185`*^9, 3.7125537513282995`*^9}, {3.712553826595002*^9, 
+  3.7125539293900566`*^9}, {3.7125539990816097`*^9, 3.7125540735958433`*^9}, {
+  3.7125542098014283`*^9, 3.7125543420928125`*^9}, {3.71255439171157*^9, 
+  3.7125545449480486`*^9}, {3.712555191460727*^9, 3.712555193475929*^9}}]
+}, Open  ]]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell["", "SlideShowNavigationBar",
+ CellTags->"SlideShowHeader"],
+
+Cell[CellGroupData[{
+
+Cell["Design pedigree", "Section",
+ CellChangeTimes->{{3.7125625766586847`*^9, 3.7125625779948177`*^9}, {
+   3.712564291154872*^9, 3.7125643396325083`*^9}, {3.712660005372859*^9, 
+   3.7126600143009415`*^9}, {3.712660061222203*^9, 3.7126600770951767`*^9}, {
+   3.712922073258816*^9, 3.712922074986989*^9}, 3.712922395781773*^9}],
+
+Cell["\<\
+Here is an example of wheat design pedigree with 8 inbred founders (Mackay et \
+al., 2014. G3: Genes|Genomes|Genetics 4: 1603\[Dash]1610. )\
+\>", "Text",
+ CellChangeTimes->{{3.712563791806677*^9, 3.7125638191019983`*^9}, {
+  3.712564249493516*^9, 3.7125642537819448`*^9}, {3.7125642883523946`*^9, 
+  3.712564289966753*^9}, {3.7129227549149604`*^9, 3.712922791596219*^9}}],
+
+Cell[BoxData[{
+ RowBox[{
+  RowBox[{"wheatped", "=", 
+   RowBox[{"{", 
+    RowBox[{
+     RowBox[{"{", 
+      RowBox[{
+      "\"\<Generation\>\"", ",", "\"\<Individual\>\"", ",", "\"\<Gender\>\"", 
+       ",", "\"\<Mother\>\"", ",", "\"\<Father\>\""}], "}"}], ",", 
+     RowBox[{"{", 
+      RowBox[{"0", ",", "1", ",", "0", ",", "0", ",", "0"}], "}"}], ",", 
+     RowBox[{"{", 
+      RowBox[{"0", ",", "2", ",", "0", ",", "0", ",", "0"}], "}"}], ",", 
+     RowBox[{"{", 
+      RowBox[{"0", ",", "3", ",", "0", ",", "0", ",", "0"}], "}"}], ",", 
+     RowBox[{"{", 
+      RowBox[{"0", ",", "4", ",", "0", ",", "0", ",", "0"}], "}"}], ",", 
+     RowBox[{"{", 
+      RowBox[{"0", ",", "5", ",", "0", ",", "0", ",", "0"}], "}"}], ",", 
+     RowBox[{"{", 
+      RowBox[{"0", ",", "6", ",", "0", ",", "0", ",", "0"}], "}"}], ",", 
+     RowBox[{"{", 
+      RowBox[{"0", ",", "7", ",", "0", ",", "0", ",", "0"}], "}"}], ",", 
+     RowBox[{"{", 
+      RowBox[{"0", ",", "8", ",", "0", ",", "0", ",", "0"}], "}"}], ",", 
+     RowBox[{"{", 
+      RowBox[{"1", ",", "9", ",", "0", ",", "1", ",", "2"}], "}"}], ",", 
+     RowBox[{"{", 
+      RowBox[{"1", ",", "10", ",", "0", ",", "3", ",", "4"}], "}"}], ",", 
+     RowBox[{"{", 
+      RowBox[{"1", ",", "11", ",", "0", ",", "5", ",", "6"}], "}"}], ",", 
+     RowBox[{"{", 
+      RowBox[{"1", ",", "12", ",", "0", ",", "7", ",", "8"}], "}"}], ",", 
+     RowBox[{"{", 
+      RowBox[{"2", ",", "13", ",", "0", ",", "9", ",", "10"}], "}"}], ",", 
+     RowBox[{"{", 
+      RowBox[{"2", ",", "14", ",", "0", ",", "9", ",", "10"}], "}"}], ",", 
+     RowBox[{"{", 
+      RowBox[{"2", ",", "15", ",", "0", ",", "11", ",", "12"}], "}"}], ",", 
+     RowBox[{"{", 
+      RowBox[{"2", ",", "16", ",", "0", ",", "11", ",", "12"}], "}"}], ",", 
+     RowBox[{"{", 
+      RowBox[{"3", ",", "17", ",", "0", ",", "13", ",", "15"}], "}"}], ",", 
+     RowBox[{"{", 
+      RowBox[{"3", ",", "18", ",", "0", ",", "14", ",", "16"}], "}"}], ",", 
+     RowBox[{"{", 
+      RowBox[{"4", ",", "19", ",", "0", ",", "17", ",", "18"}], "}"}], ",", 
+     RowBox[{"{", 
+      RowBox[{"5", ",", "20", ",", "0", ",", "19", ",", "19"}], "}"}], ",", 
+     RowBox[{"{", 
+      RowBox[{"6", ",", "21", ",", "0", ",", "20", ",", "20"}], "}"}], ",", 
+     RowBox[{"{", 
+      RowBox[{"7", ",", "22", ",", "0", ",", "21", ",", "21"}], "}"}]}], 
+    "}"}]}], ";"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{"wheatped", "=", 
+   RowBox[{"Join", "[", 
+    RowBox[{
+     RowBox[{"wheatped", "[", 
+      RowBox[{"[", 
+       RowBox[{"All", ",", 
+        RowBox[{";;", "3"}]}], "]"}], "]"}], ",", 
+     RowBox[{"Transpose", "[", 
+      RowBox[{"{", 
+       RowBox[{"wheatped", "[", 
+        RowBox[{"[", 
+         RowBox[{"All", ",", 
+          RowBox[{"4", ";;", "5"}]}], "]"}], "]"}], "}"}], "]"}], ",", "2"}], 
+    "]"}]}], ";"}], "\[IndentingNewLine]", 
+ RowBox[{"pedigreePlot", "[", 
+  RowBox[{"wheatped", ",", 
+   RowBox[{"PlotLabel", "\[Rule]", 
+    RowBox[{"Style", "[", 
+     RowBox[{"\"\<design pedigree\>\"", ",", "Black", ",", "20", ",", 
+      RowBox[{"Background", "\[Rule]", "Yellow"}]}], "]"}]}], ",", 
+   RowBox[{"ImageSize", "\[Rule]", "Large"}]}], "]"}]}], "Input",
+ InitializationCell->True,
+ CellChangeTimes->{
+  3.712563587775528*^9, {3.712563633680301*^9, 3.712563778061908*^9}, {
+   3.712571577708966*^9, 3.7125715805162463`*^9}, {3.7129220886839495`*^9, 
+   3.71292208993187*^9}, {3.712922446167797*^9, 3.7129224582005987`*^9}}]
+}, Open  ]]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell["", "SlideShowNavigationBar",
+ CellTags->"SlideShowHeader"],
+
+Cell[CellGroupData[{
+
+Cell["Simulate sample pedigree", "Section",
+ CellChangeTimes->{{3.7125561748942585`*^9, 3.712556206599415*^9}, 
+   3.712556555827647*^9, {3.7125566806002865`*^9, 3.712556684847711*^9}, {
+   3.7126591845589175`*^9, 3.7126592261932774`*^9}, {3.712659266338876*^9, 
+   3.7126592938838196`*^9}, {3.712897012946034*^9, 3.712897014146154*^9}, {
+   3.712920595973759*^9, 3.7129206069906564`*^9}, {3.712920813685667*^9, 
+   3.7129208223743315`*^9}, {3.712921002564911*^9, 3.71292100375603*^9}, 
+   3.7129223650367064`*^9, {3.7136802340639477`*^9, 3.7136802350080423`*^9}}],
+
+Cell[BoxData[{
+ RowBox[{"?", "simPedigreeInfor"}], "\[IndentingNewLine]", 
+ RowBox[{"Options", "[", "simPedigreeInfor", "]"}], "\[IndentingNewLine]", 
+ RowBox[{"pedinforfile", "=", 
+  RowBox[{"simPedigreeInfor", "[", 
+   RowBox[{"\"\<4wayril-self3\>\"", ",", 
+    RowBox[{"sampleSize", "\[Rule]", "20"}], ",", 
+    RowBox[{"outputFileID", "\[Rule]", "\"\<Example\>\""}]}], 
+   "]"}]}]}], "Input",
+ InitializationCell->True,
+ CellChangeTimes->{
+  3.71255622296165*^9, {3.712909767300066*^9, 3.712909790397361*^9}, {
+   3.712909886448943*^9, 3.712909887209019*^9}, {3.712913439999489*^9, 
+   3.7129134435458436`*^9}, {3.7130880743311653`*^9, 
+   3.7130880746673965`*^9}, {3.713088293762822*^9, 3.713088294203866*^9}, {
+   3.7136791077603726`*^9, 3.713679124512843*^9}}],
+
+Cell[BoxData[{
+ RowBox[{
+  RowBox[{"pedigreeInfor", "=", 
+   RowBox[{"Import", "[", "pedinforfile", "]"}]}], 
+  ";"}], "\[IndentingNewLine]", 
+ RowBox[{"pedigreePlot", "[", 
+  RowBox[{
+   RowBox[{
+    RowBox[{"splitPedigreeInfor", "[", "pedigreeInfor", "]"}], "[", 
+    RowBox[{"[", "2", "]"}], "]"}], ",", 
+   RowBox[{"ImageSize", "\[Rule]", "200"}]}], "]"}], "\[IndentingNewLine]", 
+ RowBox[{"TextGrid", "[", 
+  RowBox[{"pedigreeInfor", ",", 
+   RowBox[{"Frame", "\[Rule]", "All"}]}], "]"}]}], "Input",
+ InitializationCell->True,
+ CellChangeTimes->{{3.712935888646217*^9, 3.712935967965323*^9}, {
+  3.712977708961074*^9, 3.712977722104184*^9}, {3.7129777726030226`*^9, 
+  3.712977837529297*^9}, {3.7130881073248444`*^9, 3.7130881075568676`*^9}, {
+  3.7130882244889174`*^9, 3.7130882572025824`*^9}}]
+}, Open  ]]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell["", "SlideShowNavigationBar",
+ CellTags->"SlideShowHeader"],
+
+Cell[CellGroupData[{
+
+Cell["Simulation genomic data", "Section",
+ CellChangeTimes->{
+  3.7125642319817715`*^9, {3.7125643492492657`*^9, 3.712564350649406*^9}, {
+   3.7126602189958982`*^9, 3.7126602866794252`*^9}, {3.712922147892848*^9, 
+   3.7129221669735518`*^9}, 3.712922422518841*^9}],
+
+Cell[BoxData[{
+ RowBox[{"?", "magicGeneDropping"}], "\[IndentingNewLine]", 
+ RowBox[{"Options", "[", "magicGeneDropping", "]"}]}], "Input",
+ InitializationCell->True,
+ CellChangeTimes->{{3.7129229030565395`*^9, 3.7129229035685906`*^9}, {
+  3.7130883113481717`*^9, 3.713088311844221*^9}}],
+
+Cell[BoxData[{
+ RowBox[{
+  RowBox[{
+   RowBox[{"depth", "=", 
+    RowBox[{"RandomChoice", "[", 
+     RowBox[{"{", 
+      RowBox[{"0", ",", "2"}], "}"}], "]"}]}], ";"}], " ", 
+  RowBox[{"(*", 
+   RowBox[{"depth", "=", 
+    RowBox[{
+     RowBox[{"0", " ", "means", " ", "SNP"}], "-", 
+     RowBox[{"array", " ", "data"}]}]}], "*)"}]}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{"datafiles", "=", 
+   RowBox[{"magicGeneDropping", "[", 
+    RowBox[{
+    "\"\<Arabidopsis_MAGIC_19FounderHaplo.csv\>\"", ",", "pedinforfile", ",", 
+     RowBox[{"outputFileID", "\[Rule]", "\"\<Example\>\""}], ",", 
+     RowBox[{"founderGenotypeMissing", "\[Rule]", "0.1"}], ",", 
+     RowBox[{"founderReadDepth", "\[Rule]", "depth"}], ",", 
+     RowBox[{"offspringGenotypeMissing", "\[Rule]", "0.1"}], ",", 
+     RowBox[{"offspringReadDepth", "\[Rule]", "depth"}]}], "]"}]}], 
+  ";"}]}], "Input",
+ InitializationCell->True,
+ CellChangeTimes->{
+  3.712564381266658*^9, {3.71256441858858*^9, 3.7125644462295413`*^9}, 
+   3.7125645761070924`*^9, {3.712564691408186*^9, 3.7125647008221273`*^9}, {
+   3.712564782826892*^9, 3.712564783520961*^9}, {3.7125654896048*^9, 
+   3.712565493218958*^9}, {3.712565543278351*^9, 3.712565544740497*^9}, 
+   3.712566514407346*^9, {3.7129224769308577`*^9, 3.7129224831934843`*^9}, {
+   3.712922526004152*^9, 3.7129225635971003`*^9}, {3.712923143034272*^9, 
+   3.712923234604618*^9}, {3.7129232751740613`*^9, 3.712923275390083*^9}}]
+}, Open  ]]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell["", "SlideShowNavigationBar",
+ CellTags->"SlideShowHeader"],
+
+Cell[CellGroupData[{
+
+Cell["View output files", "Section",
+ CellChangeTimes->{{3.712565893489273*^9, 3.7125658954804726`*^9}, {
+  3.7126603220959444`*^9, 3.712660326504181*^9}}],
+
+Cell[BoxData[
+ RowBox[{"TabView", "[", "\[IndentingNewLine]", 
+  RowBox[{
+   RowBox[{"Thread", "[", 
+    RowBox[{
+     RowBox[{"{", 
+      RowBox[{
+      "\"\<True FGL\>\"", ",", "\"\<True FGL diplotype\>\"", ",", 
+       "\"\<True diplotype\>\"", ",", "\"\<Observed genotype\>\""}], "}"}], "->",
+      "\[IndentingNewLine]", 
+     RowBox[{"Table", "[", "\[IndentingNewLine]", 
+      RowBox[{
+       RowBox[{
+        RowBox[{"data", "=", 
+         RowBox[{"If", "[", 
+          RowBox[{
+           RowBox[{"i", "\[Equal]", "1"}], ",", 
+           RowBox[{"ReadList", "[", 
+            RowBox[{"datafiles", "[", 
+             RowBox[{"[", "i", "]"}], "]"}], "]"}], ",", 
+           RowBox[{"Import", "[", 
+            RowBox[{
+             RowBox[{"datafiles", "[", 
+              RowBox[{"[", "i", "]"}], "]"}], ",", 
+             RowBox[{"Path", "\[Rule]", 
+              RowBox[{"Directory", "[", "]"}]}]}], "]"}]}], "]"}]}], ";", 
+        "\[IndentingNewLine]", 
+        RowBox[{"Column", "[", 
+         RowBox[{
+          RowBox[{"{", 
+           RowBox[{
+            RowBox[{
+             RowBox[{"datafiles", "[", 
+              RowBox[{"[", "i", "]"}], "]"}], "<>", 
+             "\"\<\\n(only several marks/individuals are shown)\>\""}], ",", 
+            RowBox[{"TableForm", "[", 
+             RowBox[{
+              RowBox[{
+               RowBox[{"Take", "[", 
+                RowBox[{"#", ",", 
+                 RowBox[{"UpTo", "[", "6", "]"}]}], "]"}], "&"}], "/@", 
+              RowBox[{"Take", "[", 
+               RowBox[{"data", ",", 
+                RowBox[{"UpTo", "[", 
+                 RowBox[{"Switch", "[", 
+                  RowBox[{"i", ",", "1", ",", "2", ",", "_", ",", "15"}], 
+                  "]"}], "]"}]}], "]"}]}], "]"}]}], "}"}], ",", 
+          RowBox[{"Frame", "\[Rule]", "All"}]}], "]"}]}], ",", 
+       RowBox[{"{", 
+        RowBox[{"i", ",", "1", ",", 
+         RowBox[{"Length", "[", "datafiles", "]"}]}], "}"}]}], "]"}]}], "]"}],
+    ",", "4", ",", 
+   RowBox[{"ImageSize", "\[Rule]", "Automatic"}]}], "]"}]], "Input",
+ CellOpen->False,
+ InitializationCell->True,
+ CellChangeTimes->{{3.712564747089134*^9, 3.7125647723130445`*^9}, {
+   3.7125648200278015`*^9, 3.712564850227019*^9}, {3.7125650424119835`*^9, 
+   3.7125650909090166`*^9}, {3.7125651705207524`*^9, 
+   3.7125651723669367`*^9}, {3.712565259659856*^9, 3.712565276783167*^9}, {
+   3.7125653757352448`*^9, 3.7125654025995226`*^9}, {3.712565667593543*^9, 
+   3.712565668643648*^9}, 3.7125657489336557`*^9, 3.712566558544548*^9, {
+   3.712566608635352*^9, 3.7125666166031494`*^9}, {3.712658466142324*^9, 
+   3.7126585797140446`*^9}, 3.7126586588147206`*^9, {3.712664604201127*^9, 
+   3.7126646443143277`*^9}, {3.7126647565513163`*^9, 
+   3.7126647582224836`*^9}, {3.7126647895850134`*^9, 
+   3.7126647946155167`*^9}, {3.712921658070024*^9, 3.712921682213438*^9}, {
+   3.71292248765093*^9, 3.712922494474408*^9}, 3.712922631442257*^9, {
+   3.7129779323301573`*^9, 3.7129779486177855`*^9}}],
+
+Cell["", "Subsubsection"]
+}, Open  ]]
+}, Open  ]]
+},
+WindowSize->{1920, 980},
+WindowMargins->{{-9, Automatic}, {Automatic, -9}},
+TaggingRules->{"SlideShow" -> True},
+FrontEndVersion->"11.0 for Microsoft Windows (64-bit) (July 28, 2016)",
+StyleDefinitions->FrontEnd`FileName[{"SlideShow"}, "Sapphire.nb", 
+  CharacterEncoding -> "UTF-8"]
+]
+(* End of Notebook Content *)
+
+(* Internal cache information *)
+(*CellTagsOutline
+CellTagsIndex->{
+ "SlideShowHeader"->{
+  Cell[580, 22, 4356, 95, 82, "SlideShowNavigationBar",
+   CellTags->"SlideShowHeader"],
+  Cell[5620, 137, 64, 1, 81, "SlideShowNavigationBar",
+   CellTags->"SlideShowHeader"],
+  Cell[7516, 194, 64, 1, 81, "SlideShowNavigationBar",
+   CellTags->"SlideShowHeader"],
+  Cell[9990, 260, 64, 1, 81, "SlideShowNavigationBar",
+   CellTags->"SlideShowHeader"],
+  Cell[17387, 465, 64, 1, 81, "SlideShowNavigationBar",
+   CellTags->"SlideShowHeader"],
+  Cell[21407, 578, 64, 1, 81, "SlideShowNavigationBar",
+   CellTags->"SlideShowHeader"],
+  Cell[25703, 683, 64, 1, 81, "SlideShowNavigationBar",
+   CellTags->"SlideShowHeader"],
+  Cell[27978, 738, 64, 1, 81, "SlideShowNavigationBar",
+   CellTags->"SlideShowHeader"],
+  Cell[30114, 793, 64, 1, 81, "SlideShowNavigationBar",
+   CellTags->"SlideShowHeader"]}
+ }
+*)
+(*CellTagsIndex
+CellTagsIndex->{
+ {"SlideShowHeader", 33812, 887}
+ }
+*)
+(*NotebookFileOutline
+Notebook[{
+Cell[CellGroupData[{
+Cell[580, 22, 4356, 95, 82, "SlideShowNavigationBar",
+ CellTags->"SlideShowHeader"],
+Cell[4939, 119, 435, 5, 504, "Title"],
+Cell[5377, 126, 206, 6, 226, "Subtitle"]
+}, Open  ]],
+Cell[CellGroupData[{
+Cell[5620, 137, 64, 1, 81, "SlideShowNavigationBar",
+ CellTags->"SlideShowHeader"],
+Cell[CellGroupData[{
+Cell[5709, 142, 167, 2, 131, "Section"],
+Cell[CellGroupData[{
+Cell[5901, 148, 206, 3, 59, "Item"],
+Cell[CellGroupData[{
+Cell[6132, 155, 122, 1, 53, "Subitem"],
+Cell[6257, 158, 121, 1, 53, "Subitem"],
+Cell[6381, 161, 169, 2, 53, "Subitem"]
+}, Open  ]],
+Cell[6565, 166, 118, 1, 59, "Item"],
+Cell[6686, 169, 104, 1, 59, "Item"],
+Cell[CellGroupData[{
+Cell[6815, 174, 225, 3, 53, "Subitem"],
+Cell[7043, 179, 171, 2, 53, "Subitem"],
+Cell[7217, 183, 226, 3, 53, "Subitem"]
+}, Open  ]]
+}, Open  ]]
+}, Open  ]]
+}, Open  ]],
+Cell[CellGroupData[{
+Cell[7516, 194, 64, 1, 81, "SlideShowNavigationBar",
+ CellTags->"SlideShowHeader"],
+Cell[CellGroupData[{
+Cell[7605, 199, 109, 1, 131, "Section"],
+Cell[7717, 202, 594, 13, 123, "Text"],
+Cell[8314, 217, 1170, 26, 120, "Input",
+ InitializationCell->True],
+Cell[9487, 245, 184, 2, 59, "Text"],
+Cell[9674, 249, 267, 5, 61, "Input",
+ InitializationCell->True]
+}, Open  ]]
+}, Open  ]],
+Cell[CellGroupData[{
+Cell[9990, 260, 64, 1, 81, "SlideShowNavigationBar",
+ CellTags->"SlideShowHeader"],
+Cell[CellGroupData[{
+Cell[10079, 265, 187, 2, 131, "Section"],
+Cell[10269, 269, 374, 5, 59, "Text"],
+Cell[10646, 276, 756, 21, 24, "Input",
+ CellOpen->False],
+Cell[11405, 299, 5933, 160, 24, "Input",
+ CellOpen->False,
+ InitializationCell->True]
+}, Open  ]]
+}, Open  ]],
+Cell[CellGroupData[{
+Cell[17387, 465, 64, 1, 81, "SlideShowNavigationBar",
+ CellTags->"SlideShowHeader"],
+Cell[CellGroupData[{
+Cell[17476, 470, 126, 1, 131, "Section"],
+Cell[17605, 473, 234, 5, 59, "Text"],
+Cell[17842, 480, 1110, 30, 191, "Input"],
+Cell[18955, 512, 2403, 60, 19, "Input",
+ CellOpen->False,
+ InitializationCell->True]
+}, Open  ]]
+}, Open  ]],
+Cell[CellGroupData[{
+Cell[21407, 578, 64, 1, 81, "SlideShowNavigationBar",
+ CellTags->"SlideShowHeader"],
+Cell[CellGroupData[{
+Cell[21496, 583, 328, 4, 131, "Section"],
+Cell[21827, 589, 381, 6, 59, "Text"],
+Cell[22211, 597, 3443, 80, 207, "Input",
+ InitializationCell->True]
+}, Open  ]]
+}, Open  ]],
+Cell[CellGroupData[{
+Cell[25703, 683, 64, 1, 81, "SlideShowNavigationBar",
+ CellTags->"SlideShowHeader"],
+Cell[CellGroupData[{
+Cell[25792, 688, 564, 7, 131, "Section"],
+Cell[26359, 697, 767, 15, 120, "Input",
+ InitializationCell->True],
+Cell[27129, 714, 800, 18, 120, "Input",
+ InitializationCell->True]
+}, Open  ]]
+}, Open  ]],
+Cell[CellGroupData[{
+Cell[27978, 738, 64, 1, 81, "SlideShowNavigationBar",
+ CellTags->"SlideShowHeader"],
+Cell[CellGroupData[{
+Cell[28067, 743, 265, 4, 131, "Section"],
+Cell[28335, 749, 287, 5, 91, "Input",
+ InitializationCell->True],
+Cell[28625, 756, 1440, 31, 120, "Input",
+ InitializationCell->True]
+}, Open  ]]
+}, Open  ]],
+Cell[CellGroupData[{
+Cell[30114, 793, 64, 1, 81, "SlideShowNavigationBar",
+ CellTags->"SlideShowHeader"],
+Cell[CellGroupData[{
+Cell[30203, 798, 155, 2, 131, "Section"],
+Cell[30361, 802, 2990, 67, 19, "Input",
+ CellOpen->False,
+ InitializationCell->True],
+Cell[33354, 871, 25, 0, 71, "Subsubsection"]
+}, Open  ]]
+}, Open  ]]
+}
+]
+*)
+

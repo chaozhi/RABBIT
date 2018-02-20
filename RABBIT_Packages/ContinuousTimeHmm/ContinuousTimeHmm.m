@@ -1,8 +1,12 @@
 (* Mathematica Package *)
-
 (* Created by the Wolfram Workbench Aug 24, 2013 *)
 
-BeginPackage["ContinuousTimeHmm`"]
+(* :Context: ContinuousTimeHmm`*)
+(* :Author: Chaozhi Zheng <chaozhi@gmail.com>*)
+(* :Mathematica Version: 9.0.1.0 *)
+(* :Description: A package of standard algoirthms for hidden markov model, including some related visualization functions*)
+
+BeginPackage["ContinuousTimeHmm`",{"MagicDefinition`"}]
 (* Exported symbols added here with SymbolName::usage *) 
 
 Unprotect @@ Names["ContinuousTimeHmm`*"];
@@ -15,6 +19,10 @@ CtForward::usage = "CtForward "
 CtBackward::usage = "CtBackward "
 
 CtPosteriorProb::usage = "CtPosteriorProb "
+
+CtDiPosteriorProb::usage = "CtDiPosteriorProb  "
+
+CtDiPosteriorDecoding::usage = "CtDiPosteriorDecoding  "
 
 CtLogLiklihood::usage = "CtLogLiklihood "
 
@@ -38,73 +46,47 @@ CtPathPlot::usage = "CtPathPlot  "
 
 CtSeqPlot::usage = "CtSeqPlot  "
 
+CtLogBackward::usage = "CtLogBackward  "
 
 Begin["`Private`"]
 (* Implementation of the package *)
 
-indexByInterpolation[data_?(OrderedQ[#] && VectorQ[#, NumericQ] &)] :=
-    Module[ {ls, f},
-        ls = Transpose[{data, Range[Length[data]] - 1}];
-        f = Interpolation[ls, InterpolationOrder -> 0];
-        Function[x,
-          Round[f[x]] + Switch[Depth[x],
-               1, Total[Boole[Thread[Rest[data] == x]]],
-               2, Total[Boole[Outer[Equal, x, Rest[data]]], {2}]
-              ]
-         ]
-    ]
-      
-
 CtViterbiScale[startProb_, tranProbSeq_, dataProbSeq_] :=
-    Module[ {logdataProb = Log[dataProbSeq/.{0.->0}], nSeq = Length[dataProbSeq], logtransProb, vlogProb, vIndex, 
+    Module[ {logdataProb = Log[dataProbSeq/.{0.->0}],logtransProb = Log[tranProbSeq/.{0.->0}], nSeq = Length[dataProbSeq], vlogProb, vIndex, 
       temp, ii, vPathLogProb, vPath, t},
-        vlogProb = vIndex = Table[0, {nSeq}, {Length[startProb]}];
-        vlogProb[[1]] = Log[startProb/.{0.->0}] + logdataProb[[1]];
+        vIndex = Table[0, {nSeq}, {Length[startProb]}];
+        vlogProb = Log[startProb/.{0.->0}] + logdataProb[[1]];
         Do[
-         logtransProb = Log[tranProbSeq[[t-1]]/.{0.->0}];
-         temp = ((vlogProb[[t - 1]] + #) & /@ Transpose[logtransProb]) + logdataProb[[t]];
-         vlogProb[[t]] = Max[#] & /@ temp;
-         vIndex[[t]] = Flatten[MapThread[Position[#1, #2, {1}, 1, Heads -> False] &, {temp, vlogProb[[t]]}]], {t, 2, nSeq}];
-        vPathLogProb = Max[vlogProb[[-1]]];
-        ii = Position[vlogProb[[-1]], vPathLogProb, {1}, 1, Heads -> False][[1, 1]];
+         temp = Transpose[vlogProb + logtransProb[[t-1]]] + logdataProb[[t]];
+         vIndex[[t]] = Flatten[Ordering[#, -1] & /@ temp];
+         vlogProb = MapThread[#1[[#2]] &, {temp, vIndex[[t]]}], {t, 2, nSeq}];
+        vPathLogProb = Max[vlogProb];
+        ii = Position[vlogProb, vPathLogProb, {1}, 1, Heads -> False][[1, 1]];
         vPath = Reverse[NestList[{#[[1]] - 1, vIndex[[#[[1]], #[[2]]]]} &, {nSeq, ii}, nSeq - 1][[All, 2]]];
         {vPathLogProb, vPath}
     ]  
 
-
+(*temp = ((vProb #) & /@ Transpose[tranProbSeq[[t-1]]]) dataProbSeq[[t]];
+ vProb = Max[#] & /@ temp;
+ vIndex[[t]] = Flatten[MapThread[Position[#1, #2, {1}, 1, Heads -> False] &, {temp, vProb}]]*)
 CtViterbi[startProb_, tranProbSeq_, dataProbSeq_] :=
     Module[ {nSeq = Length[dataProbSeq],vProb, vIndex, 
-      temp, ii,transProb,vPathProb, vPath, t},
-        vProb = vIndex = Table[0, {nSeq}, {Length[startProb]}];
-        vProb[[1]] = startProb dataProbSeq[[1]];
+      temp, ii,vPathProb, vPath, t},
+        vIndex = Table[0, {nSeq}, {Length[startProb]}];
+        vProb = startProb dataProbSeq[[1]];
         Do[
-         transProb = tranProbSeq[[t-1]];
-         temp = ((vProb[[t - 1]] #) & /@ Transpose[transProb]) dataProbSeq[[t]];
-         vProb[[t]] = Max[#] & /@ temp;
-         vIndex[[t]] = Flatten[MapThread[Position[#1, #2, {1}, 1, Heads -> False] &, {temp, vProb[[t]]}]], {t, 2, nSeq}];
-        vPathProb = Max[vProb[[-1]]];
-        ii = Position[vProb[[-1]], vPathProb, {1}, 1, Heads -> False][[1, 1]];
+            temp = Transpose[vProb tranProbSeq[[t - 1]]] dataProbSeq[[t]];
+            vIndex[[t]] = Flatten[Ordering[#, -1] & /@ Normal[temp]];
+            vProb = MapThread[#1[[#2]] &, {temp, vIndex[[t]]}], {t, 2, nSeq}];
+        vPathProb = Max[vProb];
+        ii = Position[vProb, vPathProb, {1}, 1, Heads -> False][[1, 1]];
         vPath = Reverse[NestList[{#[[1]] - 1, vIndex[[#[[1]], #[[2]]]]} &, {nSeq, ii}, nSeq - 1][[All, 2]]];
         {Log[vPathProb], vPath}
     ]    
 
-CtViterbi2[startProb_, tranProbSeq_, dataProbSeq_] :=
-    Module[ {nSeq = Length[dataProbSeq],vProb, vIndex, 
-      temp, ii,transProb,vPathProb, vPath, t},
-        vProb = vIndex = Table[0, {nSeq}, {Length[startProb]}];
-        vProb[[1]] = startProb dataProbSeq[[1]];
-        Do[
-         transProb = tranProbSeq[[t-1]];
-         temp = ((vProb[[t - 1]] #) & /@ Transpose[transProb]) dataProbSeq[[t]];
-         vProb[[t]] = Max[#] & /@ temp;
-         vIndex[[t]] = Flatten[MapThread[RandomChoice[Position[Thread[#1 == #2], True, {1},Heads -> False]]&,{temp,vProb[[t]]}]], {t, 2, nSeq}];
-        vPathProb = Max[vProb[[-1]]];
-        (*ii = Position[vProb[[-1]], vPathProb, {1}, 1, Heads -> False][[1, 1]];*)
-        ii = Position[Thread[vProb[[-1]] == vPathProb], True, {1},Heads -> False][[1,1]];
-        vPath = Reverse[NestList[{#[[1]] - 1, vIndex[[#[[1]], #[[2]]]]} &, {nSeq, ii}, nSeq - 1][[All, 2]]];
-        {Log[vPathProb], vPath}
-    ]     
-
+(*denote by x_t the hidden state and y_t the obseved data at time t=1...T*)
+(*forwardProb[[t]] =  Pr(x_t|y_{1...t})*)
+(*forwardScale[[t]] = Pr(y_t|y_{1...t-1})*)
 CtForward[startProb_, tranProbSeq_, dataProbSeq_] :=
     Module[ {nSeq = Length[dataProbSeq],forwardProb, forwardScale, t},
         forwardProb = forwardScale = Table[0, {nSeq}];
@@ -118,7 +100,9 @@ CtForward[startProb_, tranProbSeq_, dataProbSeq_] :=
         {forwardProb, forwardScale}
     ]
     
-(*backwardProb may be \[GreaterEqual]1 because it is scaled by the fowardScale*)
+(*denote by x_t the hidden state and y_t the obseved data at time t=1...T*)
+(*backwardProb[[t=T]] = backwardInitial (=1 by default)*)
+(*backwardProb[[t]] =  Pr(y_{t+1...T}|x_t)/Pr(y_{t+1...T|y_{1...t})*)
 CtBackward[tranProbSeq_, dataProbSeq_, forwardScale_] :=
     Module[ {nSeq = Length[dataProbSeq],backwardProb,t},
         backwardProb = Table[0, {nSeq}];
@@ -128,6 +112,32 @@ CtBackward[tranProbSeq_, dataProbSeq_, forwardScale_] :=
          backwardProb[[t]] /= forwardScale[[t + 1]], {t, nSeq - 1, 1, -1}];
         backwardProb
     ]
+    
+(*denote by x_t the hidden state and y_t the obseved data at time t=1...T*)
+(*logbackwardProb[[t=T]] = logbackwardInitial (=0 by default)*)
+(*logbackwardProb[[t]] =  Log[Pr(y_{t+1...T}|x_t)/Pr(y_{t+1...T|y_{1...t})]*)
+CtLogBackward[tranProbSeq_, dataProbSeq_,logbackwardInitial_:Automatic] :=
+    Module[ {nSeq = Length[dataProbSeq],logbackwardProb,max,prob,t},
+        logbackwardProb = Table[0, {nSeq}];
+        logbackwardProb[[-1]] = If[logbackwardInitial===Automatic, Table[0,{Length[tranProbSeq[[-1]]]}],logbackwardInitial];
+        Do[
+         max = Max[logbackwardProb[[t + 1]]];
+         prob = Exp[logbackwardProb[[t + 1]]-max];
+         logbackwardProb[[t]] = Log[tranProbSeq[[t]].(dataProbSeq[[t+1]] prob)]+max, {t, nSeq - 1, 1, -1}];
+        logbackwardProb
+    ]    
+    
+(*Unscaled backward calculation*)
+(*backwardProb[[t=T]] = 1*)
+(*backwardProb[[t]] =  Pr(y_{t+1...T}|x_t)*)
+CtBackward[tranProbSeq_, dataProbSeq_] :=
+    Module[ {nSeq = Length[dataProbSeq],backwardProb,t},
+        backwardProb = Table[0, {nSeq}];
+        backwardProb[[-1]] = Table[1, {Length[tranProbSeq[[-1]]]}];
+        Do[
+         backwardProb[[t]] = tranProbSeq[[t]].(dataProbSeq[[t+1]] backwardProb[[t + 1]]), {t, nSeq - 1, 1, -1}];
+        backwardProb
+    ]    
         
 (*
 complileCtForward = 
@@ -164,9 +174,7 @@ CtBackward2 =
   ], {{backwardProb, _Real, 2}}
   ]    
 *)  
-    
-CtPosteriorProb[forwardProb_, backwardProb_] :=
-    forwardProb backwardProb
+
 
 CtLogLiklihood[forwardScale_] :=
     Total[Log[forwardScale]]
@@ -184,9 +192,10 @@ CtPathLogProb[startProb_, tranProbSeq_, dataProbSeq_,  path_] :=
         logl
     ] 
 
-(*CtPosteriorPath[posteriorProb_] :=
-    (Position[#, Max[#], {1}, 1, Heads -> False] & /@posteriorProb)[[All, 1, 1]]*)  
-        
+(*posteriorProb[[t]] =  Pr(x_t|y_{1...T})*)    
+CtPosteriorProb[forwardProb_, backwardProb_] :=
+    forwardProb backwardProb
+
 CtPosteriorDecoding[startProb_, tranProbSeq_, dataProbSeq_] :=
     Module[ {forwardProb, forwardScale, backwardProb, logLikelihood, posteriorProb},
         {forwardProb, forwardScale} = CtForward[startProb, tranProbSeq, dataProbSeq];
@@ -196,6 +205,19 @@ CtPosteriorDecoding[startProb_, tranProbSeq_, dataProbSeq_] :=
         {logLikelihood, posteriorProb}
     ]    
     
+    
+(*diposteriorProb[[t]] =  Pr(x_t,x_{t+1}|y_{1...T})*)    
+CtDiPosteriorProb[forwardProb_,forwardScale_,backwardProb_,tranProbSeq_, dataProbSeq_] :=
+    Table[KroneckerProduct[forwardProb[[t]],dataProbSeq[[t + 1]] backwardProb[[t + 1]]] tranProbSeq[[t]]/forwardScale[[t + 1]], {t, Length[tranProbSeq]}]
+
+CtDiPosteriorDecoding[startProb_, tranProbSeq_, dataProbSeq_] :=
+    Module[ {forwardProb, forwardScale, backwardProb, logLikelihood,diposteriorProb},
+        {forwardProb, forwardScale} = CtForward[startProb, tranProbSeq, dataProbSeq];
+        backwardProb = CtBackward[tranProbSeq, dataProbSeq, forwardScale];
+        logLikelihood = CtLogLiklihood[forwardScale];
+        diposteriorProb = CtDiPosteriorProb[forwardProb,forwardScale,backwardProb,tranProbSeq, dataProbSeq];
+        {logLikelihood,diposteriorProb}
+    ]   
     
 CtPathSampling[startProb_, tranProbSeq_, dataProbSeq_, size_:1] :=
     Module[ {nSeq = Length[dataProbSeq], forwardProb, forwardScale, states = Range[Length[startProb]], transitionProb,weights,res,t},
@@ -287,4 +309,3 @@ End[]
 SetAttributes[#, {Protected,ReadProtected}]&/@ Names["ContinuousTimeHmm`*"];
 
 EndPackage[]
-
