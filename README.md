@@ -10,7 +10,9 @@ A Mathematica pipeline for genetic analysis in multiparental populations.
 
 2. Create a new mathematica notebook in a work folder, and set path to the folder "RABBIT_Packages". 
 
-3. Needs["MagicReconstruct`"] for haplotype reconstruciton. Needs["MagicImpute`"] for genotype imputation
+3. ```Needs["MagicReconstruct`"]``` for haplotype reconstruciton. 
+
+   ```Needs["MagicImpute`"]``` for genotype imputation
 
 4. Manual in the folder "RABBIT_Manual" and tutorial in the folder "RABBIT_Tutorial" 
 
