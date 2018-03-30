@@ -56,6 +56,8 @@ compilePopdesign::usage = "compilePopdesign  "
 
 compilePopPedigree::usage = "compilePopPedigree  "
 
+nextGeneration::usage = "nextGeneration  "
+
 Begin["`Private`"]
 (* Implementation of the package *)
 
@@ -93,7 +95,7 @@ compilePopPedigree[popid_String, isoogamy_: False] :=
         If[ StringMatchQ[pop, "bc" ~~ DigitCharacter .. ~~ "-self" ~~ DigitCharacter ..],
             {k, s} = ToExpression[StringDelete[StringSplit[pop, "-"], "bc" | "self"]];
             ped = {{"Generation", "MemberID","Female=1/Male=2/Hermaphrodite=0", {"MotherID","FatherID"}}, 
-            		{0, 1, 0, {0, 0}}, {0, 2, 0, {0, 0}}, {1, 3,0, {1, 2}}};
+                    {0, 1, 0, {0, 0}}, {0, 2, 0, {0, 0}}, {1, 3,0, {1, 2}}};
             temp = Join[Table[Range[ped[[-1, j]] + 1, k + ped[[-1, j]]], {j, 2}], {Table[ped[[-1, 3]], {k}], 
                Thread[{1, Range[ped[[-1, 2]], k + ped[[-1, 2]] - 1]}]}];
             ped = Join[ped, Transpose[temp]];
@@ -424,13 +426,13 @@ simIniPopFGLDO[nPower_, preCCfreq_, popSize_, chrLength_,interferStrength_, isOb
  
     
 simPedigree[iniPop_,mateScheme_] :=
-    Module[ {popped,i},
-        popped = FoldList[nextGeneration[#1, #2] &, Rest[iniPop], mateScheme];
-        popped[[2, All, 4]] = popped[[1, All, 2]][[#]] & /@ popped[[2, All, 4]];
-        Do[{popped[[i, All, 2]], popped[[i + 1, All, 4]]} += 
-        Max[popped[[i - 1, All, 2]]], {i, 2, Length[popped] - 1}];
-        i = Length[popped];
-        popped[[i, All, 2]] += popped[[i - 1, -1, 2]];
+    Module[ {ini,popped,i},
+        ini = SplitBy[Rest[iniPop], First];
+        popped = Join[Most[ini],FoldList[nextGeneration[#1, #2] &, Last[ini], mateScheme]];
+        Do[
+          popped[[i, All, 4]] = popped[[i - 1, All, 2]][[#]] & /@ popped[[i, All, 4]];
+          popped[[i, All, 2]] +=Max[popped[[i - 1, All, 2]]] - popped[[i, 1, 2]] + 1, {i, 
+           Length[ini] + 1, Length[popped]}];
         popped[[All, All, 1]] = Range[0, Length[popped] - 1];
         popped = Flatten[popped, 1];
         Join[{First[iniPop]},popped]
