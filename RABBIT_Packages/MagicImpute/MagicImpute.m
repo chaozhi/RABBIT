@@ -627,14 +627,14 @@ magicImpute[inputmagicSNP_?(ListQ[#] || StringQ[#] &), model_?(VectorQ[#, String
                 Print["File ", magicSNP," does not exist!"];
                 Return[$Failed]
             ];
-            magicSNP = Import[magicSNP,"CSV",Path->Directory[]];
+            magicSNP = Import[magicSNP,"CSV"];
         ];
         If[ StringQ[popDesign],
             If[ !FileExistsQ[popDesign],
                 Print["File ", popDesign," does not exist!"];
                 Return[$Failed]
             ];
-            popDesign = Import[inputpopDesign,"CSV",Path->Directory[]];
+            popDesign = Import[inputpopDesign,"CSV"];
         ];
         {isfounderdepth,isoffspringdepth} = checkOptionValue[magicSNP, isfounderdepth, isoffspringdepth,isfounderinbred,isprint];
         SNPValidation[magicSNP,isfounderinbred,isfounderdepth,isoffspringdepth];
@@ -906,21 +906,21 @@ plotErrorPatternGUI[obsmagicsnp_?(StringQ[#]||ListQ[#]&), estmagicsnp_?(StringQ[
                 Print["File ", obssnp," does not exist!"];
                 Return[$Failed]
             ];
-            obssnp = Import[obssnp,"CSV",Path->Directory[]];
+            obssnp = Import[obssnp,"CSV"];
         ];
         If[ StringQ[estsnp],
             If[ !FileExistsQ[estsnp],
                 Print["File ", estsnp," does not exist!"];
                 Return[$Failed]
             ];
-            estsnp = Import[estsnp,"CSV",Path->Directory[]];
+            estsnp = Import[estsnp,"CSV"];
         ];
         If[ StringQ[truesnp],
             If[ !FileExistsQ[truesnp],
                 Print["File ", truesnp," does not exist!"];
                 Return[$Failed]
             ];
-            truesnp = Import[truesnp,"CSV",Path->Directory[]];
+            truesnp = Import[truesnp,"CSV"];
         ];
         chrsubset = OptionValue[linkageGroupSet];
         {obssnp,estsnp, truesnp} = getsubMagicSNP[#, chrsubset,All]&/@{obssnp,estsnp, truesnp};
@@ -964,14 +964,14 @@ plotErrorPatternGUI[obsmagicsnp_?(StringQ[#]||ListQ[#]&), estmagicsnp_?(StringQ[
                 Print["File ", obssnp," does not exist!"];
                 Return[$Failed]
             ];
-            obssnp = Import[obssnp,"CSV",Path->Directory[]];
+            obssnp = Import[obssnp,"CSV"];
         ];
         If[ StringQ[estsnp],
             If[ !FileExistsQ[estsnp],
                 Print["File ", estsnp," does not exist!"];
                 Return[$Failed]
             ];
-            estsnp = Import[estsnp,"CSV",Path->Directory[]];
+            estsnp = Import[estsnp,"CSV"];
         ];
         chrsubset = OptionValue[linkageGroupSet];
         (*Print[chrsubset];

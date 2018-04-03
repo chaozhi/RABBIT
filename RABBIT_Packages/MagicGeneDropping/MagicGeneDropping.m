@@ -404,7 +404,7 @@ magicGeneDropping[inputfounderHaplo_?(ListQ[#]||StringQ[#]&), inputpedigreeInfor
                 Print["magicGeneDropping: File ", pedigreeInfor," does not exist!"];
                 Abort[];
             ];
-            pedigreeInfor = Import[pedigreeInfor, "CSV",Path->Directory[]]
+            pedigreeInfor = Import[pedigreeInfor, "CSV"]
         ];
         {pedigree, sampleInfor} = Rest[splitPedigreeInfor[pedigreeInfor]];       
         nFounder = Count[pedigree[[2 ;;, 4]], {0, 0}]; 
@@ -414,7 +414,7 @@ magicGeneDropping[inputfounderHaplo_?(ListQ[#]||StringQ[#]&), inputpedigreeInfor
                 Print["magicGeneDropping: File ", founderHaplo," does not exist!"];
                 Abort[];
             ];
-            founderHaplo = Import[founderHaplo, "CSV",Path->Directory[]];
+            founderHaplo = Import[founderHaplo, "CSV"];
         ];
         founderHaplo[[4 ;;, 2 ;;]] = Map[ToString, founderHaplo[[4 ;;, 2 ;;]], {2}];     
         nSNP = Length[First[founderHaplo]] - 1;

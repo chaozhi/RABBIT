@@ -494,7 +494,7 @@ magicSNPtoVCF[inputmagicSNP_?(ListQ[#] || StringQ[#] &),OptionsPattern[]] :=
                 Print["File ", magicsnp," does not exist!"];
                 Return[$Failed]
             ];
-            magicsnp = Import[magicsnp,"CSV",Path->Directory[]];
+            magicsnp = Import[magicsnp,"CSV"];
         ];
         nfounder = magicsnp[[1,2]];
         noff = Length[magicsnp[[nfounder + 5 ;;]]];
@@ -700,7 +700,7 @@ magicSNPtompMap[inputmagicsnp_, outputid_String,chrset_:All,snpset_:All] :=
     Module[ {magicsnp=inputmagicsnp, nfounder, rule, mapdata, founderdata, offdata, outputid2 = outputid},        
         If[ StringQ[magicsnp],
             If[ FileExistsQ[magicsnp],
-                magicsnp = Import[magicsnp,"CSV",Path->Directory[]],
+                magicsnp = Import[magicsnp,"CSV"],
                 Print["File ",magicsnp," does not exist!"];
                 Abort[];
             ];
@@ -778,7 +778,7 @@ calMagicReadDepth[inputmagicsnp_,isprint_:True] :=
     Module[ {magicsnp = inputmagicsnp,nfounder, freq,meandepth,lab,indices},
         If[ StringQ[magicsnp],
             If[ FileExistsQ[magicsnp],
-                magicsnp = Import[magicsnp,"CSV",Path->Directory[]],
+                magicsnp = Import[magicsnp,"CSV"],
                 Print["File ",magicsnp," does not exist!"];
                 Abort[];
             ];
@@ -800,7 +800,7 @@ calMagicMissingFraction[inputmagicsnp_, includehalfmissing_: True] :=
     Module[ {magicsnp = inputmagicsnp,nfounder, ls, fracfounder, fracoff},
         If[ StringQ[magicsnp],
             If[ FileExistsQ[magicsnp],
-                magicsnp = Import[magicsnp,"CSV",Path->Directory[]],
+                magicsnp = Import[magicsnp,"CSV"],
                 Print["File ",magicsnp," does not exist!"];
                 Abort[];
             ];
@@ -1002,7 +1002,7 @@ happytoMagicSNP[happyinputfiles_?(ArrayQ[#,2,StringQ]&),outputid_String] :=
     
 getJoinMapCPInput[jointmapinputfile_?FileExistsQ] :=
     Module[ {data, indid},
-        data = Import[jointmapinputfile, "Table",Path->Directory[]];
+        data = Import[jointmapinputfile, "Table"];
         indid = data[[2, 2 ;;]];
         data = Transpose[data[[3 ;;, 2 ;;]]];
         data[[2 ;; 3]] = Transpose[StringSplit[StringDelete[data[[2]], "<" | ">"], "x"]];

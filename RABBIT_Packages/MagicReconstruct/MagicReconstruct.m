@@ -99,14 +99,16 @@ magicReconstruct[inputmagicSNP_?(ListQ[#] ||StringQ[#]&),model_String,inputpopDe
                 Print["File ", magicSNP," does not exist!"];
                 Return[$Failed]
             ];
-            magicSNP = Import[magicSNP,"CSV",Path->Directory[]];
+            magicSNP = Import[magicSNP,"CSV"];
+            magicSNP = DeleteCases[magicSNP, {}];
         ];
         If[ StringQ[popDesign],
             If[ !FileExistsQ[popDesign],
                 Print["File ", popDesign," does not exist!"];
                 Return[$Failed]
             ];
-            popDesign = Import[inputpopDesign,"CSV",Path->Directory[]];
+            popDesign = Import[inputpopDesign,"CSV"];
+            popDesign = DeleteCases[popDesign, {}];
         ];
         {isfounderdepth,isoffspringdepth} = checkOptionValue[magicSNP, isfounderdepth, isoffspringdepth,isfounderinbred,isprint];
         SNPValidation[magicSNP,isfounderinbred,isfounderdepth,isoffspringdepth];
@@ -127,6 +129,7 @@ magicReconstruct[inputmagicSNP_?(ListQ[#] ||StringQ[#]&),model_String,inputpopDe
         printstep = 10^Max[0, IntegerLength[Length[sampleid]] - 2];
         (*derivedGeno dimensions {nchr,nsnp,ngenotype,nfounder}*)
         derivedGeno = getDerivedGenotype[founderHaplo, ToLowerCase[model]==="depmodel",True];
+        
         Monitor[Do[
              If[ isprint&&Mod[ind,printstep]==0,
                  PrintTemporary["Time elapsed = "<>ToString[Round[SessionTime[] - starttime,0.1]]<>" Seconds. \tStart analyzing "<>sampleid[[ind]]<>"--"<>ToString[ind]<>"th of "<>ToString[Length[obsGeno]]];

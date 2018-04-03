@@ -47,9 +47,9 @@ csvExport::usage = "csvExport[file,table] exports table into comma-delimited fil
 
 csvExport2::usage = "csvExport2 is similar to csvExport but for a large table"
 
-readTable::usage = "readTable[file,format,chunkSize:1000] performs memory-efficient import of tabular data in file in format and default chuncksize of 1000."
+(*readTable::usage = "readTable[file,format,chunkSize:1000] performs memory-efficient import of tabular data in file in format and default chuncksize of 1000."*)
 
-readMultTable::usage = "readMultTable[file,format,chunkSize:1000] read multiple tables that are seperated by one line. The line consists of three elements: table separator, asssoication key, and description. It return an association between keys and tables."
+readDictTable::usage = "readDictTable[file,format] read multiple tables that are seperated by one line. The line consists of three elements: table separator, asssoication key, and description. It return an association between keys and tables."
 
 kroneckerMatrixSum::usage = "kroneckerMatrixSum  "
 
@@ -107,28 +107,29 @@ toDelimitedString[list_List,delimiter_String:"|"] :=
 
 csvExport[file_String, table_] :=
     Module[ {ls,i},
-    	ls = Replace[table,x_?NumericQ :> ToString[x, FormatType -> InputForm], {2}];
-        ls=Table[StringReplace[TextString[ls[[i]]], {"{" | "}" -> "", ", " -> ","}],{i,Length[ls]}];
+        ls = Replace[table,x_?NumericQ :> ToString[x, FormatType -> InputForm], {2}];
+        ls = Table[StringReplace[TextString[ls[[i]]], {"{" | "}" -> "", ", " -> ","}],{i,Length[ls]}];
         Export[file, ls, "List"]
     ]
     
 csvExport2[file_String, table_] :=
     Module[ {ls,ii,iils},
-    	ls = Table[0,{Length[table]}];
-    	iils= Partition[Range[Length[ls]], UpTo[10]];
-    	Do[
-    		ls[[ii]]=Replace[table[[ii]],x_?NumericQ :> ToString[x, FormatType -> InputForm], {2}];
-    		ls[[ii]]=StringReplace[TextString[#], {"{" | "}" -> "", ", " -> ","}]&/@ls[[ii]],{ii,iils}];
+        ls = Table[0,{Length[table]}];
+        iils = Partition[Range[Length[ls]], UpTo[10]];
+        Do[
+            ls[[ii]] = Replace[table[[ii]],x_?NumericQ :> ToString[x, FormatType -> InputForm], {2}];
+            ls[[ii]] = StringReplace[TextString[#], {"{" | "}" -> "", ", " -> ","}]&/@ls[[ii]],{ii,iils}];
         Export[file, ls, "List"]
     ]    
         
 (*http://stackoverflow.com/questions/7525782/import-big-files-arrays-with-mathematica*)
-readTable[file_String?FileExistsQ, format_String, chunkSize_Integer:1000] :=
+(*does not work in v11.3, works in v11.0.0*)
+(*readTable[file_String?FileExistsQ, format_String, chunkSize_Integer:1000] :=
     Module[ {stream, dataChunk, result, linkedList, add},
         SetAttributes[linkedList, HoldAllComplete];
         add[ll_, value_] :=
             linkedList[ll, value];
-        stream = StringToStream[Import[file, "String",Path->Directory[]]];
+        stream = StringToStream[Import[file, "String"]];
         Internal`WithLocalSettings[Null,(*main code*)
             result = linkedList[];
             While[dataChunk =!= {}, 
@@ -139,15 +140,16 @@ readTable[file_String?FileExistsQ, format_String, chunkSize_Integer:1000] :=
          Close[stream]
          ];
         Join @@ result
-    ]
+    ]*)
     
-readMultTable[file_String?FileExistsQ, format_String, 
-  chunkSize_Integer: 1000] := Module[{data, sep},
-  data = readTable[file, format, chunkSize];
-  sep = data[[1, 1]];
-  data = Partition[Split[data, #1[[1]] != sep && #2[[1]] != sep &], 2];
-  Association[#[[1, 1, 2]] -> #[[2]] & /@ data]
-  ] 
+readDictTable[file_String?FileExistsQ, format_String, 
+  chunkSize_Integer: 1000] :=
+    Module[ {data, sep},
+        data = Import[file, format];
+        sep = data[[1, 1]];
+        data = Partition[Split[data, #1[[1]] != sep && #2[[1]] != sep &], 2];
+        Association[#[[1, 1, 2]] -> #[[2]] & /@ data]
+    ] 
 
 (*kroneckerMatrixSum[m1_?MatrixQ, m2_?MatrixQ] :=
     KroneckerProduct[m1, IdentityMatrix[Length[m2]]] + 
@@ -278,11 +280,12 @@ renameDuplicates[list_?(VectorQ[#, StringQ] &)] :=
         ]
     ]
             
-notebookEvaluate[nbfilename_String] := Module[{nb},
-  nb = NotebookOpen[FindFile[nbfilename]];
-  NotebookEvaluate[nb];
-  NotebookClose[nb]
-  ]            
+notebookEvaluate[nbfilename_String] :=
+    Module[ {nb},
+        nb = NotebookOpen[FindFile[nbfilename]];
+        NotebookEvaluate[nb];
+        NotebookClose[nb]
+    ]            
             
 End[]
 
