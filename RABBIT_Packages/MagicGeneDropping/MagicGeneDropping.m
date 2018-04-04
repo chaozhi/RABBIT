@@ -81,6 +81,7 @@ splitPedigreeInfor[pedigreeInfor_] :=
         infor = Partition[Split[pedigreeInfor, #1[[1]] != key && #2[[1]] != key &], 2];
         description = infor[[All,1]];
         {pedigree, sampleInfor} = infor[[All, 2]];
+        sampleInfor=sampleInfor[[All,;;3]];
         pedigree = Join[pedigree[[All, ;; -3]], Transpose[{pedigree[[All, -2 ;;]]}], 2];
         sampleInfor[[2 ;;, -1]] = ToString[#] & /@ sampleInfor[[2 ;;, -1]];
         sampleInfor[[2 ;;, -1]] = StringSplit[#, "-"] & /@ sampleInfor[[2 ;;, -1]];
