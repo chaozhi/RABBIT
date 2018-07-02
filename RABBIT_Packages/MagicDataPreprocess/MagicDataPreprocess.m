@@ -441,7 +441,7 @@ Options[vcftoMagicSNP] = {
     outputFileID -> ""
     }
     
-vcftoMagicSNP[vcffile_String?FileExistsQ,genoformat:"GT"|"AD", founders_,OptionsPattern[]] :=
+vcftoMagicSNP[vcffile_String?FileExistsQ,genoformat:"GT"|"AD"|"GP", founders_,OptionsPattern[]] :=
     Module[ {recomrate,isfounderinbred,outputid,outputfile,res,depth,founders2=founders},
         {recomrate,isfounderinbred,outputid} = OptionValue[{recombinationRate,isFounderInbred,outputFileID}];
         If[ outputid=!="",
@@ -456,7 +456,7 @@ vcftoMagicSNP[vcffile_String?FileExistsQ,genoformat:"GT"|"AD", founders_,Options
         res
     ]
     
-vcftoMagicSNP[foundervcf_String?FileExistsQ,offspringvcf_String?FileExistsQ, genoformat : "GT" | "AD", OptionsPattern[]] :=
+vcftoMagicSNP[foundervcf_String?FileExistsQ,offspringvcf_String?FileExistsQ, genoformat : "GT" | "AD"|"GP", OptionsPattern[]] :=
     Module[ {outputfile, isfounderinbred,recomrate, outputid, depths, nfounder, magicsnp},
         {recomrate,isfounderinbred,outputid} = OptionValue[{recombinationRate,isFounderInbred,outputFileID}];
         If[ outputid=!="",
@@ -563,7 +563,7 @@ getvcfsampleName[vcffile_String] :=
     ]
       
       
-genoofVCF[vcffile_String?FileExistsQ,genoformat:"GT"|"AD"] :=
+genoofVCF[vcffile_String?FileExistsQ,genoformat:"GT"|"AD"|"GP"] :=
     Module[ {vcfdata, linefield, depth, nind, pos, ls,i,bool},
         vcfdata = ReadList[vcffile, String];
         linefield = Position[vcfdata, _?(StringTake[#, 2] =!= "##" && 

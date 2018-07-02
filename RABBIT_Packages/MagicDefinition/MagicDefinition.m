@@ -49,6 +49,8 @@ csvExport2::usage = "csvExport2 is similar to csvExport but for a large table"
 
 (*readTable::usage = "readTable[file,format,chunkSize:1000] performs memory-efficient import of tabular data in file in format and default chuncksize of 1000."*)
 
+readTable::usage = "readTable  "
+
 readDictTable::usage = "readDictTable[file,format] read multiple tables that are seperated by one line. The line consists of three elements: table separator, asssoication key, and description. It return an association between keys and tables."
 
 kroneckerMatrixSum::usage = "kroneckerMatrixSum  "
@@ -68,6 +70,8 @@ randomIntegerPartition::usage = "randomIntegerPartition  "
 renameDuplicates::usage = "renameDuplicates  "
 
 notebookEvaluate::usage = "notebookEvaluate  "
+
+
 
 
 Begin["`Private`"]
@@ -105,14 +109,14 @@ maxIndexPair[list_List] :=
 toDelimitedString[list_List,delimiter_String:"|"] :=
     Map[StringJoin @@ Riffle[#, delimiter] &, Map[ToString, list, {-1}], {-2}]    
 
-csvExport[file_String, table_] :=
+csvExport2[file_String, table_] :=
     Module[ {ls,i},
         ls = Replace[table,x_?NumericQ :> ToString[x, FormatType -> InputForm], {2}];
         ls = Table[StringReplace[TextString[ls[[i]]], {"{" | "}" -> "", ", " -> ","}],{i,Length[ls]}];
         Export[file, ls, "List"]
     ]
     
-csvExport2[file_String, table_] :=
+csvExport[file_String, table_] :=
     Module[ {ls,ii,iils},
         ls = Table[0,{Length[table]}];
         iils = Partition[Range[Length[ls]], UpTo[10]];
@@ -142,8 +146,9 @@ csvExport2[file_String, table_] :=
         Join @@ result
     ]*)
     
-readDictTable[file_String?FileExistsQ, format_String, 
-  chunkSize_Integer: 1000] :=
+readTable[file_String?FileExistsQ, format_String]:=Import[file,format]    
+    
+readDictTable[file_String?FileExistsQ, format_String] :=
     Module[ {data, sep},
         data = Import[file, format];
         sep = data[[1, 1]];

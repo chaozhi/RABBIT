@@ -152,45 +152,48 @@ magicImputeFounder[magicSNP_, model_, epsF_, eps_, popDesign_,minphredscore_,max
             If[ isfounderdepth,
                 fhaploset = Map[siteParentHaploPriorGBS[#, epsF2,minphredscore,maxfoundererror,genothreshold,isfoundermaleX,isfounderinbred] &, founderHaplo[[ch]]],
                 fhaploset = Map[siteParentHaploPrior[#, epsF2,isfoundermaleX,isfounderinbred,maxfoundererror] &, founderHaplo[[ch]]];
-            ];
-            If[ isprint,
-                PrintTemporary["Time elapsed = " <>ToString[Round[SessionTime[] - starttime, 0.1]] 
-                <> " Seconds. \t Start imputing founder linkagegroup " <> ToString[ch]<>" out of "<>ToString[Length[founderHaplo]]];
-                PrintTemporary["Mean number of phases per locus: " <> ToString[Round[Mean[Length[#] & /@ fhaploset],0.01]]," out of "<>ToString[2^(nFounder (1+Boole[!isfounderinbred]))]];
-            ];
-            nn = Round[Length[fhaploset]/2];
-            {fwphaseprob, fworigprob, fwphaseindex} = parentForwardCalculation[model,samplelabel, markovprocess, fhaploset, chrobsgeno, 
-               epsF2, eps, minphredscore, isoffspringdepth, ismaleX];
-            backtmin = If[ isextrareverse,
-                           nn+1,
-                           1
-                       ];
-            {fwphase,fwphaseprob} = Most[parentBackwardMaximize[fwphaseprob, fworigprob, isdepModel,ismaleX,samplelabel, markovprocess,backtmin]];
-            ClearAll[fworigprob];
-            fhaploset = MapThread[#1[[#2]] &, {fhaploset,fwphaseindex}];
-            If[ isprint,
-                PrintTemporary["Mean number of phases per locus after forward calculation: " <> ToString[Round[Mean[Length[#] & /@ fwphaseindex],0.01]]," out of "<>ToString[2^(nFounder (1+Boole[!isfounderinbred]))]];
-            ];
-            If[ !isextrareverse,
-                phase = fwphase,
-                (*fixing phasing of the second half of the chromosome*)
-                fhaploset2 = fhaploset;
-                fhaploset2[[nn + 1 ;;]] = List /@ MapThread[#1[[#2]] &, {fhaploset[[nn + 1 ;;]],fwphase[[nn + 1 ;;]]}];
-                fhaploset2[[nn + 1 ;;, All, 2]] = 1;
-                (*reverse chromosome direction*)
-                revmarkovprocess = markovprocess;
-                revmarkovprocess[[All, 2, 2]] = Reverse[#] & /@ revmarkovprocess[[All, 2, 2]];
-                revmarkovprocess[[All, 2, 2]] = Map[Transpose, revmarkovprocess[[All, 2, 2]], {2}];
-                {revphaseprob, revorigprob, revphaseindex} = parentForwardCalculation[model,samplelabel, revmarkovprocess, 
-                    Reverse[fhaploset2], Reverse[chrobsgeno], epsF2, eps, minphredscore, isoffspringdepth, ismaleX];
-                {phase,revphaseprob} = Most[parentBackwardMaximize[revphaseprob, revorigprob, isdepModel,ismaleX, samplelabel, revmarkovprocess,Length[fhaploset]+1-nn]];
-                {revphaseindex,phase,revphaseprob} = Reverse[#]&/@{revphaseindex,phase,revphaseprob};
-                ClearAll[revorigprob];
-                phase = MapThread[#1[[#2]] &, {revphaseindex, phase}];
-                phase[[nn+1;;]] = fwphase[[nn+1;;]];
-            ];
-            phase = MapThread[#1[[#2]] &, {fhaploset[[All, All, 1]], phase}];
-            phase, {ch, Length[founderHaplo]}];
+            ];            
+            If[Union[Length[#] & /@ fhaploset] === {1},
+            	phase = fhaploset[[All, 1, 1]],
+	            If[ isprint,
+	                PrintTemporary["Time elapsed = " <>ToString[Round[SessionTime[] - starttime, 0.1]] 
+	                <> " Seconds. \t Start imputing founder linkagegroup " <> ToString[ch]<>" out of "<>ToString[Length[founderHaplo]]];
+	                PrintTemporary["Mean number of phases per locus: " <> ToString[Round[Mean[Length[#] & /@ fhaploset],0.01]]," out of "<>ToString[2^(nFounder (1+Boole[!isfounderinbred]))]];
+	            ];
+	            nn = Round[Length[fhaploset]/2];
+	            {fwphaseprob, fworigprob, fwphaseindex} = parentForwardCalculation[model,samplelabel, markovprocess, fhaploset, chrobsgeno, 
+	               epsF2, eps, minphredscore, isoffspringdepth, ismaleX];
+	            backtmin = If[ isextrareverse,
+	                           nn+1,
+	                           1
+	                       ];
+	            {fwphase,fwphaseprob} = Most[parentBackwardMaximize[fwphaseprob, fworigprob, isdepModel,ismaleX,samplelabel, markovprocess,backtmin]];
+	            ClearAll[fworigprob];
+	            fhaploset = MapThread[#1[[#2]] &, {fhaploset,fwphaseindex}];
+	            If[ isprint,
+	                PrintTemporary["Mean number of phases per locus after forward calculation: " <> ToString[Round[Mean[Length[#] & /@ fwphaseindex],0.01]]," out of "<>ToString[2^(nFounder (1+Boole[!isfounderinbred]))]];
+	            ];
+	            If[ !isextrareverse,
+	                phase = fwphase,
+	                (*fixing phasing of the second half of the chromosome*)
+	                fhaploset2 = fhaploset;
+	                fhaploset2[[nn + 1 ;;]] = List /@ MapThread[#1[[#2]] &, {fhaploset[[nn + 1 ;;]],fwphase[[nn + 1 ;;]]}];
+	                fhaploset2[[nn + 1 ;;, All, 2]] = 1;
+	                (*reverse chromosome direction*)
+	                revmarkovprocess = markovprocess;
+	                revmarkovprocess[[All, 2, 2]] = Reverse[#] & /@ revmarkovprocess[[All, 2, 2]];
+	                revmarkovprocess[[All, 2, 2]] = Map[Transpose, revmarkovprocess[[All, 2, 2]], {2}];
+	                {revphaseprob, revorigprob, revphaseindex} = parentForwardCalculation[model,samplelabel, revmarkovprocess, 
+	                    Reverse[fhaploset2], Reverse[chrobsgeno], epsF2, eps, minphredscore, isoffspringdepth, ismaleX];
+	                {phase,revphaseprob} = Most[parentBackwardMaximize[revphaseprob, revorigprob, isdepModel,ismaleX, samplelabel, revmarkovprocess,Length[fhaploset]+1-nn]];
+	                {revphaseindex,phase,revphaseprob} = Reverse[#]&/@{revphaseindex,phase,revphaseprob};
+	                ClearAll[revorigprob];
+	                phase = MapThread[#1[[#2]] &, {revphaseindex, phase}];
+	                phase[[nn+1;;]] = fwphase[[nn+1;;]];
+	            ];
+	            phase = MapThread[#1[[#2]] &, {fhaploset[[All, All, 1]], phase}];	            
+	            phase
+            ], {ch, Length[founderHaplo]}];
         If[ ! isfounderinbred,
             posfoundermale = Flatten[Position[foundergender, "Male"]];
             phase[[posX, All, 2 posfoundermale]] = "";

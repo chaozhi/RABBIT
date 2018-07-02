@@ -206,7 +206,7 @@ magicJuncdist[nFounder_,popDesign_,isfounderinbred_,isincludeXX_] :=
                 ];
          If[ posA=!={},
              If[ !(VectorQ[First[juncdist], NonNegative] && Length[First[juncdist]] == 6&&juncdist[[1,1]]<=1),
-                 Print["magicPriorProcess: wrong popDesign for autosomes!","popDesign = ",popDesign];
+                 Print["magicContinuedPriorProcess: wrong popDesign for autosomes!","popDesign = ",popDesign];
                  Abort[]
              ];
              {startProbAutosome, tranRateAutosome} = magicMarkovRate[model, nFGL, First[juncdist]];
@@ -363,7 +363,7 @@ sampleContinuedPriorProcess[nFounder_, popDesign_, isfounderinbred_,model_, posA
               ];
               gender = First[gender];
               {startprobls, tranratels} = pedContinuedPriorProcess[pedPriorList[[i, 2]], model, gender, posA, posX];
-              pedPriorList[[i, 1]] -> {startprobls, tranratels}, {i, Length[pedPriorList]}],
+              pedPriorList[[i, 1]] -> {startprobls, tranratels}, {i, Length[pedPriorList]}],            
             {juncdist, startprobAutosome, tranrateAutosome, startprobFemale, 
               tranrateFemale, startprobMale, tranrateMale} = magicContinuedPriorProcess[nFounder, popDesign, isfounderinbred, model, posA, posX];
             funnelcode = Range[nFounder];
@@ -439,7 +439,7 @@ toDiplocode[fglcode_] :=
         states[[pos]]==newstates*)
         pos = SortBy[Transpose[{Range[Length[states]], newstates}], Last][[All, 1]];
         If[ newstates[[pos]]!= states,
-            Print["getDiplocode: wrong relabeling by haplocode!"];
+            Print["toDiplocode: wrong relabeling by haplocode!"];
             Abort[]
         ];
         pos
@@ -450,7 +450,7 @@ toHaplocode[fglcode_] :=
         nfgl = Length[fglcode];
         pos = SortBy[Transpose[{Range[nfgl], fglcode}], Last][[All,1]];
         If[ fglcode[[pos]]!= Range[nfgl],
-            Print["getDiplocode: wrong relabeling by haplocode!"];
+            Print["toHaplocode: wrong relabeling by haplocode!"];
             Abort[]
         ];
         pos

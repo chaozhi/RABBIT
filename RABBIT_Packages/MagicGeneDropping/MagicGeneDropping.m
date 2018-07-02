@@ -87,10 +87,10 @@ splitPedigreeInfor[pedigreeInfor_] :=
         sampleInfor[[2 ;;, -1]] = StringSplit[#, "-"] & /@ sampleInfor[[2 ;;, -1]];
         nFounder = Count[pedigree[[2 ;;, -1]], {0, 0}];
         founders = Map[ToString,pedigree[[2 ;; nFounder + 1, 2]]];
-        If[ ! (And @@ Union[sameSetQ[founders, #] & /@ sampleInfor[[2 ;;, -1]]]),
+        (*If[ ! (And @@ Union[sameSetQ[founders, #] & /@ sampleInfor[[2 ;;, -1]]]),
             Print["splitPedigreeInfor: inconsistent founder IDs between pedigree and funnelcode of pedigreeInfor!"];
             Abort[]
-        ];
+        ];*)
         sampleInfor[[2 ;;, -1]] = sampleInfor[[2 ;;, -1]] /. Thread[founders -> Range[nFounder]];
         {description, pedigree, sampleInfor}
     ]
@@ -98,6 +98,7 @@ splitPedigreeInfor[pedigreeInfor_] :=
 mergePedigreeInfor[pedigree_,sampleInfor_,key_:"Pedigree-Information" ] :=
     Module[ {infor = sampleInfor,nfounder},
         nfounder = Max[infor[[2, -1]]];
+        (*assuming the first row of infor is the column names*)
         infor[[2 ;;, -1]] = StringJoin[Riffle[#, "-"]] & /@ Map[ToString,infor[[2 ;;, -1]],{2}];
         Join[{{key, "The in-depth pedigree with funnelcode 1-2..."<>ToString[nfounder]}}, Flatten[#] & /@ pedigree, 
          {{key, "The memberID and funnelcode for each sampled individual"}},infor]
