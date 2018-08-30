@@ -1,7 +1,7 @@
 RABBIT
 ======
 
-RABBIT was developped for reconstrucing ancestral blocks bit by bit in multiparental populations, which has been extended for genotype imputaiton and genetic map construction. Tested in Matheamtica 11.0. 
+RABBIT was developped for Reconstrucing Ancestral Blocks BIT by bit in multiparental populations, which has been extended for genotype imputaiton and genetic map construction. Tested in Matheamtica 11.0. 
 
 
 ##Getting started
