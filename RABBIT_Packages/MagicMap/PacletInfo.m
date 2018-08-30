@@ -1,12 +1,12 @@
 (* Paclet Info File *)
 
-(* created 2016/02/22*)
+(* created 2016/07/14*)
 
 Paclet[
-    Name -> "MagicImpute",
+    Name -> "MagicMap",
     Version -> "0.0.1",
     MathematicaVersion -> "6+",
-    Description -> "A package for genotype imputation in experimental populations.",
+    Description -> "This package provides funcutions for constructing genetic map in experimental populations. ",
     Creator -> "Chaozhi Zheng",
     Extensions -> 
         {

@@ -237,6 +237,7 @@ setstage[pedigree_,founderFGL_,isAutosome_,pairlist_] :=
             Print[Join[{{pedigree[[1]],pedigree[[2]],"motherer gender"}},wronggender]//MatrixForm];
             Abort[]
         ];
+        (*Print["{$isautosome,$founderfgl,$nfounder,$fgllabset,$mothers, $fathers}",{$isautosome,$founderfgl,$nfounder,$fgllabset,$mothers, $fathers}];*)
         pairlist2 = pairlist /. rule;
         pairlist2
     ]  
@@ -366,7 +367,7 @@ pedIdentityConcisePrior[pedigree_, founderFGL_, isAutosome_, indlist_] :=
     ]        
 
 fi[a_?(#<=$nfounder&)] :=
-    fi[a] = Map[SparseArray, Replace[$fgllabset, {# -> 1, _ -> 0}, {1}] & /@ $founderfgl[[a]]]
+    fi[a] = Map[SparseArray, Replace[$fgllabset, {# -> N[1], _ -> N[0]}, {1}] & /@ $founderfgl[[a]]]
 fi[a_] :=
     fi[a] =
     Module[ {m, p},
