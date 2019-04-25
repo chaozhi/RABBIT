@@ -116,10 +116,10 @@ csvExport2[file_String, table_] :=
         Export[file, ls, "List"]
     ]
     
-csvExport[file_String, table_] :=
+csvExport[file_String, table_,nrow_Integer:100] :=
     Module[ {ls,ii,iils},
         ls = Table[0,{Length[table]}];
-        iils = Partition[Range[Length[ls]], UpTo[10]];
+        iils = Partition[Range[Length[ls]], UpTo[nrow]];
         Do[
             ls[[ii]] = Replace[table[[ii]],x_?NumericQ :> ToString[x, FormatType -> InputForm], {2}];
             ls[[ii]] = StringReplace[TextString[#], {"{" | "}" -> "", ", " -> ","}]&/@ls[[ii]],{ii,iils}];

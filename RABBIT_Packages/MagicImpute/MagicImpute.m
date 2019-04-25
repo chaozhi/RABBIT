@@ -30,13 +30,19 @@ genoErrorPattern::usage = "genoErrorPattern[obsmagicsnp, estmagicsnp,truemagicsn
 
 plotErrorPatternGUI::usage = "plotErrorPatternGUI[obsmagicsnp, estmagicsnp,truemagicsnp] plots and summarizes the status of each genoetype estimation. The three arguments correspond to observed data, estimated genotypes, and true genotypes, respectively. There are 6 labeled statuses: \"TrueCorrect\" (genotype errors that are changed correctly), \"TrueDetect\"(genotype errors that are changed wrongly), \"FalseNegative\" (genotype errors that are not detected), \"FalsePositive\" (Non genotype errors that are wrongly corrected), and \"FalseImpute\" (wrongly imputed genotypes). \n plotErrorPatternGUI[obsmagicsnp, estmagicsnp] plots and summarizes the results with three possible statuses: \"NonImputation\" (missing genoytypes are not imputed), \"Imputation\" (missing genoytypes are imputed), and \"Correction\" (observed genoytypes are changed). "
 
+parentForwardCalculation::usage = "parentForwardCalculation  "
+
+parentBackwardMaximize::usage = "parentBackwardMaximize  "
+
 Begin["`Private`"]
 (* Implementation of the package *)
   
 (*Total[Total[origprob priorhaploweight], {2}] == Total[fworigscale priorhaploweight]*)
 calPosteriorProb[prob_, priorhaploweight_] :=
-    Module[ {origscale, phaseprob, origprob},
-        origscale = Total[prob, {3}];
+    Module[ {pmax,origscale, phaseprob, origprob},
+    	pmax = Map[Max, prob, {2}];
+    	origscale = Total[prob/pmax, {3}] pmax;
+        (*origscale = Total[prob, {3}];*)
         origprob = prob/origscale;
         phaseprob = Total[Log[origscale], {2}] + Log[priorhaploweight];
         phaseprob = Exp[phaseprob - Max[phaseprob]];
@@ -54,20 +60,22 @@ parentForwardCalculation[model_,samplelabel_, markovprocess_, inputfhaploset_, o
             sitedataprob = siteMagicLikelihoodGBS[model,fhaploset[[1, All, 1]], obsgeno[[1]], epsF,eps, minphredscore, ismaleX],
             sitedataprob = siteMagicLikelihood[model,fhaploset[[1, All, 1]], obsgeno[[1]], epsF,eps, ismaleX];
         ];
+        isdepModel = ToLowerCase[model]==="depmodel";
+        samplecode = sampleCode[samplelabel, isdepModel, ismaleX];              
         fworigprob[[1]] = Map[# startprob &, sitedataprob, {1}];
         {fwphaseprob[[1]], fworigprob[[1]]} = calPosteriorProb[fworigprob[[1]], fhaploset[[1, All, 2]]];
-        fwphaseindex[[1]] = Range[Length[fhaploset[[1]]]];
-        isdepModel = ToLowerCase[model]==="depmodel";
-        samplecode = sampleCode[samplelabel, isdepModel, ismaleX];
-        Monitor[Do[
+        fwphaseindex[[1]] = Range[Length[fhaploset[[1]]]];        
+        (*Put[model,fhaploset, obsgeno, epsF,eps, ismaleX,sitedataprob,startprob,samplelabel, markovprocess,samplecode,fwphaseprob, fworigprob, fwphaseindex,"imputetemp.txt"];
+        Abort[];*)          
+        Monitor[Do[                   
           tranprob = sampleTransition[samplelabel, markovprocess,samplecode, t - 1];
           If[ isoffspringdepth,
               sitedataprob = siteMagicLikelihoodGBS[model,fhaploset[[t, All, 1]], obsgeno[[t]],epsF, eps, minphredscore, ismaleX],
               sitedataprob = siteMagicLikelihood[model,fhaploset[[t, All, 1]], obsgeno[[t]], epsF,eps, ismaleX];
-          ];
+          ];          
           fworigprob[[t]] = MapThread[#1.#2 &, {fwphaseprob[[t-1]].fworigprob[[t-1]], tranprob}];
-          fworigprob[[t]] = Table[fworigprob[[t]],{Length[sitedataprob]}] sitedataprob;
-          {fwphaseprob[[t]], fworigprob[[t]]} = calPosteriorProb[fworigprob[[t]], fhaploset[[t, All, 2]]];
+          fworigprob[[t]] = Table[fworigprob[[t]],{Length[sitedataprob]}] sitedataprob;          
+          {fwphaseprob[[t]], fworigprob[[t]]} = calPosteriorProb[fworigprob[[t]], fhaploset[[t, All, 2]]];          
           tinyprob = Max[fwphaseprob[[t]]] 10^(-10.);
           fwphaseindex[[t]] = Flatten[Position[Sign[Round[fwphaseprob[[t]], tinyprob]], 1]];
           {fwphaseprob[[t]], fworigprob[[t]], fhaploset[[t]]} = {fwphaseprob[[t]], fworigprob[[t]], fhaploset[[t]]}[[All, fwphaseindex[[t]]]];
@@ -135,9 +143,9 @@ magicImputeFounder[magicSNP_, model_, epsF_, eps_, popDesign_,minphredscore_,max
         (*sampleMarkovProcess is a list of rules for each group (according  memeberID or gender):
           MemberID/gender -> {startProb0,tranProb0}, not accounting for the ordering of funnelcode*)
         (*startProb0=a list of initial distribution for each linkage group;
-        tranProb0= a list of transition prob matrices between consecutive markers for each linkage group*)
+        tranProb0= a list of transition prob matrices between consecutive markers for each linkage group*)        
         {samplelabel, sampleMarkovProcess} = sampleDiscretePriorProcess[nFounder,popDesign, isfounderinbred,model, posA, posX, offspringgender, sampleid,deltd];
-        isdepModel = ToLowerCase[model]==="depmodel";
+        isdepModel = ToLowerCase[model]==="depmodel";        
         phase = Table[
             epsF2 = epsFls[[ch]];
             markovprocess = sampleMarkovProcess;
@@ -152,23 +160,24 @@ magicImputeFounder[magicSNP_, model_, epsF_, eps_, popDesign_,minphredscore_,max
             If[ isfounderdepth,
                 fhaploset = Map[siteParentHaploPriorGBS[#, epsF2,minphredscore,maxfoundererror,genothreshold,isfoundermaleX,isfounderinbred] &, founderHaplo[[ch]]],
                 fhaploset = Map[siteParentHaploPrior[#, epsF2,isfoundermaleX,isfounderinbred,maxfoundererror] &, founderHaplo[[ch]]];
-            ];            
+            ];               
             If[Union[Length[#] & /@ fhaploset] === {1},
             	phase = fhaploset[[All, 1, 1]],
 	            If[ isprint,
 	                PrintTemporary["Time elapsed = " <>ToString[Round[SessionTime[] - starttime, 0.1]] 
-	                <> " Seconds. \t Start imputing founder linkagegroup " <> ToString[ch]<>" out of "<>ToString[Length[founderHaplo]]];
-	                PrintTemporary["Mean number of phases per locus: " <> ToString[Round[Mean[Length[#] & /@ fhaploset],0.01]]," out of "<>ToString[2^(nFounder (1+Boole[!isfounderinbred]))]];
-	            ];
+	                <> " Seconds. \t Start imputing founder linkagegroup " <> ToString[ch]<>" out of "<>ToString[Length[founderHaplo]]];	                
+	                PrintTemporary["#markers: ", Length[fhaploset],". #phases per locus: " <> ToString[Round[Mean[Length[#] & /@ fhaploset],0.01]]," out of "<>ToString[2^(nFounder (1+Boole[!isfounderinbred]))]];
+	            ];	            
 	            nn = Round[Length[fhaploset]/2];
 	            {fwphaseprob, fworigprob, fwphaseindex} = parentForwardCalculation[model,samplelabel, markovprocess, fhaploset, chrobsgeno, 
 	               epsF2, eps, minphredscore, isoffspringdepth, ismaleX];
+	            (*Put[fwphaseprob, fworigprob, fwphaseindex,model,samplelabel, markovprocess, fhaploset, chrobsgeno, epsF2, eps, minphredscore, isoffspringdepth, ismaleX,"imputetemp.txt"];
+	            Abort[];*)
 	            backtmin = If[ isextrareverse,
 	                           nn+1,
 	                           1
-	                       ];
-	            {fwphase,fwphaseprob} = Most[parentBackwardMaximize[fwphaseprob, fworigprob, isdepModel,ismaleX,samplelabel, markovprocess,backtmin]];
-	            ClearAll[fworigprob];
+	                       ];	                     
+	            {fwphase,fwphaseprob} = Most[parentBackwardMaximize[fwphaseprob, fworigprob, isdepModel,ismaleX,samplelabel, markovprocess,backtmin]];	            	            
 	            fhaploset = MapThread[#1[[#2]] &, {fhaploset,fwphaseindex}];
 	            If[ isprint,
 	                PrintTemporary["Mean number of phases per locus after forward calculation: " <> ToString[Round[Mean[Length[#] & /@ fwphaseindex],0.01]]," out of "<>ToString[2^(nFounder (1+Boole[!isfounderinbred]))]];
@@ -180,27 +189,29 @@ magicImputeFounder[magicSNP_, model_, epsF_, eps_, popDesign_,minphredscore_,max
 	                fhaploset2[[nn + 1 ;;]] = List /@ MapThread[#1[[#2]] &, {fhaploset[[nn + 1 ;;]],fwphase[[nn + 1 ;;]]}];
 	                fhaploset2[[nn + 1 ;;, All, 2]] = 1;
 	                (*reverse chromosome direction*)
-	                revmarkovprocess = markovprocess;
+	                revmarkovprocess = markovprocess;	                	
 	                revmarkovprocess[[All, 2, 2]] = Reverse[#] & /@ revmarkovprocess[[All, 2, 2]];
 	                revmarkovprocess[[All, 2, 2]] = Map[Transpose, revmarkovprocess[[All, 2, 2]], {2}];
 	                {revphaseprob, revorigprob, revphaseindex} = parentForwardCalculation[model,samplelabel, revmarkovprocess, 
 	                    Reverse[fhaploset2], Reverse[chrobsgeno], epsF2, eps, minphredscore, isoffspringdepth, ismaleX];
+	                (*Put[fhaploset,revphaseindex,revphaseprob, revorigprob, isdepModel,ismaleX, samplelabel, revmarkovprocess,"tempphase0_"<>ToString[$KernelID]<>".txt"];*)	                	
 	                {phase,revphaseprob} = Most[parentBackwardMaximize[revphaseprob, revorigprob, isdepModel,ismaleX, samplelabel, revmarkovprocess,Length[fhaploset]+1-nn]];
 	                {revphaseindex,phase,revphaseprob} = Reverse[#]&/@{revphaseindex,phase,revphaseprob};
 	                ClearAll[revorigprob];
 	                phase = MapThread[#1[[#2]] &, {revphaseindex, phase}];
 	                phase[[nn+1;;]] = fwphase[[nn+1;;]];
 	            ];
-	            phase = MapThread[#1[[#2]] &, {fhaploset[[All, All, 1]], phase}];	            
+	            phase = MapThread[#1[[#2]] &, {fhaploset[[All, All, 1]], phase}];
 	            phase
             ], {ch, Length[founderHaplo]}];
-        If[ ! isfounderinbred,
+        If[ ! isfounderinbred,        	        	
             posfoundermale = Flatten[Position[foundergender, "Male"]];
             phase[[posX, All, 2 posfoundermale]] = "";
             phase = Map[StringJoin, Map[Partition[#, 2] &, phase, {2}], {3}];
-        ];
+        ];        	
         imputedmagicsnp = magicSNP;
         imputedmagicsnp[[5 ;; nFounder + 4, 2 ;;]] = Transpose[Flatten[phase,1]];
+        (*DeleteFile["temporary_phase_chr" <> ToString[#] <> ".txt"] & /@ Range[Length[founderHaplo]];*)         	
         imputedmagicsnp
     ]
   
@@ -393,11 +404,6 @@ magicImputeOffspringSplit[magicSNP_, model_, epsF_, eps_, popDesign_, minphredsc
                   " Seconds. \t Start imputing offspring linkagegroup " <> ToString[ch]<>" out of "<>ToString[Length[subset]]];
            ];
            subsnp = Join[magicSNP[[{1}]], magicSNP[[2 ;;, subset[[ch, 2]]]]];
-           (*If[ch==1,
-               Put[subsnp, model, epsF, eps, popDesign, minphredscore, errorgenobound, imputingbound, 
-            isfounderinbred, isfounderdepth, isoffspringdepth, starttime,"temp.txt"];
-               Abort[];
-           ];*)
            magicImputeOffspring[subsnp, model, epsF, eps, popDesign, minphredscore, errorgenobound, imputingbound, 
             isfounderinbred, isfounderdepth, isoffspringdepth, starttime, False], {ch, Length[subset]}]];
         {imputedmagicsnp, imputedsnpgenoprob, truegenoposterior} = Join[First[#], Sequence @@ #[[2 ;;, All, 2 ;;]], 2] & /@ {imputedmagicsnp, imputedsnpgenoprob, truegenoposterior};
@@ -432,8 +438,8 @@ magicImputeOffspring[magicSNP_, model_, epsF_, eps_, popDesign_,
             founderid,sampleid}  = transformMagicSNP[magicSNP,isfounderinbred,isfounderdepth,isoffspringdepth];        
         (*Put[reconstructoutputfile,founderHaplo, obsGeno, epsF, eps,minphredscore, offspringgender, posX,isoffspringdepth,errorgenobound,imputingbound,isprint,"temp.txt"];
         Print["calSNPGenoProb"];*)
-        (*Abort[];*)
-        snpgenoprob = calSNPGenoProb[reconstructoutputfile,model,founderHaplo, epsF, eps,offspringgender, posX];
+        (*Abort[];*)        
+        snpgenoprob = calSNPGenoProb[reconstructoutputfile,model,founderHaplo, epsF, eps,offspringgender, posX];        
         DeleteFile[reconstructoutputfile];
         snpgenoprob = Map[Normalize[#, Total] &, snpgenoprob, {3}];
         snpgenoprob = Round[snpgenoprob, 10^(-5.)];
@@ -450,6 +456,9 @@ magicImputeOffspring[magicSNP_, model_, epsF_, eps_, popDesign_,
                 offspringgender, posX, errorgenobound,imputingbound,isprint];
             calledgeno = obsGeno;
         ];
+        (*Put[bestgeno, bestprob,errorpos,errorcount,nonimputecount,avgimputeprob,isdepmodel,obsGeno, snpgenoprob, 
+                offspringgender, posX, errorgenobound,imputingbound,isprint,"imputetemp.txt"];
+        Abort[];*)
         imputedmagicsnp = imputedsnpgenoprob = truegenoposterior = magicSNP;
         Do[
             imputedmagicsnp[[nFounder + 4+i, 2 ;;]] = Flatten[bestgeno[[i]]];
@@ -1012,4 +1021,5 @@ plotErrorPatternGUI[obsmagicsnp_?(StringQ[#]||ListQ[#]&), estmagicsnp_?(StringQ[
 End[]
 
 EndPackage[]
+
 

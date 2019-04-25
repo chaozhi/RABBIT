@@ -316,7 +316,7 @@ diploLikeliGBS[observedgeno_?(Depth[#] == 4 &), eps_,minphredscore_] :=
         pp12 = Total[{p12, p11, p22, p21} epsls];
         pp21 = Total[{p21, p11, p22, p12} epsls];
         pp22 = Total[{p22, p12, p21, p11} epsls];
-        Transpose[#] & /@ Transpose[{pp11, pp12, pp21, pp22}]
+        Transpose[#] & /@ Transpose[{pp11, pp12, pp21, pp22}]        
     ]
 
 (*scenario: for all individual at a single site*)
@@ -366,7 +366,7 @@ haploLikeliGBS[observedhaplo_?(Depth[#] == 4 &), eps_,minphredscore_] :=
         p2 = (baseerrorprob)^n1 (1 - baseerrorprob)^n2;
         pp1 = (1-eps) p1+eps p2;
         pp2 =  (1-eps) p2+eps p1;
-        Transpose[{pp1,pp2}, {3, 1, 2}]
+        Transpose[{pp1,pp2}, {3, 1, 2}]        
     ]
 
 (*scenario: for all offspring at a single site*)

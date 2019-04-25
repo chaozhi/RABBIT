@@ -26,6 +26,8 @@ pedAncestryConcisePrior::usage = "pedAncestryConcisePrior  "
 
 pedAncestryCompatibleQ::usage = "pedAncestryCompatibleQ  "
 
+phiijk::usage = "phiijk  "
+
 (* Exported symbols added here with SymbolName::usage *) 
 
 Begin["`Private`"]
@@ -415,7 +417,7 @@ phiij[a_, b_] :=
 (*StringJoin[#]&/@Tuples[{{"m","p"},{"m","p"},{"m","p"}}]*)
  (*phiijk=three-gene non-ibd probability; phiijk[a,b,c]={mmm,mmp,mpm,mpp,pmm,pmp,ppm,ppp}*)
 phiijk[a_?(#<=$nfounder&), b_?(#<=$nfounder&),  c_?(#<=$nfounder&)] :=
-    phiijk[a, b,c] = Map[SparseArray, Flatten[Table[Outer[Times, fi[a][[i]], fi[b][[j]], fi[c][[k]]], {i, 2}, {j, 2}, {k, 2}], 2]]    
+	phiijk[a, b,c] = Map[SparseArray, Flatten[Table[Outer[Times, fi[a][[i]], fi[b][[j]], fi[c][[k]]], {i, 2}, {j, 2}, {k, 2}], 2]]    
 phiijk[a_, b_, c_] :=
     phiijk[a, b, c] =
     Module[ {mmm, mmp, mpm, mpp, pmm, pmp, ppm, ppp, i, j, k, ch,nfgl = Length[First[fi[1]]]},

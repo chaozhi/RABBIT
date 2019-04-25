@@ -3,6 +3,7 @@
 (* Created by the Wolfram Workbench Mar 18, 2014 *)
 
 BeginPackage["MagicReconstruct`",{"MagicDefinition`","ContinuousTimeHmm`","MagicDataPreprocess`",
+	"MagicDataFilter`",
     "MagicReconstruct`MagicModel`","MagicReconstruct`MagicLikelihood`",
     "MagicReconstruct`MagicAlgorithm`"}]
 (* Exported symbols added here with SymbolName::usage *) 
@@ -39,6 +40,8 @@ calAddKinship::usage = "calAddKinship[haploprobfile, ibdprobfile, outputkinshipf
 plotAncestryProbGUI::usage = "plotAncestryProbGUI[summaryfile, trueFGLdiplofile] or plotAncestryProbGUI[summaryfile] returns an animate for visualizing posterior probability. The summaryfile is the outputfile returned by saveAsSummaryMR.  "
 
 isPlotGenoProb::usage = "isPlotGenoProb is an option to specify whether to plot genotype probability (True) or haplotype probability (False). "
+
+plotCondProb::usage = "plotCondProb  "
 
 
 Begin["`Private`"]
@@ -116,6 +119,8 @@ magicReconstruct[inputmagicSNP_?(ListQ[#] ||StringQ[#]&),model_String,inputpopDe
         (*obsGeno dimensions     {noffspring,nchr,nsnp}*)
         {deltd, founderHaplo, obsGeno,snpMap,haploMap,nFounder,posA,posX,foundergender,offspringgender,
             founderid,sampleid} = transformMagicSNP[magicSNP,isfounderinbred,isfounderdepth,isoffspringdepth];
+        (*Put[nFounder, popDesign, isfounderinbred,model, posA, posX, offspringgender, sampleid,deltd,"tempwheat.txt"];
+        Abort[];*)
         {sampleLabel, sampleMarkovProcess} = sampleDiscretePriorProcess[nFounder, popDesign, isfounderinbred,model, posA, posX, offspringgender, sampleid,deltd];
         {clusters,weights,clusterhaploMap} = getClusterhaploMap[haploMap,outputsmooth];
         Quiet[Close[outputfile]];
@@ -215,23 +220,29 @@ calOrigLogl[inputmagicSNP_List, model_String, epsF_?NonNegative, eps_?NonNegativ
         deltd, founderHaplo, obsGeno,foundergender,offspringgender,posA,posX,continuedMarkovProcess,markov,chrposA,chrposX,chr,
         nFounder,founderid,sampleid,snpMap,haploMap,sampleLabel,startProb,tranProb,haplocode,diplocode,dataProb,ind},
         {deltd, founderHaplo, obsGeno,snpMap,haploMap,nFounder,posA,posX,foundergender,offspringgender,
-            founderid,sampleid} = transformMagicSNP[magicSNP,isfounderinbred,isfounderdepth,isoffspringdepth];        
+            founderid,sampleid} = transformMagicSNP[magicSNP,isfounderinbred,isfounderdepth,isoffspringdepth];
         {sampleLabel, continuedMarkovProcess} = sampleContinuedPriorProcess[nFounder, popDesign, isfounderinbred, 
-        		model, posA, posX, offspringgender, sampleid];
-		Sum[
-		    markov = continuedMarkovProcess;
-		    markov[[All, 2]] = markov[[All, 2, All, {chr}]];
-		    markov = toDiscreteMarkovProcess[markov, deltd[[{chr}]]];
-		    chrposA = If[MemberQ[posA, chr], {1}, {}];
-		    chrposX = If[MemberQ[posX, chr], {1}, {}];
-		    Table[
-		     {haplocode, diplocode} = sampleLabel[[ind + 1, 4 ;; 5]];
-		     {startProb, tranProb} = sampleLabel[[ind + 1, 2]] /. markov;
-		     If[ !OrderedQ[haplocode],
-              {startProb,tranProb} = relabelMarkovProcess[{startProb,tranProb}, haplocode,diplocode];
-		     ];
-		     dataProb = lineMagicLikelihood[model, founderHaplo[[All, {chr}]],obsGeno[[ind, {chr}]], epsF, eps, chrposA, chrposX, offspringgender[[ind]]];
-		     origLogLiklihood[startProb, tranProb, dataProb], {ind, Length[obsGeno]}], {chr, Length[deltd]}]
+                model, posA, posX, offspringgender, sampleid];
+        Sum[
+            markov = continuedMarkovProcess;
+            markov[[All, 2]] = markov[[All, 2, All, {chr}]];
+            markov = toDiscreteMarkovProcess[markov, deltd[[{chr}]]];
+            chrposA = If[ MemberQ[posA, chr],
+                          {1},
+                          {}
+                      ];
+            chrposX = If[ MemberQ[posX, chr],
+                          {1},
+                          {}
+                      ];
+            Table[
+             {haplocode, diplocode} = sampleLabel[[ind + 1, 4 ;; 5]];
+             {startProb, tranProb} = sampleLabel[[ind + 1, 2]] /. markov;
+             If[ !OrderedQ[haplocode],
+                 {startProb,tranProb} = relabelMarkovProcess[{startProb,tranProb}, haplocode,diplocode];
+             ];
+             dataProb = lineMagicLikelihood[model, founderHaplo[[All, {chr}]],obsGeno[[ind, {chr}]], epsF, eps, chrposA, chrposX, offspringgender[[ind]]];
+             origLogLiklihood[startProb, tranProb, dataProb], {ind, Length[obsGeno]}], {chr, Length[deltd]}]
     ]
     
 calOrigGeneration[magicSNP_List, model_String, epsF_?NonNegative, 
@@ -266,15 +277,15 @@ calOrigGeneration[magicSNP_List, model_String, epsF_?NonNegative,
     ]
 
 toIBDProb[genoprob_] :=
-    Module[ {depth, len, nFounder, genotypes, pos,inbred,x,vec},
+    Module[ {depth, len, nfgl, genotypes, pos,inbred,x,vec},
         depth = Depth[genoprob];
         len = Union[Flatten[Map[Last[Dimensions[#]] &, genoprob, {depth - 3}]]];
-        nFounder = Solve[x (x + 1)/2 == First[len] && x > 0, x][[1, 1, 2]];
-        If[ ! (Length[len] == 1 && IntegerQ[nFounder]),
+        nfgl = Solve[x (x + 1)/2 == First[len] && x > 0, x][[1, 1, 2]];
+        If[ ! (Length[len] == 1 && IntegerQ[nfgl]),
             Print["toIBDProb: the argument is not an array of unphased genotype probabilities!"];
             Abort[]
         ];
-        genotypes = origGenotype[nFounder][[1, 1]];
+        genotypes = origGenotype[nfgl][[1, 1]];
         pos = Flatten[Position[genotypes, {x_, x_}]];
         vec = SparseArray[{}, {Length[genotypes]}];
         vec[[pos]] = 1;
@@ -283,16 +294,16 @@ toIBDProb[genoprob_] :=
     ]  
 
 toHaploProb[genoprob_] :=
-    Module[ {depth, len, nFounder, genotypes, mtx,haploprob,x,i,j},
+    Module[ {depth, len, nfgl, genotypes, mtx,haploprob,x,i,j},
         depth = Depth[genoprob];
         len = Union[Flatten[Map[Last[Dimensions[#]] &, genoprob, {depth - 3}]]];
-        nFounder = Solve[x (x + 1)/2 == First[len] && x > 0, x][[1, 1, 2]];
-        If[ ! (Length[len] == 1 && IntegerQ[nFounder]),
+        nfgl = Solve[x (x + 1)/2 == First[len] && x > 0, x][[1, 1, 2]];
+        If[ ! (Length[len] == 1 && IntegerQ[nfgl]),
             Print["toGenoProb: the argument is not an array of unphased genotype probabilities!"];
             Abort[]
         ];
-        genotypes = origGenotype[nFounder][[1, 1]];
-        mtx = ConstantArray[0, {Length[genotypes], nFounder}];
+        genotypes = origGenotype[nfgl][[1, 1]];
+        mtx = ConstantArray[0, {Length[genotypes], nfgl}];
         Do[mtx[[i, genotypes[[i, j]]]] += 1, {i, Length[genotypes]}, {j,Dimensions[genotypes][[2]]}];
         mtx = Transpose[mtx]/Dimensions[genotypes][[2]];
         haploprob = Map[Transpose[mtx.Transpose[#]] &, genoprob, {depth - 3}];
@@ -302,16 +313,16 @@ toHaploProb[genoprob_] :=
 (*diploprob[[i,j]]: a list of diplotype probabilities at marker j of linkage group i, for a given indvidual*)
 (*also works if there are no level of linkage groups, also works if there are additonal level of individuals*)    
 toGenoProb[diploprob_] :=
-    Module[ {depth,len,nFounder, geno2diplo, i, mtx},
+    Module[ {depth,len,nfgl, geno2diplo, i, mtx},
         depth = Depth[diploprob];
         len = Union[Flatten[Map[Last[Dimensions[#]] &, diploprob, {depth - 3}]]];
-        nFounder = Sqrt[First[len]];
-        If[ ! (Length[len] == 1 && IntegerQ[nFounder]),
+        nfgl = Sqrt[First[len]];
+        If[ ! (Length[len] == 1 && IntegerQ[nfgl]),
             Print["toGenoProb: the argument is not an array of diplotype probabilities!"];
             Abort[]
         ];
-        geno2diplo = origGenotype[nFounder][[2, 1]];
-        mtx = SparseArray[{}, {nFounder (nFounder + 1)/2, nFounder^2}];
+        geno2diplo = origGenotype[nfgl][[2, 1]];
+        mtx = SparseArray[{}, {nfgl (nfgl + 1)/2, nfgl^2}];
         Do[mtx[[i, geno2diplo[[i]]]] = 1, {i, Length[mtx]}];
         Map[Transpose[mtx.Transpose[#]] &, diploprob, {depth - 3}]
     ]
@@ -324,30 +335,31 @@ getCondProb[resultFile_String?FileExistsQ] :=
     ]
 
 saveAsSummaryMR[resultFile_String?FileExistsQ, summaryFile_String] :=
-    Module[ {res, model,epsF, eps, popDesign,outputid,algorithmname, samplesize,outputsmooth,isprint,isfounderinbred,isoffspringdepth,foundergender,offspringgender,posA,posX,
-        founderid,sampleid,snpMap,founderHaplo, obsGeno,clusters,weights,clusterhaploMap,clustersnpMap, nFounder,chrid,logl,logl2,genotypes, diplotypes, genoID, genotypes2, haploID, haplotypes2, 
+    Module[ {res, model,epsF, eps,fglid, popDesign,outputid,algorithmname, samplesize,outputsmooth,isprint,isfounderinbred,isoffspringdepth,foundergender,offspringgender,posA,posX,
+        founderid,sampleid,snpMap,founderHaplo, obsGeno,clusters,weights,clusterhaploMap,clustersnpMap, nfgl,chrid,logl,logl2,genotypes, diplotypes, genoID, genotypes2, haploID, haplotypes2, 
       rowID, genoprob2, haploprob2,ibdprob2, diploID, diplotypes2, path, summary, diplotohaplo,key = "magicReconstruct-Summary",outfile},
         PrintTemporary["Time used in reading "<>resultFile<>": "
             <>ToString[Round[AbsoluteTiming[
          res = ReadList[resultFile];][[1]],0.01]]<>" seconds. "<>DateString[]];
         {model,epsF,eps,popDesign,outputid,algorithmname, samplesize,outputsmooth,isprint,isfounderinbred,isoffspringdepth,
             foundergender,offspringgender,posA,posX,founderid,sampleid,snpMap,founderHaplo, obsGeno,clusters,weights,clusterhaploMap} = res[[1]];
-        clustersnpMap = clusterhaploMap[[;;3]];
-        nFounder = Length[founderid];
-        {genotypes, diplotypes} = origGenotype[nFounder][[1]];
+        clustersnpMap = clusterhaploMap[[;;3]];        
+        fglid = If[isfounderinbred, founderid, Flatten[{# <> "_m", # <> "_p"} & /@ founderid]];
+        nfgl = Length[fglid];
+        {genotypes, diplotypes} = origGenotype[nfgl][[1]];
         diplotohaplo = Replace[diplotypes, {{x_, x_} :> x, {_, _} -> 0}, {1}];
-        haploID = "haplotype" <> ToString[#] & /@ Range[nFounder];
-        haplotypes2 = Transpose[{haploID, Range[nFounder], founderid}];
+        haploID = "haplotype" <> ToString[#] & /@ Range[nfgl];
+        haplotypes2 = Transpose[{haploID, Range[nfgl], fglid}];
         haplotypes2 = Join[{{"Haplotype", "Code", "founder"}}, haplotypes2];
         genoID = "genotype" <> ToString[#] & /@ Range[Length[genotypes]];
         genotypes2 = Transpose[{genoID,
            toDelimitedString[genotypes,"|"],
-           toDelimitedString[Map[founderid[[#]] &, genotypes, {2}],"|"]}];
+           toDelimitedString[Map[fglid[[#]] &, genotypes, {2}],"|"]}];
         genotypes2 = Join[{{"Genotype", "Code", "founder"}}, genotypes2];
         diploID = "diplotype" <> ToString[#] & /@ Range[Length[diplotypes]];
         diplotypes2 = Transpose[{diploID,
            toDelimitedString[diplotypes,"|"],
-           toDelimitedString[Map[founderid[[#]] &, diplotypes, {2}],"|"]}];
+           toDelimitedString[Map[fglid[[#]] &, diplotypes, {2}],"|"]}];
         diplotypes2 = Join[{{"Diplotype", "Code", "founder"}}, diplotypes2];
         chrid = Split[clusterhaploMap[[2, 2 ;;]]][[All, 1]];
         logl = res[[2 ;;, All, 1]];
@@ -447,10 +459,10 @@ saveAsSummaryMR[resultFile_String?FileExistsQ, summaryFile_String] :=
     ]    
     
 saveCondProb[resultFile_String?FileExistsQ, summaryFile_String, probtype_String:"genotype"] :=
-    Module[ {res,model,epsF,eps,popDesign,outputid,algorithmname, samplesize,outputsmooth,isprint,isfounderinbred,isoffspringdepth,
+    Module[ {res,model,epsF,eps,fglid,popDesign,outputid,algorithmname, samplesize,outputsmooth,isprint,isfounderinbred,isoffspringdepth,
             foundergender,offspringgender,posA,posX,founderid,sampleid,snpMap,founderHaplo, obsGeno,clusters,weights,clusterhaploMap,
-            clustersnpMap,nFounder,genotypes, diplotypes,diplotohaplo,haploID,haplotypes2,genoID,genotypes2,diploID,diplotypes2,chrid,
-            logl,logl2,diploprob,diploprob2,genoprob2,haploprob2,rowID,summary,key = "magicReconstruct-Summary",outfile},
+            clustersnpMap,nfgl,genotypes, diplotypes,diplotohaplo,haploID,haplotypes2,genoID,genotypes2,diploID,diplotypes2,chrid,
+            logl,logl2,condprob,diploprob2,genoprob2,haploprob2,rowID,summary,key = "magicReconstruct-Summary",outfile},
         If[ ! MatchQ[probtype, "diplotype" | "genotype" | "haplotype"],
             Print["The probtype must be diplotype, genotype, or haplotype! wrong probtype of ", probtype, "!"];
         ];
@@ -468,22 +480,23 @@ saveCondProb[resultFile_String?FileExistsQ, summaryFile_String, probtype_String:
             Print["Conditional ", probtype, " probabilities are not available for ", model];
             Abort[];
         ];
-        clustersnpMap = clusterhaploMap[[;;3]];
-        nFounder = Length[founderid];
-        {genotypes, diplotypes} = origGenotype[nFounder][[1]];
+        clustersnpMap = clusterhaploMap[[;;3]];        
+        fglid = If[isfounderinbred, founderid, Flatten[{# <> "_m", # <> "_p"} & /@ founderid]];
+        nfgl = Length[fglid];
+        {genotypes, diplotypes} = origGenotype[nfgl][[1]];
         diplotohaplo = Replace[diplotypes, {{x_, x_} :> x, {_, _} -> 0}, {1}];
-        haploID = "haplotype" <> ToString[#] & /@ Range[nFounder];
-        haplotypes2 = Transpose[{haploID, Range[nFounder], founderid}];
+        haploID = "haplotype" <> ToString[#] & /@ Range[nfgl];
+        haplotypes2 = Transpose[{haploID, Range[nfgl], fglid}];
         haplotypes2 = Join[{{"Haplotype", "Code", "founder"}}, haplotypes2];
         genoID = "genotype" <> ToString[#] & /@ Range[Length[genotypes]];
         genotypes2 = Transpose[{genoID,
            toDelimitedString[genotypes,"|"],
-           toDelimitedString[Map[founderid[[#]] &, genotypes, {2}],"|"]}];
+           toDelimitedString[Map[fglid[[#]] &, genotypes, {2}],"|"]}];
         genotypes2 = Join[{{"Genotype", "Code", "founder"}}, genotypes2];
         diploID = "diplotype" <> ToString[#] & /@ Range[Length[diplotypes]];
         diplotypes2 = Transpose[{diploID,
            toDelimitedString[diplotypes,"|"],
-           toDelimitedString[Map[founderid[[#]] &, diplotypes, {2}],"|"]}];
+           toDelimitedString[Map[fglid[[#]] &, diplotypes, {2}],"|"]}];
         diplotypes2 = Join[{{"Diplotype", "Code", "founder"}}, diplotypes2];
         chrid = Split[clusterhaploMap[[2, 2 ;;]]][[All, 1]];
         logl = res[[2 ;;, All, 1]];
@@ -500,23 +513,21 @@ saveCondProb[resultFile_String?FileExistsQ, summaryFile_String, probtype_String:
              {{key, "Diplotypes in order"}}, diplotypes2, 
              {{key, "Conditonal diplotype probability"}},diploprob2],
          "genotype" | "haplotype",
-         diploprob = res[[2 ;;, All, 2]];
+         condprob = res[[2 ;;, All, 2]];
          ClearAll[res];
-         PrintTemporary["Time used in transforming from diplotprob to genoprob: "
-                     <>ToString[Round[AbsoluteTiming[genoprob2 = toGenoProb[diploprob];][[1]],0.01]]<>" seconds. "<>DateString[]];
          If[ MatchQ[probtype, "haplotype"],
              rowID = Flatten[Outer[StringJoin[#1, "_", #2] &, sampleid, haploID]];
-             If[ MatchQ[probtype, "haplotype"],
-                 PrintTemporary["Time used in transforming from genoprob to haploprob: "
-                         <>ToString[Round[AbsoluteTiming[haploprob2 = toHaploProb[genoprob2];][[1]],0.01]]<>" seconds. "<>DateString[]];
-             ];
-             ClearAll[genoprob2];
-             haploprob2 = Flatten[Transpose[Flatten[#, 1]] & /@ haploprob2, 1];
+             haploprob2 = Flatten[Transpose[Flatten[#, 1]] & /@ condprob, 1];
+             ClearAll[condprob];
              haploprob2 = Join[clustersnpMap, Join[Transpose[{rowID}], haploprob2, 2]];
              summary = Join[{{key,"founderhaplo","Genetic map and founder hapolotypes"}}, clusterhaploMap, 
                  {{key, "logl","Ln marginal likelihood"}}, logl2,
                  {{key, "halotype", "haplotypes in order"}},haplotypes2, 
                  {{key, "haploprob","Conditonal haplotype probability"}},haploprob2],
+             (*genotypes*)
+             PrintTemporary["Time used in transforming from diplotprob to genoprob: "
+                     <>ToString[Round[AbsoluteTiming[genoprob2 = toGenoProb[condprob];][[1]],0.01]]<>" seconds. "<>DateString[]];
+             ClearAll[condprob];
              rowID = Flatten[Outer[StringJoin[#1, "_", #2] &, sampleid, genoID]];
              genoprob2 = Flatten[Transpose[Flatten[#, 1]] & /@ genoprob2, 1];
              genoprob2 = Join[clustersnpMap, Join[Transpose[{rowID}], genoprob2, 2]];
@@ -587,19 +598,106 @@ getchrsetdata[data_, chrset_] :=
         None,
         Rest[getsubMagicSNP[Join[{{None, None}}, data], chrset, All]]
     ]
-  
-plotAncestryProbGUI[summaryfile_String?FileExistsQ, inputtruefgldiplo_?(ListQ[#] ||StringQ[#]||#===None&),opts : OptionsPattern[]] :=
-    Module[ {summary, nfounder, noffspring, truefgldiplo = inputtruefgldiplo, 
-      isgeno,chrsubset, diplorule, truegeno, gg, pos, condprob, ls, types, label,line},
-        {isgeno,chrsubset} = OptionValue@{isPlotGenoProb,linkageGroupSet};
-        If[ StringQ[truefgldiplo],
-            If[ ! FileExistsQ[truefgldiplo],
-                Print["File ", truefgldiplo, " does not exist!"];
-                Return[$Failed]
-            ];
-            truefgldiplo = Import[truefgldiplo, "CSV", Path -> Directory[]];
+
+plothaploprob[condprob_, truefgldiplo_] :=
+    Module[ {diplorule, nfounder, offprob, truegeno, gg, label,line,ls,g1, g2,g3},        
+        If[ truefgldiplo =!= None,
+        	nfounder = truefgldiplo[[1, 2]];
+            diplorule = Flatten[Outer[List, Range[nfounder], Range[nfounder]], 1];
+            diplorule = Thread[Range[Length[diplorule]] -> diplorule];
+            truegeno = truefgldiplo[[nfounder + 5 ;;, 2 ;;]] /. diplorule;
         ];
-        truefgldiplo = getsubMagicSNP[truefgldiplo,chrsubset,All];
+        gg = Table[
+          offprob = condprob[[line]];
+          label = "Offspring " <> ToString[line] <>". GrayLevel=Posterior Probability, ";
+              If[ truefgldiplo =!= None,
+                  label = label <>"\!\(\*
+					StyleBox[\"red\",\nFontColor->RGBColor[1, 0, 0]]\)\!\(\*
+					StyleBox[\" \",\nFontColor->RGBColor[1, 0, 0]]\)\!\(\*
+					StyleBox[\"X\",\nFontColor->RGBColor[1, 0, 0]]\) =true IBD genotype, "<>"\!\(\*
+					StyleBox[\"blue\",\nFontColor->RGBColor[0, 0, 1]]\)\!\(\*
+					StyleBox[\" \",\nFontColor->RGBColor[0, 0, 1]]\)\!\(\*
+					StyleBox[\"O\",\nFontColor->RGBColor[0, 0, 1]]\)\!\(\*
+					StyleBox[\" \",\nFontColor->RGBColor[0, 0, 1]]\)=true non-IBD genotype.",
+                  label = label <> "certical line=chromosome boundary.";
+              ];
+          g1 = MatrixPlot[Reverse[offprob], FrameLabel -> {"Haplotype", "SNP index"}, 
+            ColorFunctionScaling -> False, MaxPlotPoints -> Infinity, 
+            AspectRatio -> 1/2.5, DataRange -> {{1, Dimensions[offprob][[2]]}, {1, Length[offprob]}}];
+          g2 = If[ truefgldiplo =!= None,
+                   {ls = truegeno[[line]] /. {i_, i_} :> i;
+                    ls = Transpose[{Range[Length[ls]], ls}];
+                    ListPlot[Select[ls, MatchQ[#, {_, _Integer}] &],PlotRange -> {{1, Dimensions[offprob][[2]]}, {1,Length[offprob]}}, 
+                        PlotRangePadding -> 0,PlotMarkers -> {"\[Times]", 10}, PlotStyle -> Red],
+                    ls = Select[ls, MatchQ[#, {_, _List}] &];
+                    ls = Flatten[Thread[#] & /@ ls, 1];
+                    ListPlot[ls, PlotRange -> {{1, Dimensions[offprob][[2]]}, {1,Length[offprob]}}, PlotRangePadding -> 0, 
+                     PlotMarkers -> {"\[EmptyCircle]", 14}, PlotStyle -> Blue]},
+                   ListPlot[{1}, PlotMarkers -> {Automatic, 0}]
+               ];
+          If[ truefgldiplo =!= None,
+          	g3=ListLinePlot[Thread[{#, {0.3, Length[offprob] + 0.7}}] & /@Accumulate[Tally[truefgldiplo[[3, 2 ;;]]][[All, 2]]],
+                PlotStyle -> Directive[Dashed, Thick, Brown]];
+          	gg={g1,g2,g3},
+          	gg={g1,g2}
+          ];
+          Show[Sequence@@gg,ImageSize -> 1000, Frame -> True, PlotLabel -> label, 
+           LabelStyle -> Directive[FontSize -> 14, Black, FontFamily -> "Helvetica"]], {line, Length[condprob]}];
+        gg
+    ]
+    
+plotgenoprob[condprob_, truefgldiplo_] :=
+    Module[ {nfounder, types, truegeno, gg, offprob,label, line,g1, g2, g3},
+        If[ truefgldiplo =!= None,
+        	nfounder = truefgldiplo[[1, 2]];
+        	types = origGenotype[nfounder];
+            truegeno = truefgldiplo[[nfounder + 5 ;;, 2 ;;]] /.Thread[Range[Length[types[[2, 2]]]] -> types[[2, 2]]];
+        ];
+        gg = Table[
+          offprob = condprob[[line]];
+          label = "Offspring " <> ToString[line] <>". GrayLevel=posterior probability, ";
+          If[ truefgldiplo =!= None,
+              label = label <> "red X =true genotype.",
+              label = label <> "vertical line=chromosome boundary.";
+          ];
+          g1 = MatrixPlot[Reverse[offprob], FrameLabel -> {"Genotype", "SNP index"}, 
+            ColorFunctionScaling -> False, MaxPlotPoints -> Infinity, 
+            AspectRatio -> 1/2.5, DataRange -> {{1, Dimensions[offprob][[2]]}, {1, 
+               Length[offprob]}}];
+          g2 = If[ truefgldiplo =!= None,
+                   ListPlot[Transpose[{Range[Length[truegeno[[line]]]], truegeno[[line]]}],
+                     PlotRange -> {{1, Dimensions[offprob][[2]]}, {1, Length[offprob]}}, PlotRangePadding -> 0, 
+                     PlotMarkers -> {"\[Times]", 10}, PlotStyle -> Red],
+                   ListPlot[{1}, PlotMarkers -> {Automatic, 0}]
+               ];          
+          If[ truefgldiplo =!= None,
+          	g3 = ListLinePlot[Thread[{#, {0.3, Length[offprob] + 0.7}}] & /@Accumulate[Tally[truefgldiplo[[3, 2 ;;]]][[All, 2]]], 
+            PlotStyle -> Directive[Dashed, Thick, Brown]];
+          	gg={g1,g2,g3},
+          	gg={g1,g2}
+          ];
+          Show[Sequence@@gg, FrameTicks -> {{Transpose[{Range[Length[types[[1, 1]]]], types[[1, 1]]}], None}, {Automatic, None}}, 
+           ImageSize -> 1000, Frame -> True, PlotLabel -> label, 
+           LabelStyle -> Directive[FontSize -> 14, Black, FontFamily -> "Helvetica"]], {line, Length[condprob]}];
+        gg
+    ]
+    
+plotAncestryProbGUI[summaryfile_String?FileExistsQ, inputtruefgldiplo_?(ListQ[#] ||StringQ[#]||#===None&),
+	opts : OptionsPattern[]] :=
+    Module[ {summary, nfounder, nfgl,noffspring, truefgldiplo = inputtruefgldiplo, 
+      isgeno,chrsubset, gg, pos, condprob, types, line,isfounderinbred},
+        {isgeno,chrsubset} = OptionValue@{isPlotGenoProb,linkageGroupSet};        
+        If[truefgldiplo=!=None,
+	        If[ StringQ[truefgldiplo],
+	            If[ ! FileExistsQ[truefgldiplo],
+	                Print["File ", truefgldiplo, " does not exist!"];
+	                Return[$Failed]
+	            ];
+	            truefgldiplo = Import[truefgldiplo, "CSV", Path -> Directory[]];
+	        ];
+	        truefgldiplo = getsubMagicSNP[truefgldiplo,chrsubset,All];
+        ];        
+        (*extract summary file*)
         summary = getSummaryMR[summaryfile];
         (*{"Genetic map and founder hapolotypes", "Conditonal genotype probability", 
         "Conditonal haplotype probability", "Conditonal IBD probability"}*)
@@ -613,85 +711,87 @@ plotAncestryProbGUI[summaryfile_String?FileExistsQ, inputtruefgldiplo_?(ListQ[#]
         ];
         nfounder = Length[summary[[6, 2 ;;, 2]]];
         noffspring = (Length[summary[[7]]] - 3)/nfounder;
+        (*to infer isfounderinbred from truefgl*)    
+        isfounderinbred = True;        
+        nfgl = nfounder(1 + Boole[! isfounderinbred]); 
         If[ isgeno,
-            (*visualize genotype probability*)
-            types = origGenotype[nfounder];
-            If[ truefgldiplo =!= None,
-                truegeno = truefgldiplo[[nfounder + 5 ;;, 2 ;;]] /. 
-                   Thread[Range[Length[types[[2, 2]]]] -> types[[2, 2]]];
-            ];
-            gg = Table[
-              pos = Span @@ {4 + Length[types[[1, 1]]] (line - 1),3 + Length[types[[1, 1]]] line};
-              condprob = summary[[5, pos, 2 ;;]];
-              label = "Offspring " <> ToString[line] <>". GrayLevel=posterior probability, ";
-              If[ truefgldiplo =!= None,
-                  label = label <>"red X =true genotype.",
-                  label = label <> "vertical line=chromosome boundary.";
-              ];
-              Show[
-               MatrixPlot[Reverse[condprob],FrameLabel -> {"Genotype", "SNP index"}, 
-                ColorFunctionScaling -> False, MaxPlotPoints -> Infinity, AspectRatio -> 1/2.5, 
-                DataRange -> {{1, Dimensions[condprob][[2]]}, {1, Length[condprob]}}],
-               If[ truefgldiplo =!= None,
-                   ListPlot[Transpose[{Range[Length[truegeno[[line]]]],truegeno[[line]]}], 
-                    PlotRange -> {{1, Dimensions[condprob][[2]]}, {1, Length[condprob]}}, PlotRangePadding -> 0, 
-                    PlotMarkers -> {"\[Times]", 10}, PlotStyle -> Red],
-                   ListPlot[{1}, PlotMarkers -> {Automatic, 0}]
-               ],
-               ListLinePlot[Thread[{#, {0.3, Length[condprob] + 0.7}}] & /@Accumulate[Tally[summary[[5, 2, 2 ;;]]][[All, 2]]],
-                PlotStyle -> Directive[Dashed, Thick, Brown]],
-               Sequence @@ FilterRules[{opts}, Options[ListPlot]],
-               FrameTicks -> {{Transpose[{Range[Length[types[[1, 1]]]],types[[1, 1]]}], None}, {Automatic, None}},
-               ImageSize -> 1000, Frame -> True, PlotLabel -> label,
-               LabelStyle -> Directive[FontSize -> 14, Black, FontFamily -> "Helvetica"]
-               ], {line, noffspring}],
-            (*visualize haplotype probability*)
-            If[ truefgldiplo =!= None,
-                diplorule = Flatten[Outer[List, Range[nfounder], Range[nfounder]], 1];
-                diplorule = Thread[Range[Length[diplorule]] -> diplorule];
-                truegeno = truefgldiplo[[nfounder + 5 ;;, 2 ;;]] /. diplorule;
-            ];
-            gg = Table[
-              pos = Span @@ {4 + nfounder (line - 1), 3 + nfounder line};
-              condprob = summary[[7, pos, 2 ;;]];
-              label = "Offspring " <> ToString[line] <>". GrayLevel=Posterior Probability, ";
-              If[ truefgldiplo =!= None,
-                  label = label <>"\!\(\*
-					StyleBox[\"red\",\nFontColor->RGBColor[1, 0, 0]]\)\!\(\*
-					StyleBox[\" \",\nFontColor->RGBColor[1, 0, 0]]\)\!\(\*
-					StyleBox[\"X\",\nFontColor->RGBColor[1, 0, 0]]\) =true IBD genotype, "<>"\!\(\*
-					StyleBox[\"blue\",\nFontColor->RGBColor[0, 0, 1]]\)\!\(\*
-					StyleBox[\" \",\nFontColor->RGBColor[0, 0, 1]]\)\!\(\*
-					StyleBox[\"O\",\nFontColor->RGBColor[0, 0, 1]]\)\!\(\*
-					StyleBox[\" \",\nFontColor->RGBColor[0, 0, 1]]\)=true non-IBD genotype.",
-                  label = label <> "certical line=chromosome boundary.";
-              ];
-              Show[
-               MatrixPlot[Reverse[condprob], FrameLabel -> {"Haplotype", "SNP index"}, 
-                ColorFunctionScaling -> False, MaxPlotPoints -> Infinity, 
-                AspectRatio -> 1/2.5, DataRange -> {{1, Dimensions[condprob][[2]]}, {1,Length[condprob]}}],
-               If[ truefgldiplo =!= None,
-                   {ls = truegeno[[line]] /. {i_, i_} :> i;
-                    ls = Transpose[{Range[Length[ls]], ls}];
-                    ListPlot[Select[ls, MatchQ[#, {_, _Integer}] &],PlotRange -> {{1, Dimensions[condprob][[2]]}, {1,Length[condprob]}}, 
-                        PlotRangePadding -> 0,PlotMarkers -> {"\[Times]", 10}, PlotStyle -> Red],
-                    ls = Select[ls, MatchQ[#, {_, _List}] &];
-                    ls = Flatten[Thread[#] & /@ ls, 1];
-                    ListPlot[ls, PlotRange -> {{1, Dimensions[condprob][[2]]}, {1,Length[condprob]}}, PlotRangePadding -> 0, 
-                     PlotMarkers -> {"\[EmptyCircle]", 14}, PlotStyle -> Blue]},
-                   ListPlot[{1}, PlotMarkers -> {Automatic, 0}]
-               ],
-               ListLinePlot[Thread[{#, {0.3, Length[condprob] + 0.7}}] & /@Accumulate[Tally[summary[[2, 2, 2 ;;]]][[All, 2]]],
-                PlotStyle -> Directive[Dashed, Thick, Brown]],
-               Sequence @@ FilterRules[{opts}, Options[ListPlot]],
-               ImageSize -> 1000, Frame -> True, PlotLabel -> label,
-               LabelStyle -> Directive[FontSize -> 14, Black, FontFamily -> "Helvetica"]
-               ], {line, noffspring}]
+        	(*genoprob*)
+        	condprob = Table[
+        		pos = Span @@ {4 + Length[types[[1, 1]]] (line - 1), 3 + Length[types[[1, 1]]] line};
+        		summary[[5, pos, 2 ;;]], {line, noffspring}],        	
+        	(*haploprob*)
+        	condprob = Table[
+        		pos = Span @@ {4 + nfgl (line - 1), 3 + nfgl line};
+        		summary[[7, pos, 2 ;;]], {line, noffspring}];        	
         ];
+        If[ isgeno,
+        	(*genoprob*)        	
+        	gg = plotgenoprob[condprob, truefgldiplo],
+        	(*haploprob*)
+        	gg = plothaploprob[condprob, truefgldiplo];
+        ];
+         
         ListAnimate[gg, Sequence @@ FilterRules[{opts}, Options[ListAnimate]], 
          AnimationRunning -> True, AnimationDirection -> ForwardBackward, DefaultDuration -> 2 noffspring]
     ]
-      
+
+Options[plotCondProb] = Join[{linkageGroupSet->All},Options[ListPlot],Options[ListAnimate]];
+
+plotCondProb[probfile_String?FileExistsQ, opts : OptionsPattern[]] :=
+    plotCondProb[probfile,None,opts]
+    
+plotCondProb[probfile_String?FileExistsQ, inputtruefgldiplo_?(ListQ[#] ||StringQ[#]||#===None&),
+	opts : OptionsPattern[]] :=
+    Module[ {summary, nfounder, nfgl,noffspring, truefgldiplo = inputtruefgldiplo, 
+      chrsubset, gg, condprob,nstate,type,prob,isfounderinbred},
+        {chrsubset} = OptionValue@{linkageGroupSet};
+        (*true*)
+        If[ StringQ[truefgldiplo],
+            If[ ! FileExistsQ[truefgldiplo],
+                Print["File ", truefgldiplo, " does not exist!"];
+                Return[$Failed]
+            ];
+            truefgldiplo = Import[truefgldiplo, "CSV", Path -> Directory[]];
+        ];
+        truefgldiplo = getsubMagicSNP[truefgldiplo,chrsubset,All];
+        nfounder = truefgldiplo[[1, 2]];
+        (*to infer isfounderinbred from truefgl*)    
+        isfounderinbred = True;        
+        nfgl = nfounder(1 + Boole[! isfounderinbred]);
+        noffspring = Length[truefgldiplo] - nfounder - 4;
+        (*condprob*)
+        summary = Import[probfile, "CSV", Path -> Directory[]];
+		nstate = (Length[summary] - 3)/noffspring;
+		If[Head[nstate] =!= Integer,
+		  Print["Inconsistent dimensions. nrow=", Length[summary]];
+		  Abort[]
+		  ];
+		(*Print["{nfgl,noffspring,nstate} = ", {nfgl, noffspring, nstate}];*)
+		type = Which[nstate == nfgl*nfgl, "diplotype", 
+		   nstate == nfgl*(nfgl + 1)/2, "genotype", nstate == nfgl, 
+		   "haplotype",
+		   _,
+		   Print["inconsistent dimenions. {nfgl,noffspring,nstate} = ", {nfgl,
+		      noffspring, nstate}]; Abort[]
+		   ];
+		prob = SplitBy[Transpose[summary[[All, 2 ;;]]], #[[2]] &];
+		prob = Flatten[prob[[chrsubset]], 1][[All, 4 ;;]];
+		condprob = Partition[Transpose[prob], nstate];
+		Which[ 
+			type=="genotype",
+        	(*genoprob*)        	
+        	gg = plotgenoprob[condprob, truefgldiplo],
+        	type=="haplotype",
+        	(*haploprob*)
+        	gg = plothaploprob[condprob, truefgldiplo],
+        	type=="haplotype",
+        	Abort[];
+        ]; 
+		(**)
+        ListAnimate[gg, Sequence @@ FilterRules[{opts}, Options[ListAnimate]], 
+         AnimationRunning -> True, AnimationDirection -> ForwardBackward, DefaultDuration -> 2 noffspring]
+    ]
+          
 End[]
 
 SetAttributes[#, {Protected,ReadProtected}]&/@ Names["MagicReconstruct`*"];

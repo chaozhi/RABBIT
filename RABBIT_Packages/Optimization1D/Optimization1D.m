@@ -133,9 +133,9 @@ brentLocalMin[f_Function, start_?(NumberQ[#] || # == Automatic &),lowbound_?Nume
          ];
         If[ iter == itmax + 1,
             his = Take[his,iter-1];
-            Print[Style[
-              "brentLocalMin: exceed maximum iterations of " <> 
-               ToString[itmax] <> "!", Red]]
+            brentLocalMin::iter =  " reach the maximum number `1` of iterations";
+            Message[brentLocalMin::iter, 100];
+            (*Print[Style["brentLocalMin: exceed maximum iterations of " <>ToString[itmax] <> "!", Red],";{x,fx}=",{x,fx}]*)
         ];
         {x, fx, his}
     ]

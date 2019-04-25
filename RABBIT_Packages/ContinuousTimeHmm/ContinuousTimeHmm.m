@@ -117,13 +117,14 @@ CtBackward[tranProbSeq_, dataProbSeq_, forwardScale_] :=
 (*logbackwardProb[[t=T]] = logbackwardInitial (=0 by default)*)
 (*logbackwardProb[[t]] =  Log[Pr(y_{t+1...T}|x_t)/Pr(y_{t+1...T|y_{1...t})]*)
 CtLogBackward[tranProbSeq_, dataProbSeq_,logbackwardInitial_:Automatic] :=
-    Module[ {nSeq = Length[dataProbSeq],logbackwardProb,max,prob,t},
+    Module[ {nSeq = Length[dataProbSeq],logbackwardProb,max,prob,t,temp},
         logbackwardProb = Table[0, {nSeq}];
         logbackwardProb[[-1]] = If[logbackwardInitial===Automatic, Table[0,{Length[tranProbSeq[[-1]]]}],logbackwardInitial];
         Do[
          max = Max[logbackwardProb[[t + 1]]];
          prob = Exp[logbackwardProb[[t + 1]]-max];
-         logbackwardProb[[t]] = Log[tranProbSeq[[t]].(dataProbSeq[[t+1]] prob)]+max, {t, nSeq - 1, 1, -1}];
+         temp = Log[tranProbSeq[[t]].(dataProbSeq[[t + 1]] prob)] + max;         
+         logbackwardProb[[t]] = temp /. Indeterminate -> 1.1*Min[DeleteCases[temp, Indeterminate]], {t, nSeq - 1, 1, -1}];
         logbackwardProb
     ]    
     

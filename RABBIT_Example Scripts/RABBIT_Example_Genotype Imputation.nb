@@ -10,10 +10,10 @@
 NotebookFileLineBreakTest
 NotebookFileLineBreakTest
 NotebookDataPosition[       157,          7]
-NotebookDataLength[     18564,        404]
-NotebookOptionsPosition[     17205,        354]
-NotebookOutlinePosition[     17755,        377]
-CellTagsIndexPosition[     17669,        372]
+NotebookDataLength[     20652,        425]
+NotebookOptionsPosition[     19248,        374]
+NotebookOutlinePosition[     19802,        397]
+CellTagsIndexPosition[     19715,        392]
 WindowFrame->Normal*)
 
 (* Beginning of Notebook Content *)
@@ -57,11 +57,13 @@ Cell[BoxData[{
    3.7271509392566223`*^9}, {3.739509672674045*^9, 3.739509675594045*^9}, 
    3.739513954850045*^9}],
 
-Cell[BoxData["\<\"D:\\\\Chaozhi\\\\DirectoryWUR\\\\RABBIT \
+Cell[BoxData["\<\"D:\\\\Chaozhi\\\\StatisticalPackages\\\\RABBIT \
 Software\\\\RABBIT_Example Scripts\"\>"], "Output",
  CellChangeTimes->{{3.739515518577245*^9, 3.7395155399612455`*^9}, 
    3.7395155838362455`*^9, 3.7395157078916454`*^9, 3.739515803677245*^9, 
-   3.741593195571684*^9}]
+   3.741593195571684*^9, 3.745736375918333*^9, 3.7458306655788136`*^9, 
+   3.7651644369651957`*^9, {3.7651651531847954`*^9, 3.7651651628385954`*^9}, 
+   3.7651655732841954`*^9}]
 }, Open  ]],
 
 Cell[CellGroupData[{
@@ -81,8 +83,8 @@ design information in several possible ways: a list of mating schemes from \
 founder population to the last generation, a list of values denoting the \
 junction distribution, or a filename for population pedigree information. \
 \"\>", "MSG"]], "Print", "PrintUsage",
- CellChangeTimes->{3.7415931959747243`*^9},
- CellTags->"Info43741600395-7676656"]
+ CellChangeTimes->{3.7651655737711954`*^9},
+ CellTags->"Info203765172773-1416283"]
 }, Open  ]],
 
 Cell[CellGroupData[{
@@ -112,7 +114,8 @@ Cell[BoxData[
    RowBox[{"isPrintTimeElapsed", "\[Rule]", "True"}]}], "}"}]], "Output",
  CellChangeTimes->{{3.7395155190960455`*^9, 3.739515540469245*^9}, 
    3.7395155841452456`*^9, 3.739515708151645*^9, 3.739515804238245*^9, 
-   3.74159319603373*^9}]
+   3.74159319603373*^9, 3.7457363818021326`*^9, 3.745830669917248*^9, 
+   3.765164437235195*^9, 3.7651651631555953`*^9, 3.7651655738491955`*^9}]
 }, Open  ]],
 
 Cell[CellGroupData[{
@@ -132,8 +135,9 @@ Cell[BoxData[{
   RowBox[{
    RowBox[{"magicImpute", "[", 
     RowBox[{"magicsnpfile", ",", "model", ",", "popdesignfile", ",", 
-     RowBox[{"outputFileID", "\[Rule]", "dataid"}]}], "]"}], "//", 
-   "AbsoluteTiming"}]}]}], "Input",
+     RowBox[{"outputFileID", "\[Rule]", 
+      RowBox[{"dataid", "<>", "\"\<_magicImputeOutput\>\""}]}]}], "]"}], "//",
+    "AbsoluteTiming"}]}]}], "Input",
  CellChangeTimes->{{3.6656727742550983`*^9, 3.665672810866192*^9}, {
    3.665731972642981*^9, 3.6657319728769827`*^9}, {3.6657358408469334`*^9, 
    3.665735841034135*^9}, {3.665736058439838*^9, 3.665736058627039*^9}, {
@@ -211,84 +215,92 @@ Cell[BoxData[{
    3.739509862180045*^9}, {3.739509968489045*^9, 3.7395099865660453`*^9}, 
    3.739510054788045*^9, {3.7395101923790455`*^9, 3.7395102264150453`*^9}, {
    3.7395134930370455`*^9, 3.7395134976840453`*^9}, {3.7395148354148455`*^9, 
-   3.7395148416858454`*^9}}],
+   3.7395148416858454`*^9}, {3.7651655545755954`*^9, 3.7651655614145956`*^9}}],
 
 Cell[BoxData["\<\"Example\"\>"], "Output",
  CellChangeTimes->{{3.739515519146045*^9, 3.739515540523245*^9}, 
    3.739515584197245*^9, 3.739515708201645*^9, 3.739515804455245*^9, 
-   3.741593196060733*^9}],
+   3.741593196060733*^9, 3.7457363829191327`*^9, 3.745830672876543*^9, 
+   3.7651644372661953`*^9, 3.765165163189595*^9, 3.7651655739021955`*^9}],
 
 Cell[BoxData["\<\"Example_PedigreeInfor.csv\"\>"], "Output",
  CellChangeTimes->{{3.739515519146045*^9, 3.739515540523245*^9}, 
    3.739515584197245*^9, 3.739515708201645*^9, 3.739515804455245*^9, 
-   3.7415931960817347`*^9}],
+   3.741593196060733*^9, 3.7457363829191327`*^9, 3.745830672876543*^9, 
+   3.7651644372661953`*^9, 3.765165163189595*^9, 3.7651655739391956`*^9}],
 
 Cell[CellGroupData[{
 
 Cell[BoxData[
  InterpretationBox[
   RowBox[{"\<\"magicImpute. Start date = \"\>", 
-   "\[InvisibleSpace]", "\<\"Thu 26 Jul 2018 13:26:36\"\>"}],
-  SequenceForm["magicImpute. Start date = ", "Thu 26 Jul 2018 13:26:36"],
+   "\[InvisibleSpace]", "\<\"Thu 25 Apr 2019 09:19:33\"\>"}],
+  SequenceForm["magicImpute. Start date = ", "Thu 25 Apr 2019 09:19:33"],
   Editable->False]], "Print",
  CellChangeTimes->{{3.739515519196045*^9, 3.7395155405742455`*^9}, 
    3.7395155842532454`*^9, 3.7395157082546453`*^9, 3.7395158048592453`*^9, 
-   3.741593196113735*^9}],
+   3.741593196113735*^9, 3.7457363829601326`*^9, 3.7458306729155474`*^9, 
+   3.765164437313195*^9, 3.7651651632425957`*^9, 3.7651655739651957`*^9}],
 
 Cell[BoxData[
  InterpretationBox[
   RowBox[{"\<\"{#founders, #offspring, #markers} = \"\>", "\[InvisibleSpace]", 
    RowBox[{"{", 
-    RowBox[{"4", ",", "100", ",", "776"}], "}"}]}],
-  SequenceForm["{#founders, #offspring, #markers} = ", {4, 100, 776}],
+    RowBox[{"4", ",", "150", ",", "776"}], "}"}]}],
+  SequenceForm["{#founders, #offspring, #markers} = ", {4, 150, 776}],
   Editable->False]], "Print",
  CellChangeTimes->{{3.739515519196045*^9, 3.7395155405742455`*^9}, 
    3.7395155842532454`*^9, 3.7395157082546453`*^9, 3.7395158048592453`*^9, 
-   3.7415931965957837`*^9}],
+   3.741593196113735*^9, 3.7457363829601326`*^9, 3.7458306729155474`*^9, 
+   3.765164437313195*^9, 3.7651651632425957`*^9, 3.7651655744831953`*^9}],
 
-Cell[BoxData["\<\"Time elapsed = 0.5 Seconds. \\t Start imputing founders! \"\
+Cell[BoxData["\<\"Time elapsed = 0.6 Seconds. \\t Start imputing founders! \"\
 \>"], "Print",
  CellChangeTimes->{{3.739515519196045*^9, 3.7395155405742455`*^9}, 
    3.7395155842532454`*^9, 3.7395157082546453`*^9, 3.7395158048592453`*^9, 
-   3.7415931966147857`*^9}],
+   3.741593196113735*^9, 3.7457363829601326`*^9, 3.7458306729155474`*^9, 
+   3.765164437313195*^9, 3.7651651632425957`*^9, 3.7651655745081954`*^9}],
 
-Cell[BoxData["\<\"Time elapsed = 9.5 Seconds. \\t Start imputing offspring! \
+Cell[BoxData["\<\"Time elapsed = 14.4 Seconds. \\t Start imputing offspring! \
 \"\>"], "Print",
  CellChangeTimes->{{3.739515519196045*^9, 3.7395155405742455`*^9}, 
    3.7395155842532454`*^9, 3.7395157082546453`*^9, 3.7395158048592453`*^9, 
-   3.7415932055846825`*^9}],
+   3.741593196113735*^9, 3.7457363829601326`*^9, 3.7458306729155474`*^9, 
+   3.765164437313195*^9, 3.7651651632425957`*^9, 3.7651655882917957`*^9}],
 
-Cell[BoxData["\<\"Time elapsed = 25.7 Seconds. \\t Start exporting! \"\>"], \
+Cell[BoxData["\<\"Time elapsed = 45.2 Seconds. \\t Start exporting! \"\>"], \
 "Print",
  CellChangeTimes->{{3.739515519196045*^9, 3.7395155405742455`*^9}, 
    3.7395155842532454`*^9, 3.7395157082546453`*^9, 3.7395158048592453`*^9, 
-   3.741593221801299*^9}],
+   3.741593196113735*^9, 3.7457363829601326`*^9, 3.7458306729155474`*^9, 
+   3.765164437313195*^9, 3.7651651632425957`*^9, 3.7651656190313954`*^9}],
 
 Cell[BoxData[
  InterpretationBox[
-  RowBox[{"\<\"Fraction of detected erroneous genotypes: 0/2803 in founders \
-and 660/54320 in offspring\"\>", "\[InvisibleSpace]", "\<\".\\n\"\>", 
-   "\[InvisibleSpace]", "\<\"Fraction of imputed missing genotyes: 301/301 in \
-founders and 22250.5/23280. in offspring\"\>", 
+  RowBox[{"\<\"Fraction of detected erroneous genotypes: 0/2812 in founders \
+and 1789/104730 in offspring\"\>", "\[InvisibleSpace]", "\<\".\\n\"\>", 
+   "\[InvisibleSpace]", "\<\"Fraction of imputed missing genotyes: 292/292 in \
+founders and 11192.5/11670. in offspring\"\>", 
    "\[InvisibleSpace]", "\<\".\"\>"}],
   SequenceForm[
-  "Fraction of detected erroneous genotypes: 0/2803 in founders and 660/54320 \
-in offspring", ".\n", 
-   "Fraction of imputed missing genotyes: 301/301 in founders and \
-22250.5/23280. in offspring", "."],
+  "Fraction of detected erroneous genotypes: 0/2812 in founders and \
+1789/104730 in offspring", ".\n", 
+   "Fraction of imputed missing genotyes: 292/292 in founders and \
+11192.5/11670. in offspring", "."],
   Editable->False]], "Print",
  CellChangeTimes->{{3.739515519196045*^9, 3.7395155405742455`*^9}, 
    3.7395155842532454`*^9, 3.7395157082546453`*^9, 3.7395158048592453`*^9, 
-   3.7415932224113607`*^9}],
+   3.741593196113735*^9, 3.7457363829601326`*^9, 3.7458306729155474`*^9, 
+   3.765164437313195*^9, 3.7651651632425957`*^9, 3.7651656200573955`*^9}],
 
 Cell[BoxData[
  InterpretationBox[
   RowBox[{"\<\"Output files:\\n\\t\"\>", "\[InvisibleSpace]", 
    TagBox[
     TagBox[GridBox[{
-       {"\<\"Example_ErroneousGenotype.csv\"\>"},
-       {"\<\"Example_ImputedGenotype.csv\"\>"},
-       {"\<\"Example_PosteriorProbability.csv\"\>"}
+       {"\<\"Example_magicImputeOutput_ErroneousGenotype.csv\"\>"},
+       {"\<\"Example_magicImputeOutput_ImputedGenotype.csv\"\>"},
+       {"\<\"Example_magicImputeOutput_PosteriorProbability.csv\"\>"}
       },
       GridBoxAlignment->{
        "Columns" -> {{Left}}, "ColumnsIndexed" -> {}, "Rows" -> {{Baseline}}, 
@@ -305,55 +317,63 @@ Cell[BoxData[
      TableForm[BoxForm`e$]]]}],
   SequenceForm["Output files:\n\t", 
    TableForm[{
-    "Example_ErroneousGenotype.csv", "Example_ImputedGenotype.csv", 
-     "Example_PosteriorProbability.csv"}]],
+    "Example_magicImputeOutput_ErroneousGenotype.csv", 
+     "Example_magicImputeOutput_ImputedGenotype.csv", 
+     "Example_magicImputeOutput_PosteriorProbability.csv"}]],
   Editable->False]], "Print",
  CellChangeTimes->{{3.739515519196045*^9, 3.7395155405742455`*^9}, 
    3.7395155842532454`*^9, 3.7395157082546453`*^9, 3.7395158048592453`*^9, 
-   3.7415932224363627`*^9}],
+   3.741593196113735*^9, 3.7457363829601326`*^9, 3.7458306729155474`*^9, 
+   3.765164437313195*^9, 3.7651651632425957`*^9, 3.7651656201053953`*^9}],
 
 Cell[BoxData[
  InterpretationBox[
   RowBox[{"\<\"Done! Finished date =\"\>", 
-   "\[InvisibleSpace]", "\<\"Thu 26 Jul 2018 13:27:02\"\>", 
+   "\[InvisibleSpace]", "\<\"Thu 25 Apr 2019 09:20:20\"\>", 
    "\[InvisibleSpace]", "\<\". \\tTime elapsed in total = \"\>", 
-   "\[InvisibleSpace]", "26.400000000000002`", 
-   "\[InvisibleSpace]", "\<\" Seconds.\"\>"}],
+   "\[InvisibleSpace]", "46.2`", "\[InvisibleSpace]", "\<\" Seconds.\"\>"}],
   SequenceForm[
-  "Done! Finished date =", "Thu 26 Jul 2018 13:27:02", 
-   ". \tTime elapsed in total = ", 26.400000000000002`, " Seconds."],
+  "Done! Finished date =", "Thu 25 Apr 2019 09:20:20", 
+   ". \tTime elapsed in total = ", 46.2, " Seconds."],
   Editable->False]], "Print",
  CellChangeTimes->{{3.739515519196045*^9, 3.7395155405742455`*^9}, 
    3.7395155842532454`*^9, 3.7395157082546453`*^9, 3.7395158048592453`*^9, 
-   3.741593222459365*^9}]
+   3.741593196113735*^9, 3.7457363829601326`*^9, 3.7458306729155474`*^9, 
+   3.765164437313195*^9, 3.7651651632425957`*^9, 3.7651656201423955`*^9}]
 }, Open  ]],
 
 Cell[BoxData[
  RowBox[{"{", 
-  RowBox[{"26.394038997449915`", ",", 
+  RowBox[{"46.24452937122821`", ",", 
    RowBox[{"{", 
-    RowBox[{"\<\"Example_ErroneousGenotype.csv\"\>", 
-     ",", "\<\"Example_ImputedGenotype.csv\"\>", 
-     ",", "\<\"Example_PosteriorProbability.csv\"\>"}], "}"}]}], 
-  "}"}]], "Output",
+    RowBox[{"\<\"Example_magicImputeOutput_ErroneousGenotype.csv\"\>", 
+     ",", "\<\"Example_magicImputeOutput_ImputedGenotype.csv\"\>", 
+     ",", "\<\"Example_magicImputeOutput_PosteriorProbability.csv\"\>"}], 
+    "}"}]}], "}"}]], "Output",
  CellChangeTimes->{{3.739515519146045*^9, 3.739515540523245*^9}, 
    3.739515584197245*^9, 3.739515708201645*^9, 3.739515804455245*^9, 
-   3.741593222483368*^9}]
+   3.741593196060733*^9, 3.7457363829191327`*^9, 3.745830672876543*^9, 
+   3.7651644372661953`*^9, 3.765165163189595*^9, 3.7651656201793957`*^9}]
 }, Open  ]],
 
 Cell[BoxData[
  RowBox[{"plotErrorPatternGUI", "[", 
   RowBox[{"magicsnpfile", ",", 
-   RowBox[{"dataid", "<>", "\"\<_ImputedGenotype.csv\>\""}], ",", 
+   RowBox[{"dataid", "<>", "\"\<_magicImputeOutput_ImputedGenotype.csv\>\""}],
+    ",", 
    RowBox[{"dataid", "<>", "\"\<_TrueValues_Diplotype.csv\>\""}], ",", 
    RowBox[{"linkageGroupSet", "\[Rule]", 
     RowBox[{"{", "1", "}"}]}]}], "]"}]], "Input",
  CellChangeTimes->{{3.7395136679050455`*^9, 3.739513697271045*^9}, {
    3.739513835529045*^9, 3.7395138577020454`*^9}, 3.739514430529645*^9, 
-   3.739515020443045*^9, 3.7395152898476453`*^9, 3.739515357606845*^9}]
+   3.739515020443045*^9, 3.7395152898476453`*^9, 3.739515357606845*^9, 
+   3.765165101942995*^9, {3.7651656648259954`*^9, 3.7651656681281953`*^9}}],
+
+Cell[BoxData[""], "Input",
+ CellChangeTimes->{{3.7651650940985956`*^9, 3.765165100772395*^9}}]
 },
-WindowSize->{1902, 980},
-WindowMargins->{{-9, Automatic}, {Automatic, 0}},
+WindowSize->{1920, 980},
+WindowMargins->{{-9, Automatic}, {Automatic, -9}},
 ShowSelection->True,
 Magnification:>1.25 Inherited,
 FrontEndVersion->"11.0 for Microsoft Windows (64-bit) (July 28, 2016)",
@@ -364,48 +384,49 @@ StyleDefinitions->"Default.nb"
 (* Internal cache information *)
 (*CellTagsOutline
 CellTagsIndex->{
- "Info43741600395-7676656"->{
-  Cell[3024, 72, 821, 12, 101, "Print",
-   CellTags->"Info43741600395-7676656"]}
+ "Info203765172773-1416283"->{
+  Cell[3183, 74, 822, 12, 101, "Print",
+   CellTags->"Info203765172773-1416283"]}
  }
 *)
 (*CellTagsIndex
 CellTagsIndex->{
- {"Info43741600395-7676656", 17564, 366}
+ {"Info203765172773-1416283", 19609, 386}
  }
 *)
 (*NotebookFileOutline
 Notebook[{
 Cell[CellGroupData[{
 Cell[579, 22, 2001, 35, 86, "Input"],
-Cell[2583, 59, 279, 4, 37, "Output"]
+Cell[2583, 59, 438, 6, 37, "Output"]
 }, Open  ]],
 Cell[CellGroupData[{
-Cell[2899, 68, 122, 2, 37, "Input"],
-Cell[3024, 72, 821, 12, 101, "Print",
- CellTags->"Info43741600395-7676656"]
+Cell[3058, 70, 122, 2, 37, "Input"],
+Cell[3183, 74, 822, 12, 101, "Print",
+ CellTags->"Info203765172773-1416283"]
 }, Open  ]],
 Cell[CellGroupData[{
-Cell[3882, 89, 138, 2, 37, "Input"],
-Cell[4023, 93, 1070, 21, 62, "Output"]
+Cell[4042, 91, 138, 2, 37, "Input"],
+Cell[4183, 95, 1190, 22, 62, "Output"]
 }, Open  ]],
 Cell[CellGroupData[{
-Cell[5130, 119, 6364, 94, 134, "Input"],
-Cell[11497, 215, 204, 3, 37, "Output"],
-Cell[11704, 220, 224, 3, 37, "Output"],
+Cell[5410, 122, 6467, 95, 134, "Input"],
+Cell[11880, 219, 324, 4, 37, "Output"],
+Cell[12207, 225, 342, 4, 37, "Output"],
 Cell[CellGroupData[{
-Cell[11953, 227, 418, 8, 28, "Print"],
-Cell[12374, 237, 455, 9, 28, "Print"],
-Cell[12832, 248, 265, 4, 28, "Print"],
-Cell[13100, 254, 266, 4, 28, "Print"],
-Cell[13369, 260, 256, 4, 28, "Print"],
-Cell[13628, 266, 774, 15, 52, "Print"],
-Cell[14405, 283, 1158, 29, 89, "Print"],
-Cell[15566, 314, 641, 13, 28, "Print"]
+Cell[12574, 233, 540, 9, 28, "Print"],
+Cell[13117, 244, 575, 10, 28, "Print"],
+Cell[13695, 256, 385, 5, 28, "Print"],
+Cell[14083, 263, 387, 5, 28, "Print"],
+Cell[14473, 270, 378, 5, 28, "Print"],
+Cell[14854, 277, 898, 16, 52, "Print"],
+Cell[15755, 295, 1392, 31, 89, "Print"],
+Cell[17150, 328, 730, 13, 28, "Print"]
 }, Open  ]],
-Cell[16222, 330, 436, 10, 37, "Output"]
+Cell[17895, 344, 611, 11, 37, "Output"]
 }, Open  ]],
-Cell[16673, 343, 528, 9, 37, "Input"]
+Cell[18521, 358, 626, 11, 37, "Input"],
+Cell[19150, 371, 94, 1, 37, "Input"]
 }
 ]
 *)

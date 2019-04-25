@@ -61,20 +61,24 @@ spetralEigenPlot[similarity_, n_,isprint_:False] :=
     
 spetralEigenPlot[eigenvalues_,ncluster_,evsel_,isprint_:False] :=
     Module[ {k,n,ev},
-        ev = Union[Flatten[eigenvalues]];
-        n = Length[ev];
-        Switch[evsel,
-        	"fixed",k = First[splitEigenval[ev,ncluster,isprint]],
-        	"eigenval",k = First[splitEigenval2[ev,ncluster,isprint]],
-        	"eigendiff",k = First[splitEigenval3[ev,ncluster,isprint]],
-        	"eigenratio",k = First[splitEigenval4[ev,ncluster,isprint]],
-        	_, 
-        	Print["Unknown eigenvector selection: ",evsel];Abort[]
-        ];                        
-        ev = Transpose[{Range[n], ev}];
-        If[ k < n,
-            ev = {ev[[;; k]], ev[[k + 1 ;;]]}
-        ];
+    	If[Depth[eigenvalues]==3,
+    		k=Length[First[eigenvalues]];
+    		ev=Flatten[eigenvalues],
+	        ev = Union[Flatten[eigenvalues]];	        
+	        Switch[evsel,
+	        	"fixed",k = First[splitEigenval[ev,ncluster,isprint]],
+	        	"eigenval",k = First[splitEigenval2[ev,ncluster,isprint]],
+	        	"eigendiff",k = First[splitEigenval3[ev,ncluster,isprint]],
+	        	"eigenratio",k = First[splitEigenval4[ev,ncluster,isprint]],
+	        	_, 
+	        	Print["Unknown eigenvector selection: ",evsel];Abort[]
+	        ];
+    	];
+    	n=Length[ev];
+    	ev = Transpose[{Range[n], ev}];
+    	If[ k < n,
+	            ev = {ev[[;; k]], ev[[k + 1 ;;]]}
+	        ];
         ListPlot[ev, PlotMarkers -> {Automatic,12}, PlotRange -> All, 
           Filling -> Axis, Frame -> {{True, False}, {True, False}}, 
           FrameLabel -> {"i-th smallest", "Eigenvalue"}, 
@@ -97,7 +101,7 @@ toSymSimilarity[aa_] :=
 
 
 spectralClustering[similarity_?MatrixQ, ncluster_Integer?(# > 1 &), OptionsPattern[]] :=
-    Module[ {laptype,evsel,laplacian, eigenval0,eigenval, eigenvec, k, order, cluster, neigen,opt},
+    Module[ {laptype,evsel,laplacian, eigenval0,eigenval, eigenvec,kls, k, res,nc,order, cluster, neigen,opt},
         (*laplacian = DiagonalMatrix[Total[similarity, {2}]] - similarity;*)
         laptype = OptionValue[graphLaplacian];
         evsel=OptionValue[eigenVectorSelection];
@@ -129,24 +133,34 @@ spectralClustering[similarity_?MatrixQ, ncluster_Integer?(# > 1 &), OptionsPatte
         {eigenval0, eigenvec} = Eigensystem[laplacian, -neigen, opt];
         eigenval0 = Reverse[eigenval0];
         Switch[evsel,
-        	"fixed",{k,eigenval} = splitEigenval[eigenval0,ncluster],
-        	"eigenval",{k,eigenval} = splitEigenval2[eigenval0,ncluster],
-        	"eigendiff",{k,eigenval} = splitEigenval3[eigenval0,ncluster],
-        	"eigenratio",{k,eigenval} = splitEigenval4[eigenval0,ncluster],
+        	"fixed",kls = splitEigenval[eigenval0,ncluster],
+        	"eigenval",kls = splitEigenval2[eigenval0,ncluster],
+        	"eigendiff",kls = splitEigenval3[eigenval0,ncluster],
+        	"eigenratio",kls = splitEigenval4[eigenval0,ncluster],
         	_, 
         	Print["Unknown eigenvector selection: ",evsel];Abort[]
         ];
         order = Ordering[eigenvec[[-2]]];
+        k=kls[[1]];
         cluster = FindClusters[Transpose[eigenvec[[-k ;;, order]]] -> order,ncluster, 
-            DistanceFunction -> CosineDistance, Method -> {"Agglomerate",ClusterDissimilarityFunction -> "Average"}];
+            	DistanceFunction -> CosineDistance, Method -> {"Agglomerate",ClusterDissimilarityFunction -> "Average"}];
+        If[Length[kls]>1&&Length[cluster]<ncluster,
+	        res={{Length[cluster],k,cluster}};
+	        Print["#selected eigenvec = ",k, "; #cluster = ", Length[cluster]];
+	        Do[cluster = FindClusters[Transpose[eigenvec[[-k ;;, order]]] -> order,k, 
+            		DistanceFunction -> CosineDistance, Method -> {"Agglomerate",ClusterDissimilarityFunction -> "Average"}];
+               nc = Length[cluster];
+	           Print["#selected eigenvec = ",k, "; #cluster = ", nc];
+	           If[nc>ncluster,Break[]];
+	           res=Join[res,{{nc,k,cluster}}],{k,kls}];
+	        res=SortBy[res,{#[[1]],-#[[2]]}&];
+	        {k,cluster}=res[[-1,2;;3]];
+        ];    
+        eigenval={eigenval0[[;; k]], eigenval0[[k + 1 ;;]]};
         {Sort[Sort[#] & /@ cluster, Length[#1] > Length[#2] &], eigenval, eigenvec}
     ]  
 
-splitEigenval[eigenval_,ncluster_,isprint_:False] :=
-    Module[ {k},
-    	k=ncluster;
-        {k,{eigenval[[;; k]], eigenval[[k + 1 ;;]]}}
-    ]    
+splitEigenval[eigenval_,ncluster_,isprint_:False] :={ncluster}
     
 splitEigenval2[eigenval_,ncluster_,isprint_:False] :=
     Module[ {k,ev},
@@ -156,40 +170,25 @@ splitEigenval2[eigenval_,ncluster_,isprint_:False] :=
         ev[[1]] = Prepend[ev[[1]], First[eigenval]];
         If[isprint,Print["clustering of eigenvalues: ", ev]];
         k = Accumulate[Length[#] & /@ ev];
-        k = First[Select[k, # >= ncluster &, 1]];
-        If[ k == Length[eigenval],
-            ev = {eigenval},
-            ev = {eigenval[[;; k]], eigenval[[k + 1 ;;]]}
-        ];
-        {k,ev}
+        Select[k, # >= ncluster &]
     ]
     
 splitEigenval3[eigenval_,ncluster_,isprint_:False] :=
-    Module[ {diff,peak,k,ev},
+    Module[ {diff,peak},
     	diff=Differences[eigenval[[ncluster ;;]]];
         peak = Append[PeakDetect[diff], 1];
         peak=Flatten[Position[PeakDetect[peak], 1]];
         If[isprint, Print["differences between eigenvalues[[", ncluster,";;]]: ",diff,"; peak=",peak]];
-        If[peak==={},
-		  	k=ncluster,
-		  	k=ncluster + First[peak] - 1;
-		 ];
-		ev = {eigenval[[;; k]], eigenval[[k + 1 ;;]]};
-		{k, ev}      
+        If[peak==={},{ncluster},ncluster + peak - 1]     
     ]    
 
 splitEigenval4[eigenval_, ncluster_, isprint_: False] := 
- Module[{ratio, peak,k, ev},
+ Module[{ratio, peak},
   ratio = Abs[eigenval[[ncluster ;;]]]+10^(-10.);
   ratio = ratio[[2 ;;]]/ratio[[;; -2]];  
   peak=Flatten[Position[PeakDetect[ratio], 1]];
-  If[isprint, Print["ratios between eigenvalues[[", ncluster,";;]]: ",ratio,"; peak=",peak]];
-  If[peak==={},
-  	k=ncluster,
-  	k=ncluster + First[peak] - 1;
-  ];
-  ev = {eigenval[[;; k]], eigenval[[k + 1 ;;]]};
-  {k, ev}
+  If[isprint, Print["Ratios between eigenvalues[[", ncluster,";;]]: ",ratio,"; peak=",peak]];
+  If[peak==={},{ncluster},ncluster + peak - 1]
   ] 
   
 (*splitEigenval4[eigenval_, ncluster_, isprint_: False] := 
@@ -222,7 +221,7 @@ spectralOrdering[similarity_?MatrixQ, OptionsPattern[]] :=
               ];
         While[True,
           ev = Eigensystem[laplacian, -n, opt];
-          k = Count[ev[[1]], _?(# <= 10^(-10.) &)];
+          k = Count[ev[[1]], _?(# <= 10^(-10.) &)];          
           If[ k <n,
               fiedler = If[ ToLowerCase[laptype]=="symnormalized",
                             (Total[similarity, {2}]^(-1/2))  ev[[2, -(k + 1)]],

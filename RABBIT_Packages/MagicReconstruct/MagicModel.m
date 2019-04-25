@@ -406,7 +406,7 @@ toDiscreteMarkovProcess[continuedMarkovProcess_, deltd_] :=
           Table[MatrixExp[markovprocess[[i, 2, 2, ch]] #] & /@deltd[[ch]], {ch, Length[deltd]}], {i, Length[markovprocess]}];
         markovprocess
     ]
-
+    
 toStartTranProb[samplelabel_, discretemarkovprocess_] := 
  Module[{res, startProb, tranProb, haplocode, diplocode,ind},
   res = Table[
@@ -450,7 +450,7 @@ toHaplocode[fglcode_] :=
         nfgl = Length[fglcode];
         pos = SortBy[Transpose[{Range[nfgl], fglcode}], Last][[All,1]];
         If[ fglcode[[pos]]!= Range[nfgl],
-            Print["toHaplocode: wrong relabeling by haplocode!"];
+            Print["toHaplocode: wrong relabeling by haplocode! fglcode=",fglcode];
             Abort[]
         ];
         pos

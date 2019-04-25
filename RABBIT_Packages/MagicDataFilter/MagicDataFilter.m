@@ -16,13 +16,21 @@ distortionTest::usage = "distortionTest  "
 
 readDuplicatefile::usage = "readDuplicatefile  "
 
-binningDuplicate::usage = "binningDuplicate  "
-
-saveBinnedSNP::usage = "saveBinnedSNP  "
+binningAdjacency::usage = "binningAdjacency  "
 
 cliquepartition::usage = "cliquepartition  "
 
 magicAllelicCode::usage = "magicAllelicCode  "
+
+fillgenoNAM::usage = "fillgenoNAM "
+
+genoErrorprob::usage = "genoErrorprob is an option to specify the genotyping error probability"
+
+fillThreshould::usage = "fillThreshould is an option for filling threhold so that the parental haplotype is filled only if its posterior probability is larger than the threshould. "
+
+mono2Missing::usage = "mono2Missing is an option to specify if set the offfspring genotype to missing if their parent genotypes are monomorphic"
+
+filtersnpBinning::usage = "filtersnpBinning  "
 
 (* Exported symbols added here with SymbolName::usage *) 
 
@@ -30,7 +38,7 @@ Begin["`Private`"]
 (* Implementation of the package *)
 
 magicAllelicCode[magicsnp_] :=
-    Module[ {nfounder, geno, n22, n12, n11, n2, n1, afreq, bool, pos, res},
+    Module[ {nfounder, geno, n22, n12, n11, n2, n1,tot, afreq, bool, pos, res},
         nfounder = magicsnp[[1, 2]];
         geno = Transpose[magicsnp[[nfounder + 5 ;;, 2 ;;]]];
         n22 = Count[#, 22] & /@ geno;
@@ -39,7 +47,8 @@ magicAllelicCode[magicsnp_] :=
         n1 = Count[#, 1 | "1N"] & /@ geno;
         n2 = Count[#, 2 | "2N"] & /@ geno;
         (*afreq= allelic frequency of allele 2*)
-        afreq = Round[N[(2 n22 + n12 + n2)/(2 n22 + 2 n12 + 2 n11 + n2 + n1)],1./nfounder];
+        tot = Replace[(2 n22 + 2 n12 + 2 n11 + n2 + n1), 0 -> 1, {1}];
+        afreq = Round[N[(2 n22 + n12 + n2)/tot],1./nfounder];
         (*set 2 as minor alllele, and set the genotype of founder = 1 or 11 if allelefreq of 2 = 0.5*)
         bool = # == 2 || # == 22 & /@ magicsnp[[5, 2 ;;]];
         pos = Flatten[Position[Boole[bool] Boole[Thread[afreq == 0.5]]+Boole[Thread[afreq > 0.5]], 1]];
@@ -57,11 +66,12 @@ Options[magicsnpBinning] = {
 
 magicsnpBinning[inputmagicSNP_?(ListQ[#] || StringQ[#] &), OptionsPattern[]] :=
     Module[ {magicSNP = inputmagicSNP,magicSNP00,outputid, isprint, isparallel,starttime,
-       nsnp, binls,i,outputfiles},
+       nsnp, binls,i,outputfiles,snpid,clusters,pos,binmagicsnp,minshare=0.5},
         {outputid, isprint, isparallel} = OptionValue@{outputFileID, isPrintTimeElapsed, isRunInParallel};
+        outputfiles = outputid<>"_"<>#&/@{"dupebin_magicsnp.csv","dupebin_binning.csv","dupebin_adjacencymatrix.txt"};
         If[ isprint,
             starttime = SessionTime[];
-            Print["magicsnpBinning. Start date = ", DateString[]];
+            Print["magicsnpBinning. Start date = ", DateString[],". Outputfiles = ",outputfiles];
         ];
         If[ StringQ[inputmagicSNP],
             If[ !FileExistsQ[inputmagicSNP],
@@ -70,20 +80,30 @@ magicsnpBinning[inputmagicSNP_?(ListQ[#] || StringQ[#] &), OptionsPattern[]] :=
             ];
             magicSNP = Import[inputmagicSNP,"CSV"];
         ];
+        If[ !DuplicateFreeQ[magicSNP[[2,2;;]]],
+            Print["MarkerIDs are not unique!"];
+            Abort[]
+        ];
         (*magicSNP00 saves original magicSNP, and it will be used for outputing*)
         magicSNP00 = magicSNP;
-        magicSNP=magicAllelicCode[magicSNP];
+        magicSNP = magicAllelicCode[magicSNP];
         magicSNP[[3, 2 ;;]] = "NA";
         (*possible genotypes: "N","1","2", "11","12","22","1N","2N","NN"*)
         Do[magicSNP[[i, 2 ;;]] = Map[ToString, magicSNP[[i, 2 ;;]]] /. {"21" -> "12","N1"|"N2"->"NN"},{i,5,Length[magicSNP]}];
         nsnp = Length[magicSNP[[2]]]-1;
         binls = List /@ Range[nsnp];
-        (*Put[{magicSNP, binls, isparallel},"D:\\Chaozhi\\MMA Workspace\\MagicDataFilterApp\\temp.txt"];*)
-        binls = getSNPbin[magicSNP, binls,isparallel,starttime];
-        outputfiles = saveBinnedSNP[magicSNP00, binls, outputid];
+        binls = getsnpbin[magicSNP, binls,isparallel,outputfiles[[3]],starttime];
+        snpid = magicSNP00[[2,2;;]];
+        clusters = getsnpBinning[binls, snpid];        
+        clusters = filtersnpBinning[clusters, magicSNP,minshare];
+        csvExport[outputfiles[[2]], clusters];
+        pos = DeleteCases[clusters[[2 ;;, {1, 3}]], {_, 0}][[All, 1]];
+        pos = pos /.Dispatch[Thread[magicSNP00[[2, 2 ;;]] ->Range[Length[magicSNP00[[2]]] - 1]]];
+        binmagicsnp = Join[magicSNP00[[{1}]],magicSNP00[[2;;,Join[{1},1+pos]]]];
+        csvExport[outputfiles[[1]],binmagicsnp];
         If[ isprint,
-            Print["Number of SNPs remain: ",Length[binls]];
-            Print["Done. Finished date = ", DateString[], ". Time elapsed = ", Round[SessionTime[] - starttime, 0.01], " seconds."];
+            Print["#SNPs = ", nsnp, "; #Bins = ",Length[binls]];
+            Print["Done. Finished date = ", DateString[], ". Time elapsed in magicsnpBinning= ", Round[SessionTime[] - starttime, 0.01], " seconds."];
         ];
         outputfiles
     ]
@@ -96,21 +116,21 @@ getrowspan[nsnp_, nseg_] :=
         Thread[Most[ls] ;; Rest[ls] - 1]
     ]
           
-getSNPbin[magicSNP_,binlist_,isparallel_,starttime_] :=
-    Module[ {binlist2 = binlist,bins},
+getsnpbin[magicSNP_,binlist_,isparallel_,outputfile_,starttime_] :=
+    Module[ {binlist2 = binlist,resultbins},
         If[ binlist2 ==Automatic,
             binlist2 = List /@ Range[Length[magicSNP[[2, 2 ;;]]]]
         ];
-        bins = If[ Intersection[{"1N", "2N"}, Union[Flatten[magicSNP[[5 ;;, 2 ;;]]]]] ==={},
-                   fastgetbin[magicSNP,binlist2,isparallel],
-                   0
-               ];
-        PrintTemporary["{#bin_before,#bin_after} = ", {Length[binlist2],Length[bins]}, ". Time elapsed = ", Round[SessionTime[] - starttime, 0.01]," seconds."];
-        bins
+        If[ Intersection[{"1N", "2N"}, Union[Flatten[magicSNP[[5 ;;, 2 ;;]]]]] ==={},
+            resultbins = getcalledbin[magicSNP,binlist2,isparallel,outputfile],
+            Print["To implement of marker binning for genotypes 1N and 2N!"];
+            Abort[];
+        ];
+        resultbins
     ]    
     
   
-findsnpduplicate[snpgeno_, snpidls_, rowspan_, outputfile_] :=
+bincalled[snpgeno_, snpidls_, rowspan_, outputfile_] :=
     Module[ {nsnp, outstream, i, ii,jj, ls, res,nmiss},
         nsnp = Dimensions[snpgeno][[2]];
         Quiet[Close[outputfile]];
@@ -133,7 +153,7 @@ findsnpduplicate[snpgeno_, snpidls_, rowspan_, outputfile_] :=
         Close[outstream];
     ]
   
-parallelfastgetbin[snpgeno_, snpidls_, outputfile_] :=
+parallelbincalled[snpgeno_, snpidls_, outputfile_] :=
     Module[ {nsnp, spanls, filels, countls, count,outstream, i},
         nsnp = Dimensions[snpgeno][[2]];
         spanls = getrowspan[nsnp-1, Max[1, IntegerLength[nsnp-1] - 2] $KernelCount];
@@ -145,7 +165,7 @@ parallelfastgetbin[snpgeno_, snpidls_, outputfile_] :=
         SetSharedVariable[count];
         count = 0;
         Monitor[ParallelDo[
-          findsnpduplicate[snpgeno, snpidls, spanls[[i]], filels[[i]]];
+          bincalled[snpgeno, snpidls, spanls[[i]], filels[[i]]];
           count += countls[[i]], {i, Length[filels]}, 
           DistributedContexts -> {"MagicDataFilter`", 
             "MagicDataFilter`Private`"}, Method -> "FinestGrained"], 
@@ -157,19 +177,60 @@ parallelfastgetbin[snpgeno_, snpidls_, outputfile_] :=
         DeleteFile[#] & /@ Rest[filels];
     ]    
 
-fastgetbin[magicSNP_, binlist_, isparallel_] :=
-    Module[ {magicsnp, snpgeno, snpidls,nsnp,outputfile = "temporaryfile_snpduplicate.txt"},
+getcalledbin[magicSNP_, binlist_, isparallel_,outputfile_] :=
+    Module[ {magicsnp, snpgeno, snpidls,nsnp,adjmtx,nodeweight},
         magicsnp = getsubMagicSNP[magicSNP, All, binlist[[All, 1]]];
         snpgeno = magicsnp[[5 ;;, 2 ;;]] /. {"N" | "NN" | "1N" | "2N" | "N1" | "N2" -> 0, "11" | "1" -> 1, "22" | "2" -> 2, "12" -> 3};
         snpidls = magicsnp[[2, 2;;]];
         nsnp = Length[magicsnp[[2]]]-1;
         If[ isparallel,
-            parallelfastgetbin[snpgeno, snpidls, outputfile],
-            findsnpduplicate[snpgeno, snpidls, 1;;nsnp - 1, outputfile]
+            parallelbincalled[snpgeno, snpidls, outputfile],
+            bincalled[snpgeno, snpidls, 1;;nsnp - 1, outputfile]
         ];
-        binningDuplicate[FileNameJoin[{Directory[], outputfile}]]
+        {adjmtx,nodeweight} = readDuplicatefile[FileNameJoin[{Directory[], outputfile}]];
+        binningAdjacency[adjmtx,nodeweight]
     ]   
     
+readDuplicatefile[duplicatefile_?FileExistsQ] :=
+    Module[ {res,snpidls,nmiss,rule,nsnp,weight},
+        res = ReadList[duplicatefile];
+        {snpidls, nmiss} = Transpose[Rest[First[res]]];
+        nsnp = Length[snpidls];
+        res = Flatten[Rest[res], 1];
+        (*rule = Join[{{i_, i_} -> 0}, Thread[res -> 1]];*)
+        rule = Thread[res -> 1];
+        res = SparseArray[rule, {nsnp, nsnp}];
+        res += Transpose[res];
+        weight = Max[nmiss]+1-nmiss;
+        {res,weight}
+    ]
+    
+     
+binningAdjacency[adjmtx_?MatrixQ,nodeweight_?VectorQ] :=
+    Module[ {order, newres, gg, group,binlist,binlist2,ii,gadj,cclist,dups,rule},
+        order = Ordering[-nodeweight];
+        newres = adjmtx[[order, order]];
+        gg = AdjacencyGraph[newres];
+        group = cliquepartition[gg];
+        binlist = order[[#]] & /@ group;
+        If[ ! DuplicateFreeQ[Flatten[binlist]],
+            dups = Select[Tally[Flatten[binlist]], #[[2]] >= 2 &][[All, 1]];
+            (*Don't use complement because complement re-orders the set*)
+            (*binlist = Complement[#, dups] & /@ binlist;*)
+            rule = Thread[dups -> Missing[]];
+            binlist = DeleteMissing[#] & /@ (binlist /. rule);
+            binlist = Join[binlist, List /@ dups];
+        ];
+        binlist2 = Flatten[Table[
+            If[ Length[ii] == 1,
+                {ii},
+                gadj = AdjacencyGraph[adjmtx[[ii, ii]]];
+                cclist = Rest[NestWhileList[findfirstclique[Last[#]] &, {{}, gadj},VertexCount[Last[#]] >= 1 &]];
+                ii[[#]] & /@ cclist[[All, 1]]
+            ], {ii, binlist}], 1];
+        SortBy[binlist2,First]
+    ]    
+        
 toknngraph[g_, knn_: Automatic] :=
     Module[ {n, k, rules, rules2, ad, ad2},
         If[ knn === Automatic,
@@ -211,46 +272,71 @@ cliquepartition[g_] :=
         ]
     ]
 
-readDuplicatefile[duplicatefile_?FileExistsQ] :=
-    Module[ {res,snpidls,nmiss,rule,nsnp},
-        res = ReadList[duplicatefile];
-        {snpidls, nmiss} = Transpose[Rest[First[res]]];
-        nsnp = Length[snpidls];
-        res = Flatten[Rest[res], 1];
-        (*rule = Join[{{i_, i_} -> 0}, Thread[res -> 1]];*)
-        rule = Thread[res -> 1];
-        res = SparseArray[rule, {nsnp, nsnp}];
-        res += Transpose[res];
-        {res,nmiss}
-    ]
-  
-binningDuplicate[duplicatefile_?FileExistsQ] :=
-    Module[ {res, nmiss,order, newres, gg, group},
-        {res,nmiss} = readDuplicatefile[duplicatefile];
-        order = Ordering[nmiss];
-        newres = res[[order, order]];
-        gg = AdjacencyGraph[newres];
-        group = cliquepartition[gg];
-        order[[#]] & /@ group
-    ]
 
 
-saveBinnedSNP[magicSNP_,binlist_,outputid_String] :=
-    Module[ {bins,cols,magicSNP2 = magicSNP, outputfiles,snpid, binindicator,selectedbin, clusters,j},
-        bins = SortBy[binlist, First];
-        cols = Join[{1}, 1 + bins[[All, 1]]];
-        magicSNP2 = Join[magicSNP[[{1}]], magicSNP[[2 ;;, cols]]];
-        snpid = magicSNP[[2, 2 ;;]];
+findfirstclique[gadj_Graph] :=
+    Module[ {cc, gg},
+        cc = First[FindClique[{gadj, First[VertexList[gadj]]}, Infinity, 1]];
+        gg = Subgraph[gadj, Complement[VertexList[gadj], cc]];
+        {cc, gg}
+    ]
+    
+getsnpBinning[binlist_, snpid_] :=
+    Module[ {temp, bins, selectedbin, binindicator, clusters, pos, j},
+        temp = Flatten[binlist];
+        If[ Sort[temp] =!= Range[Length[temp]],
+            Print["Wrong binlist!"];
+            Abort[]
+        ];
+        If[ Length[temp] =!= Length[Union[snpid]],
+            Print["Wrong snpid!"];
+            Abort[]
+        ];
+        (*randomize the ordering of bins*)
+        bins = RandomSample[binlist];
         selectedbin = binindicator = ConstantArray[0, {Length[snpid]}];
         Do[binindicator[[bins[[j]]]] = j;
            selectedbin[[bins[[j, 1]]]] = j, {j, Length[bins]}];
-        clusters = Join[{{"Marker-ID", "InputMarkerNo","ReplicateGroup", "Representive"}}, Transpose[{snpid, Range[Length[snpid]],binindicator, selectedbin}]];
-        outputfiles = {"magicsnpBinning.csv","binning.csv"};
-        If[ outputid=!="",
-            outputfiles = outputid<>"_"<>#&/@outputfiles;
-        ];
-        {csvExport[outputfiles[[1]], magicSNP2],csvExport[outputfiles[[2]], clusters]}
+        clusters = Transpose[{snpid, binindicator, selectedbin}];
+        pos = Flatten[Position[clusters[[All, 2]], 0]];
+        clusters[[pos, 2 ;; 3]] = "ungrouped";
+        (*randomize the ordering of markers in each bin*)
+        clusters = SortBy[RandomSample[clusters],#[[2]]&];
+        clusters = Join[{{"Marker-ID", "Bin-ID","Representive"}}, clusters];        
+        clusters
+    ]    
+
+filtersnpBinning[clusters_, magicSNP_, minshare_: 0.5] :=
+    Module[ {ungroupbin, ls, rule0, rule, nf, bins, pos, geno0, geno, 
+      nobs, nshare, fshare, snpid, binindicator, selectedbin, clusters2,i,j},
+        ungroupbin = Cases[clusters, {_, "ungrouped", __}];
+        ls = DeleteCases[clusters, {_, "ungrouped", __}];
+        ls = SplitBy[SortBy[ls[[2 ;;]], #[[2]] &], #[[2]] &];
+        ls = First[Pick[#[[All, 1]], Sign[#[[All, 3]]], 1]] -> #[[All, 1]] & /@ ls;
+        rule0 = Dispatch[Thread[magicSNP[[2, 2 ;;]] -> Range[Length[magicSNP[[2]]] - 1]]];
+        rule = ls /. rule0;
+        nf = magicSNP[[1, 2]];
+        bins = Table[pos =Join[{rule[[i, 1]]}, Complement[rule[[i, 2]], {rule[[i, 1]]}]];
+          geno0 = magicSNP[[nf + 5 ;;, 1 + pos]];
+          geno = DeleteCases[geno0, {"NN", ___}];
+          nobs = Length[geno0] - (Count[#, "NN"] & /@ Transpose[geno0]);
+          nshare = Length[geno] - (Count[#, "NN"] & /@ Transpose[geno]);
+          fshare = N[nshare/nobs];
+          fshare = Thread[fshare >= minshare];
+          pos = Pick[pos, fshare];
+          pos, {i, Length[rule]}];
+        snpid = magicSNP[[2, 2 ;;]];
+        binindicator = ConstantArray["ungrouped", {Length[snpid]}];
+        selectedbin = ConstantArray[0, {Length[snpid]}];
+        Do[binindicator[[bins[[j]]]] = j;
+           selectedbin[[bins[[j, 1]]]] = j, {j, Length[bins]}];
+        clusters2 = Transpose[{snpid, binindicator, selectedbin}];
+        clusters2 = Join[clusters2, ungroupbin];
+        clusters2 = SortBy[RandomSample[clusters2], #[[2]] &];
+        clusters2 = Join[{{"Marker-ID", "Bin-ID", "Representive"}}, clusters2];
+        clusters2
     ]
+  
 
 (***************************************************************************************************************)
      
@@ -281,7 +367,7 @@ missingFractionFilter[magicsnp_, maxmissingfraction_, inputtarget_String] :=
          miss = Join[{{"Marker No.", "Marker ID", "#Missing Genotypes", 
              "#Non-missing Genotypes", "Missing fraction", "isDeleted"}},miss];
          pos = Sort[Pick[miss[[2 ;;]], miss[[2 ;;, 6]], False][[All, 1]]];
-         Print["Number of deleted individuals: ", nsnp - Length[pos], 
+         Print["Number of deleted markers: ", nsnp - Length[pos], 
           " with fraction of missing genotype >", maxmissingfraction, "!"];
          Print[Take[miss, UpTo[Min[20,(nsnp - Length[pos] + 5)]]] // MatrixForm];
          newmagicsnp = Join[magicsnp[[{1}]], magicsnp[[2 ;;, Join[{1}, pos + 1]]]];
@@ -377,7 +463,7 @@ distortionFilterCP[inputmagicsnp_?(ListQ[#] || StringQ[#] &), distortionsiglevel
         ls = Length[#] & /@ segretypepos;
         Print[ls, " SNPs out of ", Length[magicsnp[[2]] - 1], 
             " have been identified to be one of segregation types {110, 011, 121} without distortion!"];
-        (*Correcting for incompatible offspring allelic depths for segregation types 110 and 011*)
+        (*Correcting for incompatible offspring genotypes for segregation types 110 and 011*)
         res = indicator = magicsnp;
         indicator[[5 ;;, 2 ;;]] = 0;
         label = {"S110", "S011", "S121"};
@@ -390,7 +476,7 @@ distortionFilterCP[inputmagicsnp_?(ListQ[#] || StringQ[#] &), distortionsiglevel
               pos2 = Position[offgeno[[pos]], absentgeno[[i]], {2}];
               pos2[[All, 1]] = pos[[pos2[[All, 1]]]];
               Print[Length[pos2], " out of ", Last[Dimensions[offgeno]] Length[pos], 
-               " offspring allelic depths that are called to be genotype ", 
+               " offspring genotypes that are ", 
                absentgeno[[i]], " are incompatible to segregation type ", 
                label[[i]], ", and they are set to be missing!"];
               pos2
@@ -403,13 +489,13 @@ distortionFilterCP[inputmagicsnp_?(ListQ[#] || StringQ[#] &), distortionsiglevel
             indicator = ReplacePart[indicator, Dispatch[Thread[pos -> 1]]];
         ];
         
-        (*Removing markers with incompatible parental allelic depths for segregation types 110,011,and 121*)
+        (*Removing markers with incompatible parental genotypes for segregation types 110,011,and 121*)
         parentgeno = Transpose[magicsnp[[5 ;; nfounder + 4, 2 ;;]]];
         newsegretypepos = Table[
            pos = segretypepos[[i]];
            set = Last[getParentGenopairs[label[[i]]]];
            Pick[pos, MemberQ[set, #] & /@ parentgeno[[pos]], False], {i, 3}];
-        MapThread[Print[Length[#1] - Length[#2], " out of ", Length[#1]," SNPs at which parental allelic depths are incompatible with segregregation type ", #3, " are removed!"] &, {segretypepos,newsegretypepos, label}];
+        MapThread[Print[Length[#1] - Length[#2], " out of ", Length[#1]," SNPs at which parental genotypes are incompatible with segregregation type ", #3, " are removed!"] &, {segretypepos,newsegretypepos, label}];
         segretypepos = newsegretypepos;
         ls = Length[#] & /@ segretypepos;
         Print[ls, " SNPs have been identified to be one of segregation types {110, 011, 121} after removing incompatibile markers!"];
@@ -464,7 +550,7 @@ distortionFilterCP[magicADcsvfile_?FileExistsQ, qualityscore_, callthreshold_, d
         ls = Length[#] & /@ segretypepos;
         Print[ls, " SNPs (in total ",Total[ls],") have been identified to be one of segregation types {110, 011, 121} without distortion!"];    
             
-        (*Correcting for incompatible offspring allelic depths for segregation types 110 and 011*)
+        (*Correcting for incompatible offspring genotypes for segregation types 110 and 011*)
         res = indicator = If[ isoutputcalled,
                               callsnp,
                               magicsnpad
@@ -478,7 +564,7 @@ distortionFilterCP[magicADcsvfile_?FileExistsQ, qualityscore_, callthreshold_, d
           pos2 = Position[offad[[pos]], absentgeno[[i]], {2}];
           pos2[[All, 1]] = pos[[pos2[[All, 1]]]];
           Print[Length[pos2], " out of ", Last[Dimensions[offad]] Length[pos], 
-           " offspring allelic depths that are called to be genotype ", 
+           " offspring genotypes that are  ", 
            absentgeno[[i]], " are incompatible to segregation type ", 
            label[[i]], ", and they are set to be missing!"];
           pos2, {i, 2}];
@@ -488,15 +574,14 @@ distortionFilterCP[magicADcsvfile_?FileExistsQ, qualityscore_, callthreshold_, d
             res = ReplacePart[res, Dispatch[Thread[pos -> "NN"]]],
             res = ReplacePart[res, Dispatch[Thread[pos -> "0|0"]]];
         ];
-        indicator = ReplacePart[indicator, Dispatch[Thread[pos -> 1]]];        
-        
-        (*Removing markers with incompatible parental allelic depths for segregation types 110,011,and 121*)
+        indicator = ReplacePart[indicator, Dispatch[Thread[pos -> 1]]];  
+        (*Removing markers with incompatible parental genotypes for segregation types 110,011,and 121*)
         parentad = Transpose[callsnp[[5 ;; nfounder + 4, 2 ;;]]];
         newsegretypepos = Table[
            pos = segretypepos[[i]];
            set = Last[getParentGenopairs[label[[i]]]];
            Pick[pos, MemberQ[set, #] & /@ parentad[[pos]], False], {i, 3}];
-        MapThread[Print[Length[#1] - Length[#2], " out of ", Length[#1]," SNPs at which parental allelic depths are incompatible with segregregation type ", #3, " are removed!"] &, {segretypepos,newsegretypepos, label}];
+        MapThread[Print[Length[#1] - Length[#2], " out of ", Length[#1]," SNPs at which parental genotypes are incompatible with segregregation type ", #3, " are removed!"] &, {segretypepos,newsegretypepos, label}];
         segretypepos = newsegretypepos;
         ls = Length[#] & /@ segretypepos;
         Print[ls, " SNPs (in total ", Total[ls],") have been identified to be one of segregation types {110, 011, 121} after removing incompatibile markers!"];
@@ -582,6 +667,106 @@ distortionFilterRIL[inputmagicsnp_?(ListQ[#] || StringQ[#] &), sdsiglevel_,genoe
         (*Print["In total, ", Length[offspringcount] - Length[keeppos], " out of ", Length[offspringcount], " SNPs are dropped!"];*)
         {Join[magicsnp[[{1}]], magicsnp[[2 ;;, Join[{1}, 1 + keeppos]]]], keeppos, chi2stat, crit}
     ]
+    
+calparentPosterprob[bimagicsnp_, parenthaplo_, genoerrorprob_, fillthreshould_] :=
+    Module[ {pos, n1n2, temp0, ratiolist, logratiolist, posterprob,genotypes, bool, res},
+        pos = Flatten[Position[Transpose[bimagicsnp[[5 ;; 6, 2 ;;]]], parenthaplo]];
+        genotypes = {"22", "12", "11"};
+        If[ pos === {},
+            res = Table[{i, {}}, {i, genotypes}],
+            n1n2 = ({Count[#, 11], Count[#, 22]} & /@Transpose[bimagicsnp[[7 ;;, 1 + pos]]]);
+            temp0 = bimagicsnp[[2 ;;, Join[{1}, 1 + pos]]];
+            (*i===frequency of allele 1 in founders; {i/2,1-i/
+            2} = {frequency of allele 1, frequency of alelle 2}*)
+            (*rationlist corresponds to 22, 12 (or 21), 11*)
+            ratiolist = Table[{i/2, 1 - i/2}, {i, 0, 2}];
+            ratiolist = # (1 - genoerrorprob) + (1 - #) genoerrorprob/2 & /@ratiolist;
+            logratiolist = Transpose[Log[ratiolist]];
+            posterprob = Exp[# - Max[#] & /@ (n1n2.logratiolist)];
+            (*i_th element of posterprob gives posterior probability of unordered parent genotypes {2,2}, {2,1},{1,1} at marker pos[[i]]*)
+            posterprob = Round[Normalize[#, Total] & /@ posterprob, 10^(-5.)];
+            genotypes = {"22", "12", "11"};
+            res = Table[
+              bool = Thread[posterprob[[All, i]] >= fillthreshould];
+              {genotypes[[i]], Pick[pos, bool]}, {i, Length[genotypes]}];
+        ];
+        res
+    ]
+      
+Options[fillgenoNAM] = {
+    genoErrorprob -> 0.001,
+    fillThreshould -> 0.99,
+    mono2Missing -> True
+    }      
+    
+fillgenoNAM[inputmagicsnp_, families_, OptionsPattern[]] :=
+    Module[ {magicsnp = inputmagicsnp,genoerrorprob,fillthreshould,mono2missing,nf, reslist, pos, submagicsnp, parenthaplo, parenthaplolist, 
+      res, gg, temp, pp, p1, newmagicsnp,i},
+        {genoerrorprob,fillthreshould,mono2missing} = OptionValue@{genoErrorprob,fillThreshould,mono2Missing};
+        nf = magicsnp[[1, 2]];
+        If[ magicsnp[[5 ;; nf + 4, 1]] =!=Join[{families[[1, 1, 1]]}, families[[All, 1, 2]]],
+            Print["Inconsistent founders!"];
+            Abort[];
+        ];
+        If[ magicsnp[[5 + nf ;;, 1]] =!= Flatten[families[[All, 2 ;;]]],
+            Print["Inconsistent offspring!"];
+            Abort[];
+        ];
+        magicsnp[[5 ;; nf + 4, 2 ;;]] = magicsnp[[5 ;; nf + 4, 2 ;;]] /. {"1" -> 1, "2" -> 2};
+        magicsnp[[5 + nf ;;, 2 ;;]] = magicsnp[[5 + nf ;;, 2 ;;]] /. {"11" -> 11, "12"->12, "21" -> 21,"22" -> 22};
+        reslist = Table[
+          pos = Flatten[Position[magicsnp[[All, 1]], #] & /@Flatten[families[[i]]]];
+          submagicsnp = Join[magicsnp[[;; 4]], magicsnp[[pos]]];
+          submagicsnp[[1, 2]] = 2;
+          Print["--------------------Filling ", i,"-th family with parents ", families[[i, 1]],"--------------------"];
+          parenthaplolist = {{"N", "N"}, {1, "N"}, {"N", 1}, {2, "N"}, {"N",2}, {1, 1}, {1, 2}, {2, 1}, {2, 2}};
+          res = Table[calparentPosterprob[submagicsnp, parenthaplo,genoerrorprob, fillthreshould], {parenthaplo, parenthaplolist}];
+          gg = 1;
+          pos = Flatten[res[[All, gg, 2]]];
+          Print["# parent haplotypes of ", parenthaplolist[[{2, 3, 7, 8}]]," that  are corrected to {2,2}: ", 
+           Length[Flatten[res[[{2, 3, 7, 8}, gg, 2]]]], " out of ", Length[pos]];
+          Print["# offspring genotypes of 11 are corrected to 22: ",Count[Flatten[submagicsnp[[7 ;;, 1 + pos]]], 11], " out of ", 
+           Count[Flatten[submagicsnp[[7 ;;, 1 + pos]]], 11 | 22]];
+          submagicsnp[[5 ;; 6, 1 + pos]] = 2;
+          submagicsnp[[7 ;;, 1 + pos]] = If[ mono2missing,
+                                             "NN",
+                                             22
+                                         ];
+          gg = 3;
+          pos = Flatten[res[[All, gg, 2]]];
+          Print["# parent haplotypes of ", parenthaplolist[[{4, 5, 7, 8}]], " that  are corrected to {1,1}: ", 
+           Length[Flatten[res[[{4, 5, 7, 8}, gg, 2]]]], " out of ", Length[pos]];
+          temp = Flatten[submagicsnp[[7 ;;, 1 + pos]]];
+          Print["# offspring genotypes of 22 are corrected to 11: ",Count[temp, 22], " out of ", Count[temp, 11 | 22]];
+          submagicsnp[[5 ;; 6, 1 + pos]] = 1;
+          submagicsnp[[7 ;;, 1 + pos]] = If[ mono2missing,
+                                             "NN",
+                                             11
+                                         ];
+          gg = 2;
+          pos = Flatten[res[[{2, 5}, gg, 2]]];
+          Print["# parent haplotypes of ", parenthaplolist[[{2, 5}]], " that  are filled to {1,2}: ", Length[pos]];
+          submagicsnp[[5, 1 + pos]] = 1;
+          submagicsnp[[6, 1 + pos]] = 2;
+          pos = Flatten[res[[{3, 4}, gg, 2]]];
+          Print["# parent haplotypes of ", parenthaplolist[[{3, 4}]]," that  are filled to {2,1}: ", Length[pos]];
+          submagicsnp[[5, 1 + pos]] = 2;
+          submagicsnp[[6, 1 + pos]] = 1;
+          submagicsnp, {i, Length[families]}];
+        pp = reslist[[All, 6]];
+        p1 = Transpose[reslist[[All, 5]]];
+        p1 = Join[{Union[p1[[1]]]}, DeleteCases[Union[#], "N"] & /@ p1[[2 ;;]]];
+        p1 = Replace[p1, {{x_} -> x, {_, ___} -> "N"}, {1}];
+        Print["# inconsistent genotypes in P1 that are set to missing: ", Count[Flatten[p1], "N"], " out of ", Length[p1] - 1];
+        pp = Join[{p1}, pp];
+        newmagicsnp = Join[reslist[[1, ;; 4]], pp, Flatten[reslist[[All, 7 ;;]], 1]];
+        newmagicsnp[[1, 2]] = Length[pp];
+        If[ Dimensions[Rest[newmagicsnp]] =!= Dimensions[Rest[magicsnp]],
+            Print["wrong dimensions of resulting magicsnp!"];
+            Abort[]
+        ];
+        newmagicsnp
+    ]   
     
 (***************************************************************************************************************)    
 

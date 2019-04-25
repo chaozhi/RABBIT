@@ -10,10 +10,10 @@
 NotebookFileLineBreakTest
 NotebookFileLineBreakTest
 NotebookDataPosition[       158,          7]
-NotebookDataLength[    102019,       2508]
-NotebookOptionsPosition[     95762,       2304]
-NotebookOutlinePosition[     97403,       2351]
-CellTagsIndexPosition[     97236,       2344]
+NotebookDataLength[    104278,       2541]
+NotebookOptionsPosition[     98041,       2338]
+NotebookOutlinePosition[     99679,       2385]
+CellTagsIndexPosition[     99512,       2378]
 WindowFrame->Normal*)
 
 (* Beginning of Notebook Content *)
@@ -274,11 +274,11 @@ Cell[BoxData[{
    3.7130079840760117`*^9, 3.71300798455606*^9}},
  ExpressionUUID -> "c7958332-8a19-417c-ba58-26ee63bf2f4e"],
 
-Cell[BoxData["\<\"D:\\\\Chaozhi\\\\DirectoryWUR\\\\RABBIT \
+Cell[BoxData["\<\"D:\\\\Chaozhi\\\\StatisticalPackages\\\\RABBIT \
 Software\\\\RABBIT_Tutorial\"\>"], "Output",
  CellChangeTimes->{{3.729403193626728*^9, 3.7294031984137278`*^9}, {
    3.730091975607269*^9, 3.7300919826167655`*^9}, {3.7318205069099436`*^9, 
-   3.731820511463854*^9}, 3.734329337271291*^9},
+   3.731820511463854*^9}, 3.734329337271291*^9, 3.7651675091717954`*^9},
  ExpressionUUID -> "4c22ac8c-f9b3-4d6d-a18f-30cb2c3ab525"]
 }, Open  ]],
 
@@ -316,112 +316,118 @@ Cell[BoxData[
           BaseStyle->"InformationLink",
           
           ButtonData:>{
-           "Info43734336537-4727549", {
+           "Info43765174709-6905075", {
             "depthDistribution", "MagicGeneDropping`"}},
           ButtonNote->"MagicGeneDropping`"], 
          ButtonBox["founderGenotypeMissing",
           BaseStyle->"InformationLink",
           
           ButtonData:>{
-           "Info43734336537-4727549", {
+           "Info43765174709-6905075", {
             "founderGenotypeMissing", "MagicGeneDropping`"}},
           ButtonNote->"MagicGeneDropping`"], 
          ButtonBox["interferenceStrength",
           BaseStyle->"InformationLink",
           
           ButtonData:>{
-           "Info43734336537-4727549", {
+           "Info43765174709-6905075", {
             "interferenceStrength", "MagicGeneDropping`"}},
           ButtonNote->"MagicGeneDropping`"], 
          ButtonBox["mergePedigreeInfor",
           BaseStyle->"InformationLink",
           
           ButtonData:>{
-           "Info43734336537-4727549", {
+           "Info43765174709-6905075", {
             "mergePedigreeInfor", "MagicGeneDropping`"}},
           ButtonNote->"MagicGeneDropping`"], 
          ButtonBox["phredQualScore",
           BaseStyle->"InformationLink",
           
           ButtonData:>{
-           "Info43734336537-4727549", {
+           "Info43765174709-6905075", {
             "phredQualScore", "MagicGeneDropping`"}},
           ButtonNote->"MagicGeneDropping`"], 
-         ButtonBox["splitPedigreeInfor",
+         ButtonBox["simPedigreeInfor",
           BaseStyle->"InformationLink",
           
           ButtonData:>{
-           "Info43734336537-4727549", {
-            "splitPedigreeInfor", "MagicGeneDropping`"}},
+           "Info43765174709-6905075", {
+            "simPedigreeInfor", "MagicGeneDropping`"}},
           ButtonNote->"MagicGeneDropping`"]},
         {
          ButtonBox["dropMonomorphic",
           BaseStyle->"InformationLink",
           ButtonData:>{
-           "Info43734336537-4727549", {
+           "Info43765174709-6905075", {
             "dropMonomorphic", "MagicGeneDropping`"}},
           ButtonNote->"MagicGeneDropping`"], 
          ButtonBox["founderReadDepth",
           BaseStyle->"InformationLink",
           
           ButtonData:>{
-           "Info43734336537-4727549", {
+           "Info43765174709-6905075", {
             "founderReadDepth", "MagicGeneDropping`"}},
           ButtonNote->"MagicGeneDropping`"], 
          ButtonBox["isObligate",
           BaseStyle->"InformationLink",
           
           ButtonData:>{
-           "Info43734336537-4727549", {"isObligate", "MagicGeneDropping`"}},
+           "Info43765174709-6905075", {"isObligate", "MagicGeneDropping`"}},
           ButtonNote->"MagicGeneDropping`"], 
          ButtonBox["offspringGenotypeMissing",
           BaseStyle->"InformationLink",
           
           ButtonData:>{
-           "Info43734336537-4727549", {
+           "Info43765174709-6905075", {
             "offspringGenotypeMissing", "MagicGeneDropping`"}},
           ButtonNote->"MagicGeneDropping`"], 
          ButtonBox["sampleGender",
           BaseStyle->"InformationLink",
           
           ButtonData:>{
-           "Info43734336537-4727549", {"sampleGender", "MagicGeneDropping`"}},
-          ButtonNote->"MagicGeneDropping`"], ""},
+           "Info43765174709-6905075", {"sampleGender", "MagicGeneDropping`"}},
+          ButtonNote->"MagicGeneDropping`"], 
+         ButtonBox["splitPedigreeInfor",
+          BaseStyle->"InformationLink",
+          
+          ButtonData:>{
+           "Info43765174709-6905075", {
+            "splitPedigreeInfor", "MagicGeneDropping`"}},
+          ButtonNote->"MagicGeneDropping`"]},
         {
          ButtonBox["expandPedigreeInfor",
           BaseStyle->"InformationLink",
           
           ButtonData:>{
-           "Info43734336537-4727549", {
+           "Info43765174709-6905075", {
             "expandPedigreeInfor", "MagicGeneDropping`"}},
           ButtonNote->"MagicGeneDropping`"], 
          ButtonBox["funnelFunction",
           BaseStyle->"InformationLink",
           
           ButtonData:>{
-           "Info43734336537-4727549", {
+           "Info43765174709-6905075", {
             "funnelFunction", "MagicGeneDropping`"}},
           ButtonNote->"MagicGeneDropping`"], 
          ButtonBox["magicGeneDropping",
           BaseStyle->"InformationLink",
           
           ButtonData:>{
-           "Info43734336537-4727549", {
+           "Info43765174709-6905075", {
             "magicGeneDropping", "MagicGeneDropping`"}},
           ButtonNote->"MagicGeneDropping`"], 
          ButtonBox["offspringReadDepth",
           BaseStyle->"InformationLink",
           
           ButtonData:>{
-           "Info43734336537-4727549", {
+           "Info43765174709-6905075", {
             "offspringReadDepth", "MagicGeneDropping`"}},
           ButtonNote->"MagicGeneDropping`"], 
-         ButtonBox["simPedigreeInfor",
+         ButtonBox["setNAMpedinfo",
           BaseStyle->"InformationLink",
           
           ButtonData:>{
-           "Info43734336537-4727549", {
-            "simPedigreeInfor", "MagicGeneDropping`"}},
+           "Info43765174709-6905075", {"setNAMpedinfo", "MagicGeneDropping`"}},
           ButtonNote->"MagicGeneDropping`"], ""}
        },
        DefaultBaseStyle->"InfoGrid",
@@ -431,7 +437,7 @@ Cell[BoxData[
     GridBoxAlignment->{"Columns" -> {{Left}}, "Rows" -> {{Baseline}}}]}, 
    Dynamic[Typeset`open$$],
    ImageSize->Automatic]]], "Print", "InfoCell",
- CellChangeTimes->{3.734329337921356*^9}]
+ CellChangeTimes->{3.765167509292795*^9}]
 }, Open  ]]
 }, Open  ]]
 }, Open  ]],
@@ -518,7 +524,7 @@ selfing\"\>"},
     TableHeadings -> {{"bcK-selfS", "Kwayril-selfS", "Kwayril-sibS"}, 
       None}]]]], "Output",
  CellChangeTimes->{3.7294031985527277`*^9, 3.731820511659893*^9, 
-  3.7343293379773617`*^9},
+  3.7343293379773617`*^9, 3.7651675093337955`*^9},
  ExpressionUUID -> "47434df8-9d8b-4dbb-a218-46d6534f25c4"]
 }, Open  ]],
 
@@ -698,14 +704,14 @@ Cell[BoxData[
         Hold[$CellContext`k$$], 1, "#backcross"}, 1, 6, 1}, {{
         Hold[$CellContext`s$$], 3, "#selfing"}, 0, 10, 1}}, Typeset`size$$ = {
      80., {157., 166.}}, Typeset`update$$ = 0, Typeset`initDone$$, 
-     Typeset`skipInitDone$$ = True, $CellContext`k$3146$$ = 
-     0, $CellContext`s$3147$$ = 0}, 
+     Typeset`skipInitDone$$ = True, $CellContext`k$569$$ = 
+     0, $CellContext`s$574$$ = 0}, 
      DynamicBox[Manipulate`ManipulateBoxes[
       1, StandardForm, 
        "Variables" :> {$CellContext`k$$ = 1, $CellContext`s$$ = 3}, 
        "ControllerVariables" :> {
-         Hold[$CellContext`k$$, $CellContext`k$3146$$, 0], 
-         Hold[$CellContext`s$$, $CellContext`s$3147$$, 0]}, 
+         Hold[$CellContext`k$$, $CellContext`k$569$$, 0], 
+         Hold[$CellContext`s$$, $CellContext`s$574$$, 0]}, 
        "OtherVariables" :> {
         Typeset`show$$, Typeset`bookmarkList$$, Typeset`bookmarkMode$$, 
          Typeset`animator$$, Typeset`animvar$$, Typeset`name$$, 
@@ -742,14 +748,14 @@ $CellContext`label =
         Hold[$CellContext`k$$], 8, "#founder"}, {2, 4, 8, 16, 32}}, {{
         Hold[$CellContext`s$$], 3, "#selfing"}, 0, 10, 1}}, Typeset`size$$ = {
      430., {191., 198.}}, Typeset`update$$ = 0, Typeset`initDone$$, 
-     Typeset`skipInitDone$$ = True, $CellContext`k$3170$$ = 
-     0, $CellContext`s$3171$$ = 0}, 
+     Typeset`skipInitDone$$ = True, $CellContext`k$603$$ = 
+     0, $CellContext`s$604$$ = 0}, 
      DynamicBox[Manipulate`ManipulateBoxes[
       1, StandardForm, 
        "Variables" :> {$CellContext`k$$ = 8, $CellContext`s$$ = 3}, 
        "ControllerVariables" :> {
-         Hold[$CellContext`k$$, $CellContext`k$3170$$, 0], 
-         Hold[$CellContext`s$$, $CellContext`s$3171$$, 0]}, 
+         Hold[$CellContext`k$$, $CellContext`k$603$$, 0], 
+         Hold[$CellContext`s$$, $CellContext`s$604$$, 0]}, 
        "OtherVariables" :> {
         Typeset`show$$, Typeset`bookmarkList$$, Typeset`bookmarkMode$$, 
          Typeset`animator$$, Typeset`animvar$$, Typeset`name$$, 
@@ -786,14 +792,14 @@ $CellContext`label =
         Hold[$CellContext`k$$], 8, "#founder"}, {2, 4, 8, 16, 32}}, {{
         Hold[$CellContext`s$$], 3, "#sibling"}, 1, 10, 1}}, Typeset`size$$ = {
      430., {162., 169.}}, Typeset`update$$ = 0, Typeset`initDone$$, 
-     Typeset`skipInitDone$$ = True, $CellContext`k$3190$$ = 
-     0, $CellContext`s$3191$$ = 0}, 
+     Typeset`skipInitDone$$ = True, $CellContext`k$623$$ = 
+     0, $CellContext`s$624$$ = 0}, 
      DynamicBox[Manipulate`ManipulateBoxes[
       1, StandardForm, 
        "Variables" :> {$CellContext`k$$ = 8, $CellContext`s$$ = 3}, 
        "ControllerVariables" :> {
-         Hold[$CellContext`k$$, $CellContext`k$3190$$, 0], 
-         Hold[$CellContext`s$$, $CellContext`s$3191$$, 0]}, 
+         Hold[$CellContext`k$$, $CellContext`k$623$$, 0], 
+         Hold[$CellContext`s$$, $CellContext`s$624$$, 0]}, 
        "OtherVariables" :> {
         Typeset`show$$, Typeset`bookmarkList$$, Typeset`bookmarkMode$$, 
          Typeset`animator$$, Typeset`animvar$$, Typeset`name$$, 
@@ -824,7 +830,7 @@ $CellContext`label =
   ImageSize->All]], "Output",
  CellChangeTimes->{{3.729403194037728*^9, 3.7294031986467276`*^9}, 
    3.730091975878296*^9, {3.7318205072440104`*^9, 3.731820511752912*^9}, 
-   3.7343293381053743`*^9},
+   3.7343293381053743`*^9, 3.7651675096797953`*^9},
  ExpressionUUID -> "0621eb0e-7504-4ffb-9dc3-08084d7eeb99"]
 }, Open  ]]
 }, Open  ]]
@@ -885,7 +891,7 @@ Cell[BoxData[{
 
 Cell[BoxData["\<\"Example_Pedigree.csv\"\>"], "Output",
  CellChangeTimes->{3.729403198924728*^9, 3.731820512011964*^9, 
-  3.734329338496413*^9},
+  3.734329338496413*^9, 3.7651675100467954`*^9},
  ExpressionUUID -> "3f49fd03-6e3b-42e1-8e47-40f7e2f553a3"]
 }, Open  ]],
 
@@ -966,15 +972,15 @@ Cell[BoxData[
        Hold[$CellContext`nFounder$$], 4, "#founder"}, 2, 10}, {{
        Hold[$CellContext`s$$], 3, "#selfing"}, 0, 6, 1}}, Typeset`size$$ = {
     576., {230., 239.}}, Typeset`update$$ = 0, Typeset`initDone$$, 
-    Typeset`skipInitDone$$ = True, $CellContext`popsize$3436$$ = 
-    False, $CellContext`nFounder$3437$$ = 0, $CellContext`s$3438$$ = 0}, 
+    Typeset`skipInitDone$$ = True, $CellContext`popsize$1070$$ = 
+    False, $CellContext`nFounder$1071$$ = 0, $CellContext`s$1072$$ = 0}, 
     DynamicBox[Manipulate`ManipulateBoxes[
      1, StandardForm, 
       "Variables" :> {$CellContext`nFounder$$ = 4, $CellContext`popsize$$ = 
         10, $CellContext`s$$ = 3}, "ControllerVariables" :> {
-        Hold[$CellContext`popsize$$, $CellContext`popsize$3436$$, False], 
-        Hold[$CellContext`nFounder$$, $CellContext`nFounder$3437$$, 0], 
-        Hold[$CellContext`s$$, $CellContext`s$3438$$, 0]}, 
+        Hold[$CellContext`popsize$$, $CellContext`popsize$1070$$, False], 
+        Hold[$CellContext`nFounder$$, $CellContext`nFounder$1071$$, 0], 
+        Hold[$CellContext`s$$, $CellContext`s$1072$$, 0]}, 
       "OtherVariables" :> {
        Typeset`show$$, Typeset`bookmarkList$$, Typeset`bookmarkMode$$, 
         Typeset`animator$$, Typeset`animvar$$, Typeset`name$$, 
@@ -1007,7 +1013,7 @@ Cell[BoxData[
   Manipulate`InterpretManipulate[1]]], "Output",
  CellChangeTimes->{{3.729403194662728*^9, 3.7294031989927278`*^9}, 
    3.730091976305339*^9, {3.7318205075000615`*^9, 3.731820512073976*^9}, 
-   3.73432933856242*^9},
+   3.73432933856242*^9, 3.7651675100857954`*^9},
  ExpressionUUID -> "f598be8b-0c6a-4edc-827e-748fed9087b0"]
 }, Open  ]]
 }, Open  ]]
@@ -1311,7 +1317,7 @@ ZwAAk/gfjQ==
   PlotRangePadding->Scaled[0.1]]], "Output",
  CellChangeTimes->{{3.729403194977728*^9, 3.7294031992597275`*^9}, 
    3.7300919766173697`*^9, {3.731820507756113*^9, 3.7318205123260264`*^9}, 
-   3.734329338890453*^9},
+   3.734329338890453*^9, 3.7651675103975954`*^9},
  ExpressionUUID -> "d3bd9210-6588-47ba-ab9d-f2dee9aa463e"]
 }, Open  ]]
 }, Open  ]]
@@ -1358,8 +1364,8 @@ Cell[BoxData[
  StyleBox["\<\"simPedigreeInfor[pedigree] returns pedigreeInfor with \
 sampleInfor being simulated from pedigree. \"\>", "MSG"]], "Print", \
 "PrintUsage",
- CellChangeTimes->{3.734329339100474*^9},
- CellTags->"Info283734336538-5347605"],
+ CellChangeTimes->{3.7651675105365953`*^9},
+ CellTags->"Info283765174710-2342463"],
 
 Cell[BoxData[
  RowBox[{"{", 
@@ -1373,13 +1379,13 @@ Cell[BoxData[
    RowBox[{"outputFileID", "\[Rule]", "\<\"\"\>"}]}], "}"}]], "Output",
  CellChangeTimes->{{3.729403195227728*^9, 3.729403199423728*^9}, 
    3.7300919769644046`*^9, {3.731820507966155*^9, 3.7318205125200653`*^9}, 
-   3.734329339180482*^9},
+   3.734329339180482*^9, 3.7651675105725956`*^9},
  ExpressionUUID -> "3a324cd3-0369-47f6-94d9-d512f4c3727d"],
 
 Cell[BoxData["\<\"Example_PedigreeInfor.csv\"\>"], "Output",
  CellChangeTimes->{{3.729403195227728*^9, 3.729403199423728*^9}, 
    3.7300919769644046`*^9, {3.731820507966155*^9, 3.7318205125200653`*^9}, 
-   3.7343293392464886`*^9},
+   3.734329339180482*^9, 3.7651675107615957`*^9},
  ExpressionUUID -> "3a324cd3-0369-47f6-94d9-d512f4c3727d"]
 }, Open  ]],
 
@@ -1512,7 +1518,7 @@ n8BP4CfwE/gJ/AR+Aj+Bn8BP4Cfh/wf7O90X
   PlotRangePadding->Scaled[0.1]]], "Output",
  CellChangeTimes->{{3.729403195888728*^9, 3.729403199607728*^9}, 
    3.73009197741745*^9, {3.7318205106937*^9, 3.7318205127281065`*^9}, 
-   3.7343293394765115`*^9},
+   3.7343293394765115`*^9, 3.7651675108785954`*^9},
  ExpressionUUID -> "d33a1fbf-6a72-410a-b601-4cb248023beb"],
 
 Cell[BoxData[
@@ -1537,26 +1543,26 @@ Cell[BoxData[
      Cell[""], Cell[""]},
     {Cell["ProgenyLine"], Cell["MemberID"], Cell["Funnelcode"], Cell[""], 
      Cell[""]},
-    {Cell["ProgenyLine1"], "10", Cell["3-1-2-4"], Cell[""], Cell[""]},
-    {Cell["ProgenyLine2"], "10", Cell["2-1-4-3"], Cell[""], Cell[""]},
-    {Cell["ProgenyLine3"], "10", Cell["4-2-1-3"], Cell[""], Cell[""]},
-    {Cell["ProgenyLine4"], "10", Cell["4-3-1-2"], Cell[""], Cell[""]},
-    {Cell["ProgenyLine5"], "10", Cell["3-1-2-4"], Cell[""], Cell[""]},
-    {Cell["ProgenyLine6"], "10", Cell["4-3-1-2"], Cell[""], Cell[""]},
-    {Cell["ProgenyLine7"], "10", Cell["4-1-2-3"], Cell[""], Cell[""]},
-    {Cell["ProgenyLine8"], "10", Cell["3-4-2-1"], Cell[""], Cell[""]},
-    {Cell["ProgenyLine9"], "10", Cell["3-2-4-1"], Cell[""], Cell[""]},
-    {Cell["ProgenyLine10"], "10", Cell["1-3-2-4"], Cell[""], Cell[""]},
-    {Cell["ProgenyLine11"], "10", Cell["2-3-1-4"], Cell[""], Cell[""]},
-    {Cell["ProgenyLine12"], "10", Cell["4-3-2-1"], Cell[""], Cell[""]},
-    {Cell["ProgenyLine13"], "10", Cell["1-4-2-3"], Cell[""], Cell[""]},
-    {Cell["ProgenyLine14"], "10", Cell["1-3-2-4"], Cell[""], Cell[""]},
-    {Cell["ProgenyLine15"], "10", Cell["2-3-4-1"], Cell[""], Cell[""]},
-    {Cell["ProgenyLine16"], "10", Cell["3-4-2-1"], Cell[""], Cell[""]},
-    {Cell["ProgenyLine17"], "10", Cell["2-3-1-4"], Cell[""], Cell[""]},
-    {Cell["ProgenyLine18"], "10", Cell["2-4-1-3"], Cell[""], Cell[""]},
-    {Cell["ProgenyLine19"], "10", Cell["4-1-3-2"], Cell[""], Cell[""]},
-    {Cell["ProgenyLine20"], "10", Cell["2-4-1-3"], Cell[""], Cell[""]}
+    {Cell["ProgenyLine1"], "10", Cell["4-3-1-2"], Cell[""], Cell[""]},
+    {Cell["ProgenyLine2"], "10", Cell["1-2-4-3"], Cell[""], Cell[""]},
+    {Cell["ProgenyLine3"], "10", Cell["3-1-4-2"], Cell[""], Cell[""]},
+    {Cell["ProgenyLine4"], "10", Cell["1-4-2-3"], Cell[""], Cell[""]},
+    {Cell["ProgenyLine5"], "10", Cell["2-1-3-4"], Cell[""], Cell[""]},
+    {Cell["ProgenyLine6"], "10", Cell["4-2-3-1"], Cell[""], Cell[""]},
+    {Cell["ProgenyLine7"], "10", Cell["4-2-3-1"], Cell[""], Cell[""]},
+    {Cell["ProgenyLine8"], "10", Cell["2-4-1-3"], Cell[""], Cell[""]},
+    {Cell["ProgenyLine9"], "10", Cell["2-1-4-3"], Cell[""], Cell[""]},
+    {Cell["ProgenyLine10"], "10", Cell["4-2-3-1"], Cell[""], Cell[""]},
+    {Cell["ProgenyLine11"], "10", Cell["4-3-1-2"], Cell[""], Cell[""]},
+    {Cell["ProgenyLine12"], "10", Cell["1-2-3-4"], Cell[""], Cell[""]},
+    {Cell["ProgenyLine13"], "10", Cell["2-4-1-3"], Cell[""], Cell[""]},
+    {Cell["ProgenyLine14"], "10", Cell["4-3-1-2"], Cell[""], Cell[""]},
+    {Cell["ProgenyLine15"], "10", Cell["4-3-1-2"], Cell[""], Cell[""]},
+    {Cell["ProgenyLine16"], "10", Cell["4-3-1-2"], Cell[""], Cell[""]},
+    {Cell["ProgenyLine17"], "10", Cell["1-3-2-4"], Cell[""], Cell[""]},
+    {Cell["ProgenyLine18"], "10", Cell["3-4-2-1"], Cell[""], Cell[""]},
+    {Cell["ProgenyLine19"], "10", Cell["3-1-2-4"], Cell[""], Cell[""]},
+    {Cell["ProgenyLine20"], "10", Cell["4-2-3-1"], Cell[""], Cell[""]}
    },
    AutoDelete->False,
    GridBoxFrame->{"Columns" -> {{True}}, "Rows" -> {{True}}},
@@ -1564,7 +1570,7 @@ Cell[BoxData[
   "TextGrid"]], "Output",
  CellChangeTimes->{{3.729403195888728*^9, 3.729403199607728*^9}, 
    3.73009197741745*^9, {3.7318205106937*^9, 3.7318205127281065`*^9}, 
-   3.734329339520516*^9},
+   3.7343293394765115`*^9, 3.7651675109165955`*^9},
  ExpressionUUID -> "d33a1fbf-6a72-410a-b601-4cb248023beb"]
 }, Open  ]]
 }, Open  ]]
@@ -1603,8 +1609,8 @@ information in several possible ways: a list of mating schemes from founder \
 population to the last generation, a list of values denoting the junction \
 distribution, or a filename for population pedigree information. \"\>", 
   "MSG"]], "Print", "PrintUsage",
- CellChangeTimes->{3.7343293397255363`*^9},
- CellTags->"Info343734336539-5769836"],
+ CellChangeTimes->{3.7651675110225954`*^9},
+ CellTags->"Info343765174710-7685412"],
 
 Cell[BoxData[
  RowBox[{"{", 
@@ -1626,7 +1632,7 @@ Cell[BoxData[
    RowBox[{"isPrintTimeElapsed", "\[Rule]", "True"}]}], "}"}]], "Output",
  CellChangeTimes->{{3.7294031961187277`*^9, 3.729403199836728*^9}, 
    3.730091977670475*^9, {3.7318205110217657`*^9, 3.7318205129941597`*^9}, 
-   3.734329339784542*^9},
+   3.734329339784542*^9, 3.7651675110615954`*^9},
  ExpressionUUID -> "94ca65ce-e057-4bd7-9d7e-d46b3646eded"]
 }, Open  ]],
 
@@ -1671,63 +1677,63 @@ Cell[CellGroupData[{
 Cell[BoxData[
  InterpretationBox[
   RowBox[{"\<\"magicGeneDropping. Start date = \"\>", 
-   "\[InvisibleSpace]", "\<\"Thu 3 May 2018 11:42:19\"\>"}],
-  SequenceForm["magicGeneDropping. Start date = ", "Thu 3 May 2018 11:42:19"],
+   "\[InvisibleSpace]", "\<\"Thu 25 Apr 2019 09:51:51\"\>"}],
+  SequenceForm["magicGeneDropping. Start date = ", "Thu 25 Apr 2019 09:51:51"],
   Editable->False]], "Print",
  CellChangeTimes->{{3.729403196459728*^9, 3.729403199971728*^9}, 
    3.730091977944503*^9, {3.7318205110907793`*^9, 3.731820513083178*^9}, 
-   3.7343293399545593`*^9},
+   3.7343293399545593`*^9, 3.7651675112345953`*^9},
  ExpressionUUID -> "73efb62e-cf45-459b-ba80-0ee26aefaa9b"],
 
 Cell[BoxData["\<\"Time elapsed = 0. Seconds. \\tStart simulating offspring \
 genomes in terms of FGL lists.\"\>"], "Print",
  CellChangeTimes->{{3.729403196459728*^9, 3.729403199971728*^9}, 
    3.730091977944503*^9, {3.7318205110907793`*^9, 3.731820513083178*^9}, 
-   3.7343293399925632`*^9},
+   3.7343293399545593`*^9, 3.7651675112685957`*^9},
  ExpressionUUID -> "73efb62e-cf45-459b-ba80-0ee26aefaa9b"],
 
-Cell[BoxData["\<\"Time elapsed = 0.9 Seconds. \\tStart dropping founder \
+Cell[BoxData["\<\"Time elapsed = 0.7 Seconds. \\tStart dropping founder \
 alleles on the offspring FGL lists.\"\>"], "Print",
  CellChangeTimes->{{3.729403196459728*^9, 3.729403199971728*^9}, 
    3.730091977944503*^9, {3.7318205110907793`*^9, 3.731820513083178*^9}, 
-   3.7343293408756514`*^9},
+   3.7343293399545593`*^9, 3.7651675119255953`*^9},
  ExpressionUUID -> "73efb62e-cf45-459b-ba80-0ee26aefaa9b"],
 
-Cell[BoxData["\<\"Time elapsed = 1.2 Seconds. \\tStart simulating allelic \
+Cell[BoxData["\<\"Time elapsed = 0.9 Seconds. \\tStart simulating allelic \
 errors in founders and offspring.\"\>"], "Print",
  CellChangeTimes->{{3.729403196459728*^9, 3.729403199971728*^9}, 
    3.730091977944503*^9, {3.7318205110907793`*^9, 3.731820513083178*^9}, 
-   3.7343293411886826`*^9},
+   3.7343293399545593`*^9, 3.7651675121495953`*^9},
  ExpressionUUID -> "73efb62e-cf45-459b-ba80-0ee26aefaa9b"],
 
 Cell[BoxData[
  InterpretationBox[
   RowBox[{"\<\"The realized fraction of missing genotypes in founders: \"\>", 
-   "\[InvisibleSpace]", "0.099`"}],
+   "\[InvisibleSpace]", "0.324`"}],
   SequenceForm[
-  "The realized fraction of missing genotypes in founders: ", 0.099],
+  "The realized fraction of missing genotypes in founders: ", 0.324],
   Editable->False]], "Print",
  CellChangeTimes->{{3.729403196459728*^9, 3.729403199971728*^9}, 
    3.730091977944503*^9, {3.7318205110907793`*^9, 3.731820513083178*^9}, 
-   3.7343293412336874`*^9},
+   3.7343293399545593`*^9, 3.765167514144595*^9},
  ExpressionUUID -> "73efb62e-cf45-459b-ba80-0ee26aefaa9b"],
 
 Cell[BoxData[
  InterpretationBox[
   RowBox[{"\<\"The realized fraction of missing genotypes in offspring: \"\>",
-    "\[InvisibleSpace]", "0.099`"}],
+    "\[InvisibleSpace]", "0.325`"}],
   SequenceForm[
-  "The realized fraction of missing genotypes in offspring: ", 0.099],
+  "The realized fraction of missing genotypes in offspring: ", 0.325],
   Editable->False]], "Print",
  CellChangeTimes->{{3.729403196459728*^9, 3.729403199971728*^9}, 
    3.730091977944503*^9, {3.7318205110907793`*^9, 3.731820513083178*^9}, 
-   3.734329341273691*^9},
+   3.7343293399545593`*^9, 3.7651675141805954`*^9},
  ExpressionUUID -> "73efb62e-cf45-459b-ba80-0ee26aefaa9b"],
 
 Cell[BoxData[
  InterpretationBox[
   RowBox[{"\<\"Saving true values and simulated data. \"\>", 
-   "\[InvisibleSpace]", "\<\"Thu 3 May 2018 11:42:21\"\>", 
+   "\[InvisibleSpace]", "\<\"Thu 25 Apr 2019 09:51:54\"\>", 
    "\[InvisibleSpace]", "\<\"\\n\\t\"\>", "\[InvisibleSpace]", 
    TagBox[GridBox[{
       {"\<\"True FGL\"\>", "\<\"Example_TrueValues_Fgl.txt\"\>"},
@@ -1749,7 +1755,7 @@ Cell[BoxData[
     Function[BoxForm`e$, 
      TableForm[BoxForm`e$]]]}],
   SequenceForm[
-  "Saving true values and simulated data. ", "Thu 3 May 2018 11:42:21", 
+  "Saving true values and simulated data. ", "Thu 25 Apr 2019 09:51:54", 
    "\n\t", 
    TableForm[{{"True FGL", "Example_TrueValues_Fgl.txt"}, {
      "True FGL diplotype", "Example_TrueValues_FglDiplotype.csv"}, {
@@ -1758,22 +1764,22 @@ Cell[BoxData[
   Editable->False]], "Print",
  CellChangeTimes->{{3.729403196459728*^9, 3.729403199971728*^9}, 
    3.730091977944503*^9, {3.7318205110907793`*^9, 3.731820513083178*^9}, 
-   3.734329341312695*^9},
+   3.7343293399545593`*^9, 3.7651675142125955`*^9},
  ExpressionUUID -> "73efb62e-cf45-459b-ba80-0ee26aefaa9b"],
 
 Cell[BoxData[
  InterpretationBox[
   RowBox[{"\<\"Done! Finished date =\"\>", 
-   "\[InvisibleSpace]", "\<\"Thu 3 May 2018 11:42:21\"\>", 
+   "\[InvisibleSpace]", "\<\"Thu 25 Apr 2019 09:51:54\"\>", 
    "\[InvisibleSpace]", "\<\". \\tTime elapsed = \"\>", "\[InvisibleSpace]", 
-   "1.7000000000000002`", "\[InvisibleSpace]", "\<\" Seconds.\"\>"}],
+   "3.2`", "\[InvisibleSpace]", "\<\" Seconds.\"\>"}],
   SequenceForm[
-  "Done! Finished date =", "Thu 3 May 2018 11:42:21", ". \tTime elapsed = ", 
-   1.7000000000000002`, " Seconds."],
+  "Done! Finished date =", "Thu 25 Apr 2019 09:51:54", ". \tTime elapsed = ", 
+   3.2, " Seconds."],
   Editable->False]], "Print",
  CellChangeTimes->{{3.729403196459728*^9, 3.729403199971728*^9}, 
    3.730091977944503*^9, {3.7318205110907793`*^9, 3.731820513083178*^9}, 
-   3.7343293416317267`*^9},
+   3.7343293399545593`*^9, 3.765167514453595*^9},
  ExpressionUUID -> "73efb62e-cf45-459b-ba80-0ee26aefaa9b"]
 }, Open  ]]
 }, Open  ]]
@@ -1847,7 +1853,6 @@ Cell[BoxData[
          RowBox[{"Length", "[", "datafiles", "]"}]}], "}"}]}], "]"}]}], "]"}],
     ",", "4", ",", 
    RowBox[{"ImageSize", "\[Rule]", "Automatic"}]}], "]"}]], "Input",
- CellOpen->False,
  InitializationCell->True,
  CellChangeTimes->{{3.712564747089134*^9, 3.7125647723130445`*^9}, {
    3.7125648200278015`*^9, 3.712564850227019*^9}, {3.7125650424119835`*^9, 
@@ -1875,10 +1880,10 @@ shown)\"\>"},
 "\<\"Female=1/Male=2/Hermaphrodite=0\"\>", "\<\"Funnelcode\"\>", \
 "\<\"genome-FGL\"\>"},
          {"\<\"ProgenyLine1\"\>", "5", "10", "0", GridBox[{
+            {"4"},
             {"3"},
             {"1"},
-            {"2"},
-            {"4"}
+            {"2"}
            },
            
            GridBoxAlignment->{
@@ -1892,10 +1897,13 @@ shown)\"\>"},
                 Offset[0.1]}, 
                Offset[0.2]}, "RowsIndexed" -> {}}], GridBox[{
             {GridBox[{
-               {"0", "1"},
-               {"51.3383048098525`", "3"},
-               {"98.13499308723297`", "1"},
-               {"148.61088540964033`", "3"},
+               {"0", "3"},
+               {"34.10114822436074`", "1"},
+               {"37.51809627234471`", "3"},
+               {"74.42283433840797`", "1"},
+               {"106.5088081008351`", "3"},
+               {"116.15627300238134`", "1"},
+               {"138.01834563045077`", "4"},
                {"152", 
                 RowBox[{"-", "1"}]}
               },
@@ -1911,12 +1919,8 @@ shown)\"\>"},
                   Offset[0.2], {
                    Offset[0.1]}, 
                   Offset[0.2]}, "RowsIndexed" -> {}}], GridBox[{
-               {"0", "1"},
-               {"51.3383048098525`", "3"},
-               {"98.13499308723297`", "1"},
-               {"102.40317398656097`", "4"},
-               {"120.9237010651143`", "1"},
-               {"148.61088540964033`", "3"},
+               {"0", "3"},
+               {"74.42283433840797`", "1"},
                {"152", 
                 RowBox[{"-", "1"}]}
               },
@@ -1933,7 +1937,11 @@ shown)\"\>"},
                    Offset[0.1]}, 
                   Offset[0.2]}, "RowsIndexed" -> {}}]},
             {GridBox[{
-               {"0", "4"},
+               {"0", "2"},
+               {"5.258501948321708`", "1"},
+               {"10.786926617957363`", "2"},
+               {"55.85903306104467`", "3"},
+               {"68.53239582937445`", "2"},
                {"99", 
                 RowBox[{"-", "1"}]}
               },
@@ -1949,9 +1957,11 @@ shown)\"\>"},
                   Offset[0.2], {
                    Offset[0.1]}, 
                   Offset[0.2]}, "RowsIndexed" -> {}}], GridBox[{
-               {"0", "4"},
-               {"73.75491483721049`", "1"},
-               {"95.65264463023391`", "4"},
+               {"0", "2"},
+               {"5.258501948321708`", "1"},
+               {"10.786926617957363`", "2"},
+               {"55.85903306104467`", "3"},
+               {"68.53239582937445`", "2"},
                {"99", 
                 RowBox[{"-", "1"}]}
               },
@@ -1969,9 +1979,8 @@ shown)\"\>"},
                   Offset[0.2]}, "RowsIndexed" -> {}}]},
             {GridBox[{
                {"0", "4"},
-               {"34.4327239960283`", "2"},
-               {"79.13152669991152`", "1"},
-               {"103.50535791837916`", "2"},
+               {"1.9517246621540778`", "2"},
+               {"113.42823788898576`", "3"},
                {"118", 
                 RowBox[{"-", "1"}]}
               },
@@ -1988,9 +1997,9 @@ shown)\"\>"},
                    Offset[0.1]}, 
                   Offset[0.2]}, "RowsIndexed" -> {}}], GridBox[{
                {"0", "4"},
-               {"34.4327239960283`", "2"},
-               {"91.03067617774082`", "1"},
-               {"116.95885035834215`", "2"},
+               {"12.246011505952595`", "3"},
+               {"47.8472516734617`", "2"},
+               {"99.59316290051848`", "3"},
                {"118", 
                 RowBox[{"-", "1"}]}
               },
@@ -2007,9 +2016,8 @@ shown)\"\>"},
                    Offset[0.1]}, 
                   Offset[0.2]}, "RowsIndexed" -> {}}]},
             {GridBox[{
-               {"0", "3"},
-               {"10.39690564119779`", "2"},
-               {"32.998647171695765`", "3"},
+               {"0", "4"},
+               {"15.137761639251067`", "2"},
                {"93", 
                 RowBox[{"-", "1"}]}
               },
@@ -2025,9 +2033,12 @@ shown)\"\>"},
                   Offset[0.2], {
                    Offset[0.1]}, 
                   Offset[0.2]}, "RowsIndexed" -> {}}], GridBox[{
-               {"0", "3"},
-               {"20.22640348497049`", "2"},
-               {"50.83472825997109`", "4"},
+               {"0", "4"},
+               {"15.137761639251067`", "2"},
+               {"27.423451642017724`", "4"},
+               {"32.82936562584145`", "2"},
+               {"69.53993969489437`", "3"},
+               {"87.44034471230432`", "2"},
                {"93", 
                 RowBox[{"-", "1"}]}
               },
@@ -2044,9 +2055,13 @@ shown)\"\>"},
                    Offset[0.1]}, 
                   Offset[0.2]}, "RowsIndexed" -> {}}]},
             {GridBox[{
-               {"0", "3"},
-               {"28.85316701515086`", "2"},
-               {"47.19118137211859`", "1"},
+               {"0", "1"},
+               {"5.140826032881108`", "4"},
+               {"58.30974968991197`", "1"},
+               {"70.04611867233464`", "2"},
+               {"91.33680105933607`", "1"},
+               {"101.98578846412067`", "3"},
+               {"125.75869061826734`", "4"},
                {"135", 
                 RowBox[{"-", "1"}]}
               },
@@ -2062,10 +2077,13 @@ shown)\"\>"},
                   Offset[0.2], {
                    Offset[0.1]}, 
                   Offset[0.2]}, "RowsIndexed" -> {}}], GridBox[{
-               {"0", "3"},
-               {"28.85316701515086`", "2"},
-               {"65.53577801123421`", "1"},
-               {"131.71630924612884`", "2"},
+               {"0", "4"},
+               {"11.203125987113424`", "1"},
+               {"16.817911714486456`", "4"},
+               {"84.28135765710573`", "3"},
+               {"91.29808776793325`", "2"},
+               {"91.33680105933607`", "1"},
+               {"125.87481324362261`", "4"},
                {"135", 
                 RowBox[{"-", "1"}]}
               },
@@ -2107,24 +2125,28 @@ shown)\"\>"},
        TableForm[{{
          "ProgenyLineID", "Generation", "MemberID", 
           "Female=1/Male=2/Hermaphrodite=0", "Funnelcode", "genome-FGL"}, {
-         "ProgenyLine1", 5, 10, 0, {3, 1, 2, 
-          4}, {{{{0, 1}, {51.3383048098525, 3}, {98.13499308723297, 1}, {
-             148.61088540964033`, 3}, {152, -1}}, {{0, 1}, {
-             51.3383048098525, 3}, {98.13499308723297, 1}, {
-             102.40317398656097`, 4}, {120.9237010651143, 1}, {
-             148.61088540964033`, 3}, {152, -1}}}, {{{0, 4}, {
-            99, -1}}, {{0, 4}, {73.75491483721049, 1}, {
-             95.65264463023391, 4}, {99, -1}}}, {{{0, 4}, {
-             34.4327239960283, 2}, {79.13152669991152, 1}, {
-             103.50535791837916`, 2}, {118, -1}}, {{0, 4}, {
-             34.4327239960283, 2}, {91.03067617774082, 1}, {
-             116.95885035834215`, 2}, {118, -1}}}, {{{0, 3}, {
-             10.39690564119779, 2}, {32.998647171695765`, 3}, {93, -1}}, {{0, 
-             3}, {20.22640348497049, 2}, {50.83472825997109, 4}, {
-             93, -1}}}, {{{0, 3}, {28.85316701515086, 2}, {
-             47.19118137211859, 1}, {135, -1}}, {{0, 3}, {
-             28.85316701515086, 2}, {65.53577801123421, 1}, {
-             131.71630924612884`, 2}, {135, -1}}}}}}]]}
+         "ProgenyLine1", 5, 10, 0, {4, 3, 1, 
+          2}, {{{{0, 3}, {34.10114822436074, 1}, {37.51809627234471, 3}, {
+             74.42283433840797, 1}, {106.5088081008351, 3}, {
+             116.15627300238134`, 1}, {138.01834563045077`, 4}, {152, -1}}, {{
+             0, 3}, {74.42283433840797, 1}, {152, -1}}}, {{{0, 2}, {
+             5.258501948321708, 1}, {10.786926617957363`, 2}, {
+             55.85903306104467, 3}, {68.53239582937445, 2}, {99, -1}}, {{0, 
+             2}, {5.258501948321708, 1}, {10.786926617957363`, 2}, {
+             55.85903306104467, 3}, {68.53239582937445, 2}, {99, -1}}}, {{{0, 
+             4}, {1.9517246621540778`, 2}, {113.42823788898576`, 3}, {
+             118, -1}}, {{0, 4}, {12.246011505952595`, 3}, {
+             47.8472516734617, 2}, {99.59316290051848, 3}, {118, -1}}}, {{{0, 
+             4}, {15.137761639251067`, 2}, {93, -1}}, {{0, 4}, {
+             15.137761639251067`, 2}, {27.423451642017724`, 4}, {
+             32.82936562584145, 2}, {69.53993969489437, 3}, {
+             87.44034471230432, 2}, {93, -1}}}, {{{0, 1}, {
+             5.140826032881108, 4}, {58.30974968991197, 1}, {
+             70.04611867233464, 2}, {91.33680105933607, 1}, {
+             101.98578846412067`, 3}, {125.75869061826734`, 4}, {135, -1}}, {{
+             0, 4}, {11.203125987113424`, 1}, {16.817911714486456`, 4}, {
+             84.28135765710573, 3}, {91.29808776793325, 2}, {
+             91.33680105933607, 1}, {125.87481324362261`, 4}, {135, -1}}}}}}]]}
     },
     DefaultBaseStyle->"Column",
     GridBoxAlignment->{"Columns" -> {{Left}}},
@@ -2147,11 +2169,11 @@ marks/individuals are shown)\"\>"},
          {"\<\"Founder2\"\>", "2", "1", "1", "1", "1"},
          {"\<\"Founder3\"\>", "2", "1", "1", "2", "2"},
          {"\<\"Founder4\"\>", "1", "2", "1", "2", "2"},
-         {"\<\"ProgenyLine1\"\>", "1", "1", "1", "1", "1"},
+         {"\<\"ProgenyLine1\"\>", "11", "11", "11", "11", "11"},
          {"\<\"ProgenyLine2\"\>", "11", "11", "11", "11", "11"},
-         {"\<\"ProgenyLine3\"\>", "11", "11", "11", "11", "11"},
-         {"\<\"ProgenyLine4\"\>", "16", "16", "16", "16", "16"},
-         {"\<\"ProgenyLine5\"\>", "11", "11", "11", "11", "11"},
+         {"\<\"ProgenyLine3\"\>", "16", "16", "16", "16", "16"},
+         {"\<\"ProgenyLine4\"\>", "6", "6", "6", "6", "6"},
+         {"\<\"ProgenyLine5\"\>", "14", "14", "13", "13", "13"},
          {"\<\"ProgenyLine6\"\>", "1", "1", "1", "1", "1"},
          {"\<\"ProgenyLine7\"\>", "16", "16", "16", "16", "16"}
         },
@@ -2171,11 +2193,11 @@ marks/individuals are shown)\"\>"},
          "pos(cM)", 0.14646, 0.14879, 0.56454, 0.87303, 0.98894}, {
          "Founder1", 1, 2, 2, 2, 1}, {"Founder2", 2, 1, 1, 1, 1}, {
          "Founder3", 2, 1, 1, 2, 2}, {"Founder4", 1, 2, 1, 2, 2}, {
-         "ProgenyLine1", 1, 1, 1, 1, 1}, {
+         "ProgenyLine1", 11, 11, 11, 11, 11}, {
          "ProgenyLine2", 11, 11, 11, 11, 11}, {
-         "ProgenyLine3", 11, 11, 11, 11, 11}, {
-         "ProgenyLine4", 16, 16, 16, 16, 16}, {
-         "ProgenyLine5", 11, 11, 11, 11, 11}, {
+         "ProgenyLine3", 16, 16, 16, 16, 16}, {
+         "ProgenyLine4", 6, 6, 6, 6, 6}, {
+         "ProgenyLine5", 14, 14, 13, 13, 13}, {
          "ProgenyLine6", 1, 1, 1, 1, 1}, {
          "ProgenyLine7", 16, 16, 16, 16, 16}}]]}
     },
@@ -2200,11 +2222,11 @@ are shown)\"\>"},
          {"\<\"Founder2\"\>", "2", "1", "1", "1", "1"},
          {"\<\"Founder3\"\>", "2", "1", "1", "2", "2"},
          {"\<\"Founder4\"\>", "1", "2", "1", "2", "2"},
-         {"\<\"ProgenyLine1\"\>", "11", "22", "22", "22", "11"},
+         {"\<\"ProgenyLine1\"\>", "22", "11", "11", "22", "22"},
          {"\<\"ProgenyLine2\"\>", "22", "11", "11", "22", "22"},
-         {"\<\"ProgenyLine3\"\>", "22", "11", "11", "22", "22"},
-         {"\<\"ProgenyLine4\"\>", "11", "22", "11", "22", "22"},
-         {"\<\"ProgenyLine5\"\>", "22", "11", "11", "22", "22"},
+         {"\<\"ProgenyLine3\"\>", "11", "22", "11", "22", "22"},
+         {"\<\"ProgenyLine4\"\>", "22", "11", "11", "11", "11"},
+         {"\<\"ProgenyLine5\"\>", "12", "21", "12", "22", "21"},
          {"\<\"ProgenyLine6\"\>", "11", "22", "22", "22", "11"},
          {"\<\"ProgenyLine7\"\>", "11", "22", "11", "22", "22"}
         },
@@ -2224,11 +2246,11 @@ are shown)\"\>"},
          "pos(cM)", 0.14646, 0.14879, 0.56454, 0.87303, 0.98894}, {
          "Founder1", 1, 2, 2, 2, 1}, {"Founder2", 2, 1, 1, 1, 1}, {
          "Founder3", 2, 1, 1, 2, 2}, {"Founder4", 1, 2, 1, 2, 2}, {
-         "ProgenyLine1", 11, 22, 22, 22, 11}, {
+         "ProgenyLine1", 22, 11, 11, 22, 22}, {
          "ProgenyLine2", 22, 11, 11, 22, 22}, {
-         "ProgenyLine3", 22, 11, 11, 22, 22}, {
-         "ProgenyLine4", 11, 22, 11, 22, 22}, {
-         "ProgenyLine5", 22, 11, 11, 22, 22}, {
+         "ProgenyLine3", 11, 22, 11, 22, 22}, {
+         "ProgenyLine4", 22, 11, 11, 11, 11}, {
+         "ProgenyLine5", 12, 21, 12, 22, 21}, {
          "ProgenyLine6", 11, 22, 22, 22, 11}, {
          "ProgenyLine7", 11, 22, 11, 22, 22}}]]}
     },
@@ -2249,18 +2271,28 @@ shown)\"\>"},
          {"\<\"chromosome\"\>", "1", "1", "1", "1", "1"},
          {"\<\"pos(cM)\"\>", "0.14646`", "0.14879`", "0.56454`", "0.87303`", 
           "0.98894`"},
-         {"\<\"Founder1\"\>", "1", "2", "2", "2", "1"},
-         {"\<\"Founder2\"\>", "2", "1", "1", "1", "\<\"N\"\>"},
-         {"\<\"Founder3\"\>", "2", "1", "1", "\<\"N\"\>", "2"},
-         {"\<\"Founder4\"\>", "1", "\<\"N\"\>", "\<\"N\"\>", "2", "2"},
-         {"\<\"ProgenyLine1\"\>", "11", "22", "\<\"NN\"\>", "22", "11"},
-         {"\<\"ProgenyLine2\"\>", "22", "11", "11", "22", "22"},
-         {"\<\"ProgenyLine3\"\>", "22", "11", "11", "22", "22"},
-         {"\<\"ProgenyLine4\"\>", "11", "22", "11", "22", "22"},
-         {"\<\"ProgenyLine5\"\>", "22", "11", "\<\"NN\"\>", "22", "22"},
-         {"\<\"ProgenyLine6\"\>", "\<\"NN\"\>", "22", "22", 
-          "22", "\<\"NN\"\>"},
-         {"\<\"ProgenyLine7\"\>", "11", "\<\"NN\"\>", "11", "22", "22"}
+         {"\<\"Founder1\"\>", "\<\"1|0\"\>", "\<\"0|8\"\>", "\<\"0|2\"\>", \
+"\<\"0|1\"\>", "\<\"1|0\"\>"},
+         {"\<\"Founder2\"\>", "\<\"0|5\"\>", "\<\"4|0\"\>", "\<\"3|0\"\>", \
+"\<\"0|0\"\>", "\<\"0|0\"\>"},
+         {"\<\"Founder3\"\>", "\<\"0|0\"\>", "\<\"0|0\"\>", "\<\"0|0\"\>", \
+"\<\"0|3\"\>", "\<\"0|4\"\>"},
+         {"\<\"Founder4\"\>", "\<\"0|0\"\>", "\<\"0|1\"\>", "\<\"0|0\"\>", \
+"\<\"4|0\"\>", "\<\"0|0\"\>"},
+         {"\<\"ProgenyLine1\"\>", "\<\"0|5\"\>", "\<\"0|0\"\>", \
+"\<\"2|0\"\>", "\<\"0|2\"\>", "\<\"0|3\"\>"},
+         {"\<\"ProgenyLine2\"\>", "\<\"0|3\"\>", "\<\"1|0\"\>", \
+"\<\"2|0\"\>", "\<\"0|0\"\>", "\<\"0|1\"\>"},
+         {"\<\"ProgenyLine3\"\>", "\<\"1|0\"\>", "\<\"0|1\"\>", \
+"\<\"0|0\"\>", "\<\"0|0\"\>", "\<\"0|3\"\>"},
+         {"\<\"ProgenyLine4\"\>", "\<\"0|0\"\>", "\<\"1|0\"\>", \
+"\<\"3|0\"\>", "\<\"3|0\"\>", "\<\"0|0\"\>"},
+         {"\<\"ProgenyLine5\"\>", "\<\"0|2\"\>", "\<\"0|6\"\>", \
+"\<\"2|0\"\>", "\<\"0|2\"\>", "\<\"0|1\"\>"},
+         {"\<\"ProgenyLine6\"\>", "\<\"1|0\"\>", "\<\"0|1\"\>", \
+"\<\"0|1\"\>", "\<\"0|2\"\>", "\<\"0|0\"\>"},
+         {"\<\"ProgenyLine7\"\>", "\<\"2|0\"\>", "\<\"0|2\"\>", \
+"\<\"0|0\"\>", "\<\"0|3\"\>", "\<\"0|4\"\>"}
         },
         GridBoxAlignment->{
          "Columns" -> {{Left}}, "ColumnsIndexed" -> {}, 
@@ -2276,15 +2308,17 @@ shown)\"\>"},
          "marker", "MN1_29291", "MN1_29716", "MN1_112907", "MASC03771", 
           "MN1_197787"}, {"chromosome", 1, 1, 1, 1, 1}, {
          "pos(cM)", 0.14646, 0.14879, 0.56454, 0.87303, 0.98894}, {
-         "Founder1", 1, 2, 2, 2, 1}, {"Founder2", 2, 1, 1, 1, "N"}, {
-         "Founder3", 2, 1, 1, "N", 2}, {"Founder4", 1, "N", "N", 2, 2}, {
-         "ProgenyLine1", 11, 22, "NN", 22, 11}, {
-         "ProgenyLine2", 22, 11, 11, 22, 22}, {
-         "ProgenyLine3", 22, 11, 11, 22, 22}, {
-         "ProgenyLine4", 11, 22, 11, 22, 22}, {
-         "ProgenyLine5", 22, 11, "NN", 22, 22}, {
-         "ProgenyLine6", "NN", 22, 22, 22, "NN"}, {
-         "ProgenyLine7", 11, "NN", 11, 22, 22}}]]}
+         "Founder1", "1|0", "0|8", "0|2", "0|1", "1|0"}, {
+         "Founder2", "0|5", "4|0", "3|0", "0|0", "0|0"}, {
+         "Founder3", "0|0", "0|0", "0|0", "0|3", "0|4"}, {
+         "Founder4", "0|0", "0|1", "0|0", "4|0", "0|0"}, {
+         "ProgenyLine1", "0|5", "0|0", "2|0", "0|2", "0|3"}, {
+         "ProgenyLine2", "0|3", "1|0", "2|0", "0|0", "0|1"}, {
+         "ProgenyLine3", "1|0", "0|1", "0|0", "0|0", "0|3"}, {
+         "ProgenyLine4", "0|0", "1|0", "3|0", "3|0", "0|0"}, {
+         "ProgenyLine5", "0|2", "0|6", "2|0", "0|2", "0|1"}, {
+         "ProgenyLine6", "1|0", "0|1", "0|1", "0|2", "0|0"}, {
+         "ProgenyLine7", "2|0", "0|2", "0|0", "0|3", "0|4"}}]]}
     },
     DefaultBaseStyle->"Column",
     GridBoxAlignment->{"Columns" -> {{Left}}},
@@ -2294,7 +2328,7 @@ shown)\"\>"},
   ImageSize->Automatic]], "Output",
  CellChangeTimes->{{3.7294031983097277`*^9, 3.729403201744728*^9}, 
    3.730091982499754*^9, {3.7318205113458304`*^9, 3.7318205132452106`*^9}, 
-   3.734329341969761*^9},
+   3.734329341969761*^9, 3.7651675148905954`*^9},
  ExpressionUUID -> "ad3bbe10-6045-480e-8c5e-a747eaeac0cb"]
 }, Open  ]],
 
@@ -2302,8 +2336,8 @@ Cell["", "Subsubsection"]
 }, Open  ]]
 }, Open  ]]
 },
-WindowSize->{1680, 998},
-WindowMargins->{{-1689, Automatic}, {22, Automatic}},
+WindowSize->{1920, 980},
+WindowMargins->{{-9, Automatic}, {Automatic, -9}},
 TaggingRules->{"SlideShow" -> True},
 FrontEndVersion->"11.0 for Microsoft Windows (64-bit) (July 28, 2016)",
 StyleDefinitions->FrontEnd`FileName[{"SlideShow"}, "Sapphire.nb", 
@@ -2321,31 +2355,31 @@ CellTagsIndex->{
    CellTags->"SlideShowHeader"],
   Cell[8345, 217, 123, 2, 81, "SlideShowNavigationBar",
    CellTags->"SlideShowHeader"],
-  Cell[16460, 440, 123, 2, 81, "SlideShowNavigationBar",
+  Cell[16724, 446, 123, 2, 81, "SlideShowNavigationBar",
    CellTags->"SlideShowHeader"],
-  Cell[32712, 834, 123, 2, 81, "SlideShowNavigationBar",
+  Cell[33012, 840, 123, 2, 81, "SlideShowNavigationBar",
    CellTags->"SlideShowHeader"],
-  Cell[40069, 1017, 123, 2, 81, "SlideShowNavigationBar",
+  Cell[40417, 1023, 123, 2, 81, "SlideShowNavigationBar",
    CellTags->"SlideShowHeader"],
-  Cell[52705, 1321, 123, 2, 81, "SlideShowNavigationBar",
+  Cell[53077, 1327, 123, 2, 81, "SlideShowNavigationBar",
    CellTags->"SlideShowHeader"],
-  Cell[63790, 1574, 123, 2, 81, "SlideShowNavigationBar",
+  Cell[64260, 1580, 123, 2, 81, "SlideShowNavigationBar",
    CellTags->"SlideShowHeader"],
-  Cell[72873, 1784, 123, 2, 81, "SlideShowNavigationBar",
+  Cell[73534, 1790, 123, 2, 81, "SlideShowNavigationBar",
    CellTags->"SlideShowHeader"]},
- "Info283734336538-5347605"->{
-  Cell[54271, 1356, 249, 5, 54, "Print",
-   CellTags->"Info283734336538-5347605"]},
- "Info343734336539-5769836"->{
-  Cell[64577, 1596, 669, 10, 72, "Print",
-   CellTags->"Info343734336539-5769836"]}
+ "Info283765174710-2342463"->{
+  Cell[54643, 1362, 251, 5, 54, "Print",
+   CellTags->"Info283765174710-2342463"]},
+ "Info343765174710-7685412"->{
+  Cell[65047, 1602, 669, 10, 72, "Print",
+   CellTags->"Info343765174710-7685412"]}
  }
 *)
 (*CellTagsIndex
 CellTagsIndex->{
- {"SlideShowHeader", 96170, 2316},
- {"Info283734336538-5347605", 97013, 2335},
- {"Info343734336539-5769836", 97128, 2338}
+ {"SlideShowHeader", 98446, 2350},
+ {"Info283765174710-2342463", 99289, 2369},
+ {"Info343765174710-7685412", 99404, 2372}
  }
 *)
 (*NotebookFileOutline
@@ -2387,127 +2421,126 @@ Cell[8665, 228, 655, 15, 123, "Text"],
 Cell[CellGroupData[{
 Cell[9345, 247, 1229, 27, 120, "Input",
  InitializationCell->True],
-Cell[10577, 276, 357, 5, 45, "Output"]
+Cell[10577, 276, 388, 5, 45, "Output"]
 }, Open  ]],
-Cell[10949, 284, 244, 4, 59, "Text"],
+Cell[10980, 284, 244, 4, 59, "Text"],
 Cell[CellGroupData[{
-Cell[11218, 292, 326, 6, 61, "Input",
+Cell[11249, 292, 326, 6, 61, "Input",
  InitializationCell->True],
-Cell[11547, 300, 4852, 133, 208, "Print"]
+Cell[11578, 300, 5085, 139, 154, "Print"]
 }, Open  ]]
 }, Open  ]]
 }, Open  ]],
 Cell[CellGroupData[{
-Cell[16460, 440, 123, 2, 81, "SlideShowNavigationBar",
+Cell[16724, 446, 123, 2, 81, "SlideShowNavigationBar",
  CellTags->"SlideShowHeader"],
 Cell[CellGroupData[{
-Cell[16608, 446, 248, 4, 131, "Section"],
-Cell[16859, 452, 431, 6, 59, "Text"],
+Cell[16872, 452, 248, 4, 131, "Section"],
+Cell[17123, 458, 431, 6, 59, "Text"],
 Cell[CellGroupData[{
-Cell[17315, 462, 815, 22, 19, "Input",
+Cell[17579, 468, 815, 22, 24, "Input",
  CellOpen->False],
-Cell[18133, 486, 1285, 35, 97, "Output"]
+Cell[18397, 492, 1309, 35, 97, "Output"]
 }, Open  ]],
 Cell[CellGroupData[{
-Cell[19455, 526, 5992, 161, 19, "Input",
+Cell[19743, 532, 5992, 161, 24, "Input",
  CellOpen->False,
  InitializationCell->True],
-Cell[25450, 689, 7201, 138, 612, "Output"]
+Cell[25738, 695, 7213, 138, 612, "Output"]
 }, Open  ]]
 }, Open  ]]
 }, Open  ]],
 Cell[CellGroupData[{
-Cell[32712, 834, 123, 2, 81, "SlideShowNavigationBar",
+Cell[33012, 840, 123, 2, 81, "SlideShowNavigationBar",
  CellTags->"SlideShowHeader"],
 Cell[CellGroupData[{
-Cell[32860, 840, 126, 1, 131, "Section"],
-Cell[32989, 843, 234, 5, 59, "Text"],
+Cell[33160, 846, 126, 1, 131, "Section"],
+Cell[33289, 849, 234, 5, 59, "Text"],
 Cell[CellGroupData[{
-Cell[33248, 852, 1169, 31, 191, "Input"],
-Cell[34420, 885, 203, 3, 45, "Output"]
+Cell[33548, 858, 1169, 31, 191, "Input"],
+Cell[34720, 891, 227, 3, 45, "Output"]
 }, Open  ]],
 Cell[CellGroupData[{
-Cell[34660, 893, 2462, 61, 19, "Input",
+Cell[34984, 899, 2462, 61, 19, "Input",
  CellOpen->False,
  InitializationCell->True],
-Cell[37125, 956, 2883, 54, 673, "Output"]
+Cell[37449, 962, 2907, 54, 673, "Output"]
 }, Open  ]]
 }, Open  ]]
 }, Open  ]],
 Cell[CellGroupData[{
-Cell[40069, 1017, 123, 2, 81, "SlideShowNavigationBar",
+Cell[40417, 1023, 123, 2, 81, "SlideShowNavigationBar",
  CellTags->"SlideShowHeader"],
 Cell[CellGroupData[{
-Cell[40217, 1023, 328, 4, 131, "Section"],
-Cell[40548, 1029, 381, 6, 91, "Text"],
+Cell[40565, 1029, 328, 4, 131, "Section"],
+Cell[40896, 1035, 381, 6, 59, "Text"],
 Cell[CellGroupData[{
-Cell[40954, 1039, 3502, 81, 207, "Input",
+Cell[41302, 1045, 3502, 81, 207, "Input",
  InitializationCell->True],
-Cell[44459, 1122, 8185, 192, 621, "Output"]
+Cell[44807, 1128, 8209, 192, 621, "Output"]
 }, Open  ]]
 }, Open  ]]
 }, Open  ]],
 Cell[CellGroupData[{
-Cell[52705, 1321, 123, 2, 81, "SlideShowNavigationBar",
+Cell[53077, 1327, 123, 2, 81, "SlideShowNavigationBar",
  CellTags->"SlideShowHeader"],
 Cell[CellGroupData[{
-Cell[52853, 1327, 564, 7, 131, "Section"],
+Cell[53225, 1333, 564, 7, 131, "Section"],
 Cell[CellGroupData[{
-Cell[53442, 1338, 826, 16, 120, "Input",
+Cell[53814, 1344, 826, 16, 120, "Input",
  InitializationCell->True],
-Cell[54271, 1356, 249, 5, 54, "Print",
- CellTags->"Info283734336538-5347605"],
-Cell[54523, 1363, 603, 13, 45, "Output"],
-Cell[55129, 1378, 289, 4, 45, "Output"]
+Cell[54643, 1362, 251, 5, 54, "Print",
+ CellTags->"Info283765174710-2342463"],
+Cell[54897, 1369, 627, 13, 45, "Output"],
+Cell[55527, 1384, 311, 4, 45, "Output"]
 }, Open  ]],
 Cell[CellGroupData[{
-Cell[55455, 1387, 859, 19, 120, "Input",
+Cell[55875, 1393, 859, 19, 120, "Input",
  InitializationCell->True],
-Cell[56317, 1408, 4729, 107, 339, "Output"],
-Cell[61049, 1517, 2680, 50, 1074, "Output"]
+Cell[56737, 1414, 4753, 107, 339, "Output"],
+Cell[61493, 1523, 2706, 50, 1074, "Output"]
 }, Open  ]]
 }, Open  ]]
 }, Open  ]],
 Cell[CellGroupData[{
-Cell[63790, 1574, 123, 2, 81, "SlideShowNavigationBar",
+Cell[64260, 1580, 123, 2, 81, "SlideShowNavigationBar",
  CellTags->"SlideShowHeader"],
 Cell[CellGroupData[{
-Cell[63938, 1580, 265, 4, 131, "Section"],
+Cell[64408, 1586, 265, 4, 131, "Section"],
 Cell[CellGroupData[{
-Cell[64228, 1588, 346, 6, 91, "Input",
+Cell[64698, 1594, 346, 6, 91, "Input",
  InitializationCell->True],
-Cell[64577, 1596, 669, 10, 72, "Print",
- CellTags->"Info343734336539-5769836"],
-Cell[65249, 1608, 1130, 21, 133, "Output"]
+Cell[65047, 1602, 669, 10, 72, "Print",
+ CellTags->"Info343765174710-7685412"],
+Cell[65719, 1614, 1154, 21, 104, "Output"]
 }, Open  ]],
 Cell[CellGroupData[{
-Cell[66416, 1634, 1499, 32, 120, "Input",
+Cell[66910, 1640, 1499, 32, 120, "Input",
  InitializationCell->True],
 Cell[CellGroupData[{
-Cell[67940, 1670, 485, 9, 44, "Print"],
-Cell[68428, 1681, 350, 5, 44, "Print"],
-Cell[68781, 1688, 352, 5, 44, "Print"],
-Cell[69136, 1695, 352, 5, 44, "Print"],
-Cell[69491, 1702, 491, 10, 44, "Print"],
-Cell[69985, 1714, 491, 10, 44, "Print"],
-Cell[70479, 1726, 1644, 35, 148, "Print"],
-Cell[72126, 1763, 674, 13, 44, "Print"]
+Cell[68434, 1676, 511, 9, 44, "Print"],
+Cell[68948, 1687, 374, 5, 44, "Print"],
+Cell[69325, 1694, 376, 5, 44, "Print"],
+Cell[69704, 1701, 376, 5, 44, "Print"],
+Cell[70083, 1708, 513, 10, 44, "Print"],
+Cell[70599, 1720, 517, 10, 44, "Print"],
+Cell[71119, 1732, 1672, 35, 148, "Print"],
+Cell[72794, 1769, 667, 13, 44, "Print"]
 }, Open  ]]
 }, Open  ]]
 }, Open  ]]
 }, Open  ]],
 Cell[CellGroupData[{
-Cell[72873, 1784, 123, 2, 81, "SlideShowNavigationBar",
+Cell[73534, 1790, 123, 2, 81, "SlideShowNavigationBar",
  CellTags->"SlideShowHeader"],
 Cell[CellGroupData[{
-Cell[73021, 1790, 155, 2, 131, "Section"],
+Cell[73682, 1796, 155, 2, 131, "Section"],
 Cell[CellGroupData[{
-Cell[73201, 1796, 3049, 68, 24, "Input",
- CellOpen->False,
+Cell[73862, 1802, 3031, 67, 236, "Input",
  InitializationCell->True],
-Cell[76253, 1866, 19441, 431, 538, "Output"]
+Cell[76896, 1871, 21077, 460, 538, "Output"]
 }, Open  ]],
-Cell[95709, 2300, 25, 0, 71, "Subsubsection"]
+Cell[97988, 2334, 25, 0, 51, "Subsubsection"]
 }, Open  ]]
 }, Open  ]]
 }

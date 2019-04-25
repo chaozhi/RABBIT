@@ -40,6 +40,8 @@ simPedigreeInfor::usage = "simPedigreeInfor[pedigree] returns pedigreeInfor with
 
 expandPedigreeInfor::usage = "expandPedigreeInfor returns a single large pedigree by combining pedgree and sampleInfor. "
 
+setNAMpedinfo::usage = "setNAMpedinfo [families,nself] returns pedinfor, where families is a list of {{commonparent,parent},{offspring1, ofspring2,..}} for each family."
+
 Begin["`Private`"]
 (* Implementation of the package *)
 
@@ -76,7 +78,7 @@ expandPedigreeInfor[pedigreeinfor_] :=
     ]    
     
 splitPedigreeInfor[pedigreeInfor_] :=
-    Module[ {key,infor,description,pedigree, sampleInfor,nFounder,founders},
+    Module[ {key,infor,description,pedigree, sampleInfor},
         key = pedigreeInfor[[1, 1]];
         infor = Partition[Split[pedigreeInfor, #1[[1]] != key && #2[[1]] != key &], 2];
         description = infor[[All,1]];
@@ -85,13 +87,14 @@ splitPedigreeInfor[pedigreeInfor_] :=
         pedigree = Join[pedigree[[All, ;; -3]], Transpose[{pedigree[[All, -2 ;;]]}], 2];
         sampleInfor[[2 ;;, -1]] = ToString[#] & /@ sampleInfor[[2 ;;, -1]];
         sampleInfor[[2 ;;, -1]] = StringSplit[#, "-"] & /@ sampleInfor[[2 ;;, -1]];
-        nFounder = Count[pedigree[[2 ;;, -1]], {0, 0}];
-        founders = Map[ToString,pedigree[[2 ;; nFounder + 1, 2]]];
+        sampleInfor[[2 ;;, -1]] = ToExpression[sampleInfor[[2 ;;, -1]]];
+        (*nFounder = Count[pedigree[[2 ;;, -1]], {0, 0}];
+        founders = Map[ToString,pedigree[[2 ;; nFounder + 1, 2]]];*)
         (*If[ ! (And @@ Union[sameSetQ[founders, #] & /@ sampleInfor[[2 ;;, -1]]]),
             Print["splitPedigreeInfor: inconsistent founder IDs between pedigree and funnelcode of pedigreeInfor!"];
             Abort[]
         ];*)
-        sampleInfor[[2 ;;, -1]] = sampleInfor[[2 ;;, -1]] /. Thread[founders -> Range[nFounder]];
+        (*sampleInfor[[2 ;;, -1]] = sampleInfor[[2 ;;, -1]] /. Thread[founders -> Range[nFounder]];*)
         {description, pedigree, sampleInfor}
     ]
 
@@ -591,6 +594,28 @@ toOutbredFounder[founderHaplo_] :=
         fhaplo[[posMale, posX]] = Map[StringTake[#, 1] &, fhaplo[[posMale, posX]], {2}];
         fhaplo
     ]
+    
+setNAMpedinfo[families_, nself_] := 
+ Module[{ped, rule, nfam, founders, funnel, popsize, sample,i,g},
+  ped = {{"Generation", "MemberID", 
+     "Female=1/Male=2/Hermaphrodite=0", {"MotherID", "FatherID"}}};
+  nfam = Length[families];
+  ped = Join[ped, Table[{0, i, 0, {0, 0}}, {i, nfam + 1}]];
+  ped = Join[ped, Table[{1, nfam + 1 + i, 0, {1, i + 1}}, {i, nfam}]];
+  ped = Join[ped, Flatten[Table[Table[{g, g*nfam + 1 + i, 
+        0, {(g - 1)*nfam + 1 + i, (g - 1)*nfam + 1 + i}}, {i,nfam}], {g, 2, nself + 1}], 1]];
+  founders = Join[{families[[1, 1, 1]]}, families[[All, 1, 2]]];
+  rule = Dispatch[Thread[Range[1, nfam + 1] -> founders]];
+  ped[[2 ;;, {2, 4}]] = ped[[2 ;;, {2, 4}]] /. rule;
+  funnel = Range[nfam + 1];
+  popsize = Length[#] & /@ families[[All, 2]];
+  sample = Flatten[Table[{0, ped[[-nfam - 1 + i, 2]], funnel}, {i, 
+      Length[popsize]}, {popsize[[i]]}], 1];
+  sample[[All, 1]] = Flatten[families[[All, 2]]];
+  sample = Join[{{"ProgenyID", "MemberID", "Funnelcode"}}, sample];
+  mergePedigreeInfor[ped, sample]
+  ]
+      
       
 End[]
 

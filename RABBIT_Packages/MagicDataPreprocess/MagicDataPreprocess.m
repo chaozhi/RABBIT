@@ -69,6 +69,8 @@ genoofVCF::usage = "genoofVCF  "
 
 genotoMagicSNP::usage = "genotoMagicSNP  "
 
+toMagicCoding::usage = "toMagicCoding[magicsnp, missingcode, genoseperator] tranforms allele coding from A/T/G/C to 1/2/N with 1 being  the major allele"
+
 
 (* Exported symbols added here with SymbolName::usage *)  
 
@@ -127,7 +129,11 @@ checkfounderSNP[magicSNP_,isfounderinbred_] :=
         ]};
         MapThread[
         If[ !SubsetQ[#1,#2],
-            Print["The possible alleles of founder genotypes must be ",#[[1]],"; the alleles ", Complement[#2,#1], " are not allowed!"];
+        	(*file=FileNameJoin[{Directory[], "tempcheck.txt"}];
+        	Put[magicSNP,isfounderinbred,file];
+        	Print["here!file=",file];*)        	
+            Print["The possible alleles of founder genotypes must be ",#1,"; the alleles ", Complement[#2,#1], " are not allowed!"];            
+            Abort[];
             res = False
         ]&,{set,ls}];
         res
@@ -248,7 +254,7 @@ jittersnp[snploc_] :=
             Print["jittersnp: there exist remaining overlapped SNPs! gsnp = ",gsnp];
             Put[snploc,gsnp,"temp.txt"];
             Abort[];
-            (*Abort[]*)
+        (*Abort[]*)
         ];
         gsnp
     ]
@@ -442,15 +448,15 @@ Options[vcftoMagicSNP] = {
     }
     
 vcftoMagicSNP[vcffile_String?FileExistsQ,genoformat:"GT"|"AD"|"GP", founders_,OptionsPattern[]] :=
-    Module[ {recomrate,isfounderinbred,outputid,outputfile,res,depth,founders2=founders},
+    Module[ {recomrate,isfounderinbred,outputid,outputfile,res,depth,founders2 = founders},
         {recomrate,isfounderinbred,outputid} = OptionValue[{recombinationRate,isFounderInbred,outputFileID}];
         If[ outputid=!="",
             outputfile = outputid<>"_"<>genoformat <> ".csv",
             outputfile = "vcftoMagicSNP_"<>genoformat <> ".csv";
         ];
         depth = genoofVCF[vcffile,genoformat];
-        If[Head[founders2]===Integer&&founders2>=1,
-        	founders2=depth[[4 ;; 3 + founders2, 1]]
+        If[ Head[founders2]===Integer&&founders2>=1,
+            founders2 = depth[[4 ;; 3 + founders2, 1]]
         ];
         res = genotoMagicSNP[depth, recomrate,founders2,isfounderinbred&&genoformat==="GT",outputfile];
         res
@@ -697,7 +703,7 @@ magicSNPtoLBImpute[magicadfile_String?FileExistsQ,OptionsPattern[]] :=
     ]
     
 magicSNPtompMap[inputmagicsnp_, outputid_String,chrset_:All,snpset_:All] :=
-    Module[ {magicsnp=inputmagicsnp, nfounder, rule, mapdata, founderdata, offdata, outputid2 = outputid},        
+    Module[ {magicsnp = inputmagicsnp, nfounder, rule, mapdata, founderdata, offdata, outputid2 = outputid},
         If[ StringQ[magicsnp],
             If[ FileExistsQ[magicsnp],
                 magicsnp = Import[magicsnp,"CSV"],
@@ -1010,6 +1016,42 @@ getJoinMapCPInput[jointmapinputfile_?FileExistsQ] :=
                                         "ll" -> "11", "lm" -> "12", "nn" -> "11","np" -> "12"};
         data = Insert[data, Table["NA", {Length[data[[1]]]}], {{2}, {2}}];
         Join[{{"nfounder", 2}},Join[List /@ Join[{"marker", "chromosome", "cM", "P1", "P2"}, indid], data, 2]]
+    ]    
+    
+toMagicCoding[magicsnp_, missingcode_, genoseperator_] :=
+    Module[ {i, ls, rule, temp, pos, rule2, magicsnp2, nfounder},
+        ls = Transpose[magicsnp[[5 ;;, 2 ;;]]];
+        ls = Replace[ls, {missingcode -> "NN"}, {2}];
+        ls = StringDelete[#, genoseperator] & /@ ls;
+        Monitor[rule = Table[
+           temp = StringSplit[DeleteCases[ls[[i]], "NN"], ""];
+           temp = Tally[Flatten[temp]];
+           temp[[All, 2]] = N[Normalize[temp[[All, 2]], Total]];
+           Sort[temp, #1[[2]] >= #2[[2]] &], {i, Length[ls]}], 
+         ProgressIndicator[i, {1, Length[ls]}]];
+        pos = Flatten[Position[Length[#] & /@ rule, _?(# >= 3 &)]];
+        If[ pos =!= {},
+            temp = Prepend[Transpose[
+               Join[magicsnp[[2 ;; 3, pos + 1]], Transpose[rule[[pos]]]]], 
+              Join[magicsnp[[2 ;; 3, 1]], {"allele frequency"}]];
+            Print["The third or thourth less frequent alleles are set to be missing!\n\t", temp // TableForm];
+        ];
+        rule2 = Thread[# -> Range[Length[#]]] & /@ rule[[All, All, 1]];
+        rule2[[All, All, 2]] = rule2[[All, All, 2]] /. Thread[Range[3, Max[rule2[[All, All, 2]]]] -> "N"];
+        rule2[[All, All, 2]] = rule2[[All, All, 2]] /. {1 -> "1", 2 -> "2"};
+        rule2 = Dispatch[#] & /@ rule2;
+        Monitor[Do[
+          If[ Mod[i, 1000] == 0,
+              PrintTemporary["i=", i, " out of ", Length[ls], ". ", DateString[]]
+          ];
+          ls[[i]] = StringJoin @@ # & /@Replace[StringSplit[ls[[i]], ""], rule2[[i]], {2}], {i,Length[ls]}], ProgressIndicator[i, {1, Length[ls]}]];
+        ls = Transpose[ls];
+        magicsnp2 = magicsnp;
+        nfounder = magicsnp2[[1, 2]];
+        ls[[;;nfounder]] = ls[[;;nfounder]] /. {"NN" -> "N","11"|"1N"|"N1"->"1","22"|"2N"|"N2"->"2"};
+        ls[[nfounder + 1 ;;]] = ls[[nfounder + 1 ;;]] /. {"1" -> "11", "2" -> "22", "N" -> "NN"};
+        magicsnp2[[5 ;;, 2 ;;]] = ls;
+        magicsnp2
     ]    
 
 (***************************************************************************************************************)
