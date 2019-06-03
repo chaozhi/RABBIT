@@ -43,6 +43,8 @@ isPlotGenoProb::usage = "isPlotGenoProb is an option to specify whether to plot 
 
 plotCondProb::usage = "plotCondProb  "
 
+plotAncestryProb::usage = "plotAncestryProb  "
+
 
 Begin["`Private`"]
 (* Implementation of the package *)
@@ -588,7 +590,8 @@ calAddKinship[haploprobfile_String?FileExistsQ, ibdprobfile_String?FileExistsQ, 
         csvExport[outputkinshipfile,kinship];
     ]  
 
-Options[plotAncestryProbGUI] = Join[{isPlotGenoProb -> Automatic,linkageGroupSet->All},Options[ListPlot],Options[ListAnimate]];
+Options[plotAncestryProb] = Join[{isPlotGenoProb -> Automatic,linkageGroupSet->All},Options[ListPlot]]
+Options[plotAncestryProbGUI] = Join[Options[plotAncestryProb],Options[ListAnimate]];
 
 plotAncestryProbGUI[summaryfile_String?FileExistsQ, opts : OptionsPattern[]] :=
     plotAncestryProbGUI[summaryfile,None,opts]
@@ -599,7 +602,7 @@ getchrsetdata[data_, chrset_] :=
         Rest[getsubMagicSNP[Join[{{None, None}}, data], chrset, All]]
     ]
 
-plothaploprob[condprob_, truefgldiplo_] :=
+plothaploprob[condprob_, truefgldiplo_,offspringls_,opts_] :=
     Module[ {diplorule, nfounder, offprob, truegeno, gg, label,line,ls,g1, g2,g3},        
         If[ truefgldiplo =!= None,
         	nfounder = truefgldiplo[[1, 2]];
@@ -609,7 +612,7 @@ plothaploprob[condprob_, truefgldiplo_] :=
         ];
         gg = Table[
           offprob = condprob[[line]];
-          label = "Offspring " <> ToString[line] <>". GrayLevel=Posterior Probability, ";
+          label = "Offspring " <> ToString[line]<>": "<>ToString[offspringls[[line]]] <>". GrayLevel=Probability, ";
               If[ truefgldiplo =!= None,
                   label = label <>"\!\(\*
 					StyleBox[\"red\",\nFontColor->RGBColor[1, 0, 0]]\)\!\(\*
@@ -619,7 +622,7 @@ plothaploprob[condprob_, truefgldiplo_] :=
 					StyleBox[\" \",\nFontColor->RGBColor[0, 0, 1]]\)\!\(\*
 					StyleBox[\"O\",\nFontColor->RGBColor[0, 0, 1]]\)\!\(\*
 					StyleBox[\" \",\nFontColor->RGBColor[0, 0, 1]]\)=true non-IBD genotype.",
-                  label = label <> "certical line=chromosome boundary.";
+                  label = label <> "vertical line=Chr boundary.";
               ];
           g1 = MatrixPlot[Reverse[offprob], FrameLabel -> {"Haplotype", "SNP index"}, 
             ColorFunctionScaling -> False, MaxPlotPoints -> Infinity, 
@@ -641,12 +644,12 @@ plothaploprob[condprob_, truefgldiplo_] :=
           	gg={g1,g2,g3},
           	gg={g1,g2}
           ];
-          Show[Sequence@@gg,ImageSize -> 1000, Frame -> True, PlotLabel -> label, 
+          Show[Sequence@@gg,opts,ImageSize -> 1000, Frame -> True, PlotLabel -> label, 
            LabelStyle -> Directive[FontSize -> 14, Black, FontFamily -> "Helvetica"]], {line, Length[condprob]}];
         gg
     ]
     
-plotgenoprob[condprob_, truefgldiplo_] :=
+plotgenoprob[condprob_, truefgldiplo_,offspringls_,opts_] :=
     Module[ {nfounder, types, truegeno, gg, offprob,label, line,g1, g2, g3},
         If[ truefgldiplo =!= None,
         	nfounder = truefgldiplo[[1, 2]];
@@ -655,10 +658,10 @@ plotgenoprob[condprob_, truefgldiplo_] :=
         ];
         gg = Table[
           offprob = condprob[[line]];
-          label = "Offspring " <> ToString[line] <>". GrayLevel=posterior probability, ";
+          label = "Offspring " <> ToString[line]<>": "<>ToString[offspringls[[line]]] <>". GrayLevel=Probability, ";
           If[ truefgldiplo =!= None,
               label = label <> "red X =true genotype.",
-              label = label <> "vertical line=chromosome boundary.";
+              label = label <> "vertical line=Chr boundary.";
           ];
           g1 = MatrixPlot[Reverse[offprob], FrameLabel -> {"Genotype", "SNP index"}, 
             ColorFunctionScaling -> False, MaxPlotPoints -> Infinity, 
@@ -676,16 +679,16 @@ plotgenoprob[condprob_, truefgldiplo_] :=
           	gg={g1,g2,g3},
           	gg={g1,g2}
           ];
-          Show[Sequence@@gg, FrameTicks -> {{Transpose[{Range[Length[types[[1, 1]]]], types[[1, 1]]}], None}, {Automatic, None}}, 
+          Show[Sequence@@gg, opts,FrameTicks -> {{Transpose[{Range[Length[types[[1, 1]]]], types[[1, 1]]}], None}, {Automatic, None}}, 
            ImageSize -> 1000, Frame -> True, PlotLabel -> label, 
            LabelStyle -> Directive[FontSize -> 14, Black, FontFamily -> "Helvetica"]], {line, Length[condprob]}];
         gg
     ]
     
-plotAncestryProbGUI[summaryfile_String?FileExistsQ, inputtruefgldiplo_?(ListQ[#] ||StringQ[#]||#===None&),
+plotAncestryProb[summaryfile_String?FileExistsQ, inputtruefgldiplo_?(ListQ[#] ||StringQ[#]||#===None&),
 	opts : OptionsPattern[]] :=
     Module[ {summary, nfounder, nfgl,noffspring, truefgldiplo = inputtruefgldiplo, 
-      isgeno,chrsubset, gg, pos, condprob, types, line,isfounderinbred},
+      isgeno,chrsubset, gg, pos, condprob, types, line,isfounderinbred,offspringls},
         {isgeno,chrsubset} = OptionValue@{isPlotGenoProb,linkageGroupSet};        
         If[truefgldiplo=!=None,
 	        If[ StringQ[truefgldiplo],
@@ -701,16 +704,19 @@ plotAncestryProbGUI[summaryfile_String?FileExistsQ, inputtruefgldiplo_?(ListQ[#]
         summary = getSummaryMR[summaryfile];
         (*{"Genetic map and founder hapolotypes", "Conditonal genotype probability", 
         "Conditonal haplotype probability", "Conditonal IBD probability"}*)
-        summary[[{2, 5, 7, 8}]] = getchrsetdata[#, chrsubset] & /@ summary[[{2, 5, 7, 8}]];
-        If[ isgeno === Automatic,
-            isgeno = ! MatchQ[summary[[5, 1, 1]], "None" | None]
-        ];
+        If[isgeno === Automatic, isgeno = ! MatchQ[summary[[5, 1, 1]], "None" | None]];
         If[ MatchQ[summary[[5, 1, 1]], "None" | None] && TrueQ[isgeno],
             Print["Genotype probabilities do not exist!"];
             Return[$Failed]
         ];
+        If[isgeno,
+    		summary[[{2, 5, 7, 8}]] =getchrsetdata[#, chrsubset] & /@ summary[[{2, 5, 7, 8}]],
+    		summary[[{2, 7}]] =getchrsetdata[#, chrsubset] & /@ summary[[{2, 7}]]
+    	];
         nfounder = Length[summary[[6, 2 ;;, 2]]];
-        noffspring = (Length[summary[[7]]] - 3)/nfounder;
+        (*noffspring = (Length[summary[[7]]] - 3)/nfounder;*)
+        offspringls = StringDelete[summary[[7]][[4 ;; ;; nfounder, 1]], "_haplotype1"];
+        noffspring = Length[offspringls];
         (*to infer isfounderinbred from truefgl*)    
         isfounderinbred = True;        
         nfgl = nfounder(1 + Boole[! isfounderinbred]); 
@@ -726,15 +732,21 @@ plotAncestryProbGUI[summaryfile_String?FileExistsQ, inputtruefgldiplo_?(ListQ[#]
         ];
         If[ isgeno,
         	(*genoprob*)        	
-        	gg = plotgenoprob[condprob, truefgldiplo],
+        	gg = plotgenoprob[condprob, truefgldiplo,offspringls,FilterRules[{opts}, Options[ListPlot]]],
         	(*haploprob*)
-        	gg = plothaploprob[condprob, truefgldiplo];
-        ];
-         
-        ListAnimate[gg, Sequence @@ FilterRules[{opts}, Options[ListAnimate]], 
-         AnimationRunning -> True, AnimationDirection -> ForwardBackward, DefaultDuration -> 2 noffspring]
+        	gg = plothaploprob[condprob, truefgldiplo,offspringls,FilterRules[{opts}, Options[ListPlot]]];
+        ];         
+        gg
     ]
 
+plotAncestryProbGUI[summaryfile_String?FileExistsQ, truefgldiplo_?(ListQ[#] ||StringQ[#]||#===None&),
+	opts : OptionsPattern[]] :=
+    Module[ {gg},
+        gg = plotAncestryProb[summaryfile,truefgldiplo,FilterRules[{opts}, Options[plotAncestryProb]]];      
+        ListAnimate[gg, Sequence @@ FilterRules[{opts}, Options[ListAnimate]], 
+         AnimationRunning -> True, AnimationDirection -> ForwardBackward, DefaultDuration -> 2 Length[gg]]
+    ]
+    
 Options[plotCondProb] = Join[{linkageGroupSet->All},Options[ListPlot],Options[ListAnimate]];
 
 plotCondProb[probfile_String?FileExistsQ, opts : OptionsPattern[]] :=

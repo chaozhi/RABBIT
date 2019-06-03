@@ -162,7 +162,7 @@ parallelbincalled[snpgeno_, snpidls_, outputfile_] :=
         filels = FileNameJoin[{Directory[], #}] & /@ filels;
         countls = Range[nsnp - 1, 1, -1];
         countls = Total[countls[[#]]] & /@ spanls;
-        SetSharedVariable[count];
+        SetSharedVariable[count,countls,spanls,filels];        
         count = 0;
         Monitor[ParallelDo[
           bincalled[snpgeno, snpidls, spanls[[i]], filels[[i]]];

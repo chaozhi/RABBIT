@@ -190,7 +190,7 @@ myParallelNeeds[contextlist_List, OptionsPattern[]] :=
         path = DeleteDuplicates[Join[Flatten[{path}],{Directory[]}]];
         $Path = DeleteDuplicates[Join[$Path, path]];
         ParallelEvaluate[$Path = DeleteDuplicates[Join[$Path, path]]];
-        ParallelNeeds[#] & /@ contextlist;
+        ParallelNeeds[#] & /@ contextlist;        
     ]    
 
 

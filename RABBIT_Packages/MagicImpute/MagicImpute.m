@@ -45,8 +45,9 @@ calPosteriorProb[prob_, priorhaploweight_] :=
         (*origscale = Total[prob, {3}];*)
         origprob = prob/origscale;
         phaseprob = Total[Log[origscale], {2}] + Log[priorhaploweight];
-        phaseprob = Exp[phaseprob - Max[phaseprob]];
-        phaseprob = Normalize[phaseprob, Total];
+        phaseprob -= Max[phaseprob];
+        (*phaseprob = Replace[phaseprob-Max[phaseprob], x_ /; x < -50 -> -Infinity, {1}];*)
+        phaseprob = Normalize[Exp[phaseprob], Total];
         {phaseprob, origprob}
     ]      
         
@@ -110,7 +111,9 @@ parentBackwardMaximize[fwphaseprob_, fworigprob_,isdepModel_,ismaleX_,samplelabe
               ls = Normal[ls # & /@ fworigprob[[t]]];
               weight = Log[Total[ls, {3}]];
               weight = Log[fwphaseprob[[t]]] + Total[weight, {2}];
-              phaseprob[[t]] =  Normalize[Exp[weight - Max[weight]],Total];
+              weight -= Max[weight];
+              (*weight = Replace[weight-Max[weight], x_ /; x < -50 -> -Infinity, {1}];*)
+              phaseprob[[t]] =  Normalize[Exp[weight],Total];
               fphase[[t]] = posMax[phaseprob[[t]]];
               orig[[t]] = Table[posMax[ls[[fphase[[t]], ind]]], {ind, noffspring}];
               0, {t, nseq - 1, tmin, -1}], ProgressIndicator[t, {1, nseq - 1}]];

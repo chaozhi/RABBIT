@@ -567,7 +567,7 @@ pedigreePlot[pedigree_, opts : OptionsPattern[]] :=
         xyls = Flatten[xyls, 1];
         xyls = Thread[ped[[2 ;;, 2]] -> xyls];
         LayeredGraphPlot[data, Join[Evaluate[FilterRules[{opts}, Options[LayeredGraphPlot]]],
-            {VertexLabeling -> True, DirectedEdges -> True,VertexCoordinateRules -> xyls,
+            {VertexLabeling->False,DirectedEdges -> True,VertexCoordinateRules -> xyls,
              VertexRenderingFunction -> ({LightYellow,Opacity[0.5], EdgeForm[Red],
              If[ ped[[Position[ped[[2 ;;, 2]], #2][[1, 1]] + 1, 3]]==2,
                  Rectangle[# - .2, # + .2],
