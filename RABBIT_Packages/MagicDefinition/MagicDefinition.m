@@ -41,7 +41,7 @@ intervalIndexFunction::usage = "intervalIndexFunction[list] is a function for se
 
 maxIndexPair::usage = "maxIndexPair[list] returns {max,indices of max} for each element at the second-to-last level of the list, where indices is a list since max may occur multiple times."
 
-toDelimitedString::usage = "toPipeDelimitedString[list,delimiter] first transforms into string for each element at the last level, then tranforms into delimited-string for eacb element at the second-to-last level of the list. By default, delimiter=\"|\"."
+toDelimitedString::usage = "toDelimitedString[list,delimiter] first transforms into string for each element at the last level, then tranforms into delimited-string for eacb element at the second-to-last level of the list. By default, delimiter=\"|\"."
 
 csvExport::usage = "csvExport[file,table] exports table into comma-delimited file, where the depth of table must be 3. Note loss of precision for numeric number."
 

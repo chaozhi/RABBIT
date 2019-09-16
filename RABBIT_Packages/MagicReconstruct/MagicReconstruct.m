@@ -74,7 +74,7 @@ magicReconstruct[inputmagicSNP_?(ListQ[#] ||StringQ[#]&),model_String,inputpopDe
     Module[ {magicSNP = inputmagicSNP, popDesign = inputpopDesign,isfounderdepth = False,epsF,eps,isfounderinbred,sampleLabel,sampleMarkovProcess, 
         outputfile,outputid,algorithmname,samplesize, outputsmooth,isprint,isoffspringdepth,minphredscore,starttime,deltd, 
         nFounder,nFgl,posA,posX,foundergender,offspringgender,founderid,sampleid, snpMap,haploMap,outstream, founderHaplo, 
-        derivedGeno,obsGeno, res,ind, diplotypes,haplotodiplo,printstep,weights,clusters,clusterhaploMap},
+        derivedGeno,obsGeno, res,ind, diplotypes,haplotodiplo,printstep,weights,clusters,clusterhaploMap,delay},
         {epsF,eps} = OptionValue@{founderAllelicError,offspringAllelicError};
         {isoffspringdepth,minphredscore} = OptionValue[Thread[sequenceDataOption -> {isOffspringAllelicDepth,minPhredQualScore}]];
         {isfounderinbred,algorithmname, samplesize,outputsmooth,outputid,isprint} = OptionValue@{
@@ -136,6 +136,7 @@ magicReconstruct[inputmagicSNP_?(ListQ[#] ||StringQ[#]&),model_String,inputpopDe
         printstep = 10^Max[0, IntegerLength[Length[sampleid]] - 2];
         (*derivedGeno dimensions {nchr,nsnp,ngenotype,nfounder}*)
         derivedGeno = getDerivedGenotype[founderHaplo, ToLowerCase[model]==="depmodel",True];
+        delay = If[isprint,0,10^6.];
         Monitor[Do[
              If[ isprint&&Mod[ind,printstep]==0,
                  PrintTemporary["Time elapsed = "<>ToString[Round[SessionTime[] - starttime,0.1]]<>" Seconds. \tStart analyzing "<>sampleid[[ind]]<>"--"<>ToString[ind]<>"th of "<>ToString[Length[obsGeno]]];
@@ -144,7 +145,7 @@ magicReconstruct[inputmagicSNP_?(ListQ[#] ||StringQ[#]&),model_String,inputpopDe
                                         sampleLabel,sampleMarkovProcess,clusters,weights,haplotodiplo,diplotypes,
                                         isoffspringdepth,algorithmname,outputsmooth,samplesize];
              Write[outstream,res], {ind, Length[obsGeno]}];
-                0, ProgressIndicator[ind, {1, Length[obsGeno]}]];
+             0, ProgressIndicator[ind, {1, Length[obsGeno]}],delay];
         Close[outstream];
         If[ isprint,
             Print["Done! Finished date =",DateString[], ". \tTime elapsed = ", Round[SessionTime[] - starttime,0.1], " Seconds."];
@@ -650,10 +651,11 @@ plothaploprob[condprob_, truefgldiplo_,offspringls_,opts_] :=
     ]
     
 plotgenoprob[condprob_, truefgldiplo_,offspringls_,opts_] :=
-    Module[ {nfounder, types, truegeno, gg, offprob,label, line,g1, g2, g3},
+    Module[ {nfounder, x,types, truegeno, gg, offprob,label, line,g1, g2, g3},
+    	nfounder = x /. Flatten[Solve[x (x + 1)/2 == Dimensions[condprob][[2]] && x > 0, x]];
+    	types = origGenotype[nfounder];
         If[ truefgldiplo =!= None,
-        	nfounder = truefgldiplo[[1, 2]];
-        	types = origGenotype[nfounder];
+        	If[nfounder == truefgldiplo[[1, 2]],Print["plotgenoprob: inconsistent nfounder"]];        	
             truegeno = truefgldiplo[[nfounder + 5 ;;, 2 ;;]] /.Thread[Range[Length[types[[2, 2]]]] -> types[[2, 2]]];
         ];
         gg = Table[
@@ -678,8 +680,8 @@ plotgenoprob[condprob_, truefgldiplo_,offspringls_,opts_] :=
             PlotStyle -> Directive[Dashed, Thick, Brown]];
           	gg={g1,g2,g3},
           	gg={g1,g2}
-          ];
-          Show[Sequence@@gg, opts,FrameTicks -> {{Transpose[{Range[Length[types[[1, 1]]]], types[[1, 1]]}], None}, {Automatic, None}}, 
+          ];          
+          Show[Sequence@@gg, opts,FrameTicks -> {{Transpose[{Range[Length[types[[1, 1]]]], types[[1, 1]]}], None}, {Automatic, None}},
            ImageSize -> 1000, Frame -> True, PlotLabel -> label, 
            LabelStyle -> Directive[FontSize -> 14, Black, FontFamily -> "Helvetica"]], {line, Length[condprob]}];
         gg
@@ -721,7 +723,8 @@ plotAncestryProb[summaryfile_String?FileExistsQ, inputtruefgldiplo_?(ListQ[#] ||
         isfounderinbred = True;        
         nfgl = nfounder(1 + Boole[! isfounderinbred]); 
         If[ isgeno,
-        	(*genoprob*)
+        	(*genoprob*)        	
+        	types = origGenotype[nfounder];        	
         	condprob = Table[
         		pos = Span @@ {4 + Length[types[[1, 1]]] (line - 1), 3 + Length[types[[1, 1]]] line};
         		summary[[5, pos, 2 ;;]], {line, noffspring}],        	
@@ -729,7 +732,7 @@ plotAncestryProb[summaryfile_String?FileExistsQ, inputtruefgldiplo_?(ListQ[#] ||
         	condprob = Table[
         		pos = Span @@ {4 + nfgl (line - 1), 3 + nfgl line};
         		summary[[7, pos, 2 ;;]], {line, noffspring}];        	
-        ];
+        ];        
         If[ isgeno,
         	(*genoprob*)        	
         	gg = plotgenoprob[condprob, truefgldiplo,offspringls,FilterRules[{opts}, Options[ListPlot]]],

@@ -139,7 +139,7 @@ simPedigreeInfor[pedigree_List, OptionsPattern[]] :=
         	pos = Sort[RandomSample[pos, samplesize]],
         	pos = RandomChoice[pos, samplesize];
         ];
-        memberlist = pedigree[[pos, 2]];
+        memberlist = Sort[pedigree[[pos, 2]]];
         (*funnelcode = Table[RandomSample[Range[nFounder]], {samplesize}];*)
         (*funnelcode = (SplitBy[SortBy[Transpose[{Range[nFounder], pedigree[[2 ;; nFounder + 1, 3]]}], Last], Last])[[All, All, 1]];
         funnelcode = Table[Flatten[RandomSample[#] & /@ funnelcode], {samplesize}][[All, Flatten[funnelcode]]],*)
@@ -433,6 +433,8 @@ magicGeneDropping[inputfounderHaplo_?(ListQ[#]||StringQ[#]&), inputpedigreeInfor
             founderHaplo = Take[founderHaplo, 3 + nFounder (1 + Boole[! isfounderinbred])];
             If[ !isfounderinbred,
                 founderHaplo = toOutbredFounder[founderHaplo];
+                founderHaplo[[4 ;;, 1]] =  "Founder" <> ToString[#] & /@ Range[Length[founderHaplo] - 3];
+                
             ],
             If[ Length[founderHaplo]-3<nFounder,
                 Print["magicpopGeneDropping: no enough input founders!"];

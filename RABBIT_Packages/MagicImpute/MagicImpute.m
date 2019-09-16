@@ -51,8 +51,8 @@ calPosteriorProb[prob_, priorhaploweight_] :=
         {phaseprob, origprob}
     ]      
         
-parentForwardCalculation[model_,samplelabel_, markovprocess_, inputfhaploset_, obsgeno_, epsF_, eps_, minphredscore_,isoffspringdepth_, ismaleX_] :=
-    Module[ {isdepModel,fhaploset = inputfhaploset,nseq, startprob,tinyprob,fwphaseindex,fwphaseprob, fworigprob, sitedataprob, tranprob, samplecode,t},
+parentForwardCalculation[model_,samplelabel_, markovprocess_, inputfhaploset_, obsgeno_, epsF_, eps_, minphredscore_,isoffspringdepth_, ismaleX_,isprint_] :=
+    Module[ {isdepModel,fhaploset = inputfhaploset,nseq, startprob,tinyprob,fwphaseindex,fwphaseprob, fworigprob, sitedataprob, tranprob, samplecode,t,delay},
         nseq = Length[fhaploset];
         startprob = sampleStartprob[samplelabel, markovprocess];
         fwphaseprob = fworigprob = fwphaseindex = Table[0, {nseq}];
@@ -67,7 +67,8 @@ parentForwardCalculation[model_,samplelabel_, markovprocess_, inputfhaploset_, o
         {fwphaseprob[[1]], fworigprob[[1]]} = calPosteriorProb[fworigprob[[1]], fhaploset[[1, All, 2]]];
         fwphaseindex[[1]] = Range[Length[fhaploset[[1]]]];        
         (*Put[model,fhaploset, obsgeno, epsF,eps, ismaleX,sitedataprob,startprob,samplelabel, markovprocess,samplecode,fwphaseprob, fworigprob, fwphaseindex,"imputetemp.txt"];
-        Abort[];*)          
+        Abort[];*)     
+        delay = If[isprint, 0, 10^6.];     
         Monitor[Do[                   
           tranprob = sampleTransition[samplelabel, markovprocess,samplecode, t - 1];
           If[ isoffspringdepth,
@@ -77,11 +78,12 @@ parentForwardCalculation[model_,samplelabel_, markovprocess_, inputfhaploset_, o
           fworigprob[[t]] = MapThread[#1.#2 &, {fwphaseprob[[t-1]].fworigprob[[t-1]], tranprob}];
           fworigprob[[t]] = Table[fworigprob[[t]],{Length[sitedataprob]}] sitedataprob;          
           {fwphaseprob[[t]], fworigprob[[t]]} = calPosteriorProb[fworigprob[[t]], fhaploset[[t, All, 2]]];          
-          tinyprob = Max[fwphaseprob[[t]]] 10^(-10.);
+		  tinyprob = Max[fwphaseprob[[t]]] 10^(-10.);
+		  (*tinyprob = Max[fwphaseprob[[t]]] 10^(-20.);*)
           fwphaseindex[[t]] = Flatten[Position[Sign[Round[fwphaseprob[[t]], tinyprob]], 1]];
           {fwphaseprob[[t]], fworigprob[[t]], fhaploset[[t]]} = {fwphaseprob[[t]], fworigprob[[t]], fhaploset[[t]]}[[All, fwphaseindex[[t]]]];
           fwphaseprob[[t]] = Normalize[fwphaseprob[[t]],Total];
-          0, {t, 2, nseq}], ProgressIndicator[t, {2, nseq}]];
+          0, {t, 2, nseq}], ProgressIndicator[t, {2, nseq}],delay];
         {fwphaseprob, fworigprob,fwphaseindex}
     ] 
             
@@ -94,8 +96,8 @@ parentForwardCalculation[model_,samplelabel_, markovprocess_, inputfhaploset_, o
 posMax[list_] :=
     RandomChoice[Flatten[Position[list, Max[list]]]]  
         
-parentBackwardMaximize[fwphaseprob_, fworigprob_,isdepModel_,ismaleX_,samplelabel_, samplemarkovprocess_,backtmin_:1] :=
-    Module[ {nseq, noffspring, fphase, orig, phaseprob,tranprob,ls, weight, ind, t,samplecode,tmin},
+parentBackwardMaximize[fwphaseprob_, fworigprob_,isdepModel_,ismaleX_,samplelabel_, samplemarkovprocess_,backtmin_,isprint_] :=
+    Module[ {nseq, noffspring, fphase, orig, phaseprob,tranprob,ls, weight, ind, t,samplecode,tmin,delay},
         nseq = Length[fwphaseprob];
         noffspring = Length[samplelabel]-1;
         fphase = orig = phaseprob = Table[0,{nseq}];
@@ -105,6 +107,7 @@ parentBackwardMaximize[fwphaseprob_, fworigprob_,isdepModel_,ismaleX_,samplelabe
         orig[[-1]] = Table[posMax[ls[[fphase[[-1]], ind]]], {ind, noffspring}];
         samplecode = sampleCode[samplelabel, isdepModel, ismaleX];
         tmin = Min[nseq-1,Max[backtmin,1]];
+        delay = If[isprint, 0, 10^6.];
         Monitor[Do[
               tranprob = sampleTransition[samplelabel, samplemarkovprocess,samplecode, t];
               ls = Table[tranprob[[ind, All, orig[[t + 1, ind]]]], {ind, noffspring}];
@@ -116,7 +119,7 @@ parentBackwardMaximize[fwphaseprob_, fworigprob_,isdepModel_,ismaleX_,samplelabe
               phaseprob[[t]] =  Normalize[Exp[weight],Total];
               fphase[[t]] = posMax[phaseprob[[t]]];
               orig[[t]] = Table[posMax[ls[[fphase[[t]], ind]]], {ind, noffspring}];
-              0, {t, nseq - 1, tmin, -1}], ProgressIndicator[t, {1, nseq - 1}]];
+              0, {t, nseq - 1, tmin, -1}], ProgressIndicator[t, {1, nseq - 1}],delay];
         {fphase, phaseprob,orig}
     ]  
 
@@ -148,7 +151,7 @@ magicImputeFounder[magicSNP_, model_, epsF_, eps_, popDesign_,minphredscore_,max
         (*startProb0=a list of initial distribution for each linkage group;
         tranProb0= a list of transition prob matrices between consecutive markers for each linkage group*)        
         {samplelabel, sampleMarkovProcess} = sampleDiscretePriorProcess[nFounder,popDesign, isfounderinbred,model, posA, posX, offspringgender, sampleid,deltd];
-        isdepModel = ToLowerCase[model]==="depmodel";        
+        isdepModel = ToLowerCase[model]==="depmodel";
         phase = Table[
             epsF2 = epsFls[[ch]];
             markovprocess = sampleMarkovProcess;
@@ -167,20 +170,22 @@ magicImputeFounder[magicSNP_, model_, epsF_, eps_, popDesign_,minphredscore_,max
             If[Union[Length[#] & /@ fhaploset] === {1},
             	phase = fhaploset[[All, 1, 1]],
 	            If[ isprint,
-	                PrintTemporary["Time elapsed = " <>ToString[Round[SessionTime[] - starttime, 0.1]] 
+	                Print["Time elapsed = " <>ToString[Round[SessionTime[] - starttime, 0.1]] 
 	                <> " Seconds. \t Start imputing founder linkagegroup " <> ToString[ch]<>" out of "<>ToString[Length[founderHaplo]]];	                
-	                PrintTemporary["#markers: ", Length[fhaploset],". #phases per locus: " <> ToString[Round[Mean[Length[#] & /@ fhaploset],0.01]]," out of "<>ToString[2^(nFounder (1+Boole[!isfounderinbred]))]];
+	                Print["#markers: ", Length[fhaploset],". #phases per locus: " <> ToString[Round[Mean[Length[#] & /@ fhaploset],0.01]]," out of "<>ToString[2^(nFounder (1+Boole[!isfounderinbred]))]];
 	            ];	            
-	            nn = Round[Length[fhaploset]/2];
+	            nn = Round[Length[fhaploset]/2];	            	            
+	            (*Put[model,samplelabel, markovprocess, fhaploset, chrobsgeno, 
+	               epsF2, eps, minphredscore, isoffspringdepth, ismaleX,"imputetemp.txt"];*)
 	            {fwphaseprob, fworigprob, fwphaseindex} = parentForwardCalculation[model,samplelabel, markovprocess, fhaploset, chrobsgeno, 
-	               epsF2, eps, minphredscore, isoffspringdepth, ismaleX];
+	               epsF2, eps, minphredscore, isoffspringdepth, ismaleX,isprint];
 	            (*Put[fwphaseprob, fworigprob, fwphaseindex,model,samplelabel, markovprocess, fhaploset, chrobsgeno, epsF2, eps, minphredscore, isoffspringdepth, ismaleX,"imputetemp.txt"];
-	            Abort[];*)
+	            Abort[];*)	            
 	            backtmin = If[ isextrareverse,
 	                           nn+1,
 	                           1
 	                       ];	                     
-	            {fwphase,fwphaseprob} = Most[parentBackwardMaximize[fwphaseprob, fworigprob, isdepModel,ismaleX,samplelabel, markovprocess,backtmin]];	            	            
+	            {fwphase,fwphaseprob} = Most[parentBackwardMaximize[fwphaseprob, fworigprob, isdepModel,ismaleX,samplelabel, markovprocess,backtmin,isprint]];	            	            
 	            fhaploset = MapThread[#1[[#2]] &, {fhaploset,fwphaseindex}];
 	            If[ isprint,
 	                PrintTemporary["Mean number of phases per locus after forward calculation: " <> ToString[Round[Mean[Length[#] & /@ fwphaseindex],0.01]]," out of "<>ToString[2^(nFounder (1+Boole[!isfounderinbred]))]];
@@ -196,9 +201,9 @@ magicImputeFounder[magicSNP_, model_, epsF_, eps_, popDesign_,minphredscore_,max
 	                revmarkovprocess[[All, 2, 2]] = Reverse[#] & /@ revmarkovprocess[[All, 2, 2]];
 	                revmarkovprocess[[All, 2, 2]] = Map[Transpose, revmarkovprocess[[All, 2, 2]], {2}];
 	                {revphaseprob, revorigprob, revphaseindex} = parentForwardCalculation[model,samplelabel, revmarkovprocess, 
-	                    Reverse[fhaploset2], Reverse[chrobsgeno], epsF2, eps, minphredscore, isoffspringdepth, ismaleX];
+	                    Reverse[fhaploset2], Reverse[chrobsgeno], epsF2, eps, minphredscore, isoffspringdepth, ismaleX,isprint];
 	                (*Put[fhaploset,revphaseindex,revphaseprob, revorigprob, isdepModel,ismaleX, samplelabel, revmarkovprocess,"tempphase0_"<>ToString[$KernelID]<>".txt"];*)	                	
-	                {phase,revphaseprob} = Most[parentBackwardMaximize[revphaseprob, revorigprob, isdepModel,ismaleX, samplelabel, revmarkovprocess,Length[fhaploset]+1-nn]];
+	                {phase,revphaseprob} = Most[parentBackwardMaximize[revphaseprob, revorigprob, isdepModel,ismaleX, samplelabel, revmarkovprocess,Length[fhaploset]+1-nn,isprint]];
 	                {revphaseindex,phase,revphaseprob} = Reverse[#]&/@{revphaseindex,phase,revphaseprob};
 	                ClearAll[revorigprob];
 	                phase = MapThread[#1[[#2]] &, {revphaseindex, phase}];
@@ -921,21 +926,22 @@ plotErrorPatternGUI[obsmagicsnp_?(StringQ[#]||ListQ[#]&), estmagicsnp_?(StringQ[
                 Print["File ", obssnp," does not exist!"];
                 Return[$Failed]
             ];
-            obssnp = Import[obssnp,"CSV"];
+            Print[Directory[]];
+            obssnp = Import[obssnp,"CSV", Path -> Directory[]];
         ];
         If[ StringQ[estsnp],
             If[ !FileExistsQ[estsnp],
                 Print["File ", estsnp," does not exist!"];
                 Return[$Failed]
             ];
-            estsnp = Import[estsnp,"CSV"];
+            estsnp = Import[estsnp,"CSV", Path -> Directory[]];
         ];
         If[ StringQ[truesnp],
             If[ !FileExistsQ[truesnp],
                 Print["File ", truesnp," does not exist!"];
                 Return[$Failed]
             ];
-            truesnp = Import[truesnp,"CSV"];
+            truesnp = Import[truesnp,"CSV", Path -> Directory[]];
         ];
         chrsubset = OptionValue[linkageGroupSet];
         {obssnp,estsnp, truesnp} = getsubMagicSNP[#, chrsubset,All]&/@{obssnp,estsnp, truesnp};
@@ -948,10 +954,10 @@ plotErrorPatternGUI[obsmagicsnp_?(StringQ[#]||ListQ[#]&), estmagicsnp_?(StringQ[
         xylab = {{{None, None}, {"Founder index","Founder index"}},{{"SNP index", None}, {"Offspring index","Offspring index"}}};
         panel = Panel[Column[{
             sliders = ColorSlider[Dynamic[#1],AppearanceElements -> "SwatchSpectrum"] & /@ {tc, td, fn,fp, fi};
-            {tc, td, fn, fp, fi} = {White,Green, Blue, Pink, Red};
-            Grid[{Append[label, ""],Append[sliders,Button["Reset colors", {tc, td, fn, fp, fi} = {White,Green, Blue, Pink, Red}]]}],
+            {tc, td, fn, fp, fi} = {Cyan,Green, Blue, Pink, Red};
+            Grid[{Append[label, ""],Append[sliders,Button["Reset colors", {tc, td, fn, fp, fi} = {Cyan,Green, Blue, Pink, Red}]]}],
             Dynamic[
-             colorrules = Thread[{0, "TrueCorrect", "TrueDetect", "FalseNegative","FalsePositive", "FalseImpute"} -> {White, tc, td, fn, fp,fi}];
+             colorrules = Thread[{0, "TrueCorrect", "TrueDetect", "FalseNegative","FalsePositive", "FalseImpute"} -> {White, tc, td, fn, fp,fi}];             
              Column[{MatrixPlot[statuses[[5 ;; nfounder + 4, 2 ;;]], Sequence@@FilterRules[{opts}, Options[MatrixPlot]], FrameLabel -> xylab[[1]], 
                 FrameTicks -> {{lefttick, righttick}, {Automatic, Automatic}}, ColorRules -> colorrules,MaxPlotPoints -> Infinity, ImageSize -> 1000],
                MatrixPlot[statuses[[nfounder + 5 ;;, 2 ;;]], Sequence@@FilterRules[{opts}, Options[MatrixPlot]], FrameLabel -> xylab[[2]], 
@@ -979,14 +985,14 @@ plotErrorPatternGUI[obsmagicsnp_?(StringQ[#]||ListQ[#]&), estmagicsnp_?(StringQ[
                 Print["File ", obssnp," does not exist!"];
                 Return[$Failed]
             ];
-            obssnp = Import[obssnp,"CSV"];
+            obssnp = Import[obssnp,"CSV", Path -> Directory[]];
         ];
         If[ StringQ[estsnp],
             If[ !FileExistsQ[estsnp],
                 Print["File ", estsnp," does not exist!"];
                 Return[$Failed]
             ];
-            estsnp = Import[estsnp,"CSV"];
+            estsnp = Import[estsnp,"CSV", Path -> Directory[]];
         ];
         chrsubset = OptionValue[linkageGroupSet];
         (*Print[chrsubset];
