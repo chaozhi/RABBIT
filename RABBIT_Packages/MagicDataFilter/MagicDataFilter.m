@@ -1,3 +1,4 @@
+
 (* Mathematica Package *)
 
 (* Created by the Wolfram Workbench Jan 22, 2017 *)
@@ -31,6 +32,8 @@ fillThreshould::usage = "fillThreshould is an option for filling threhold so tha
 mono2Missing::usage = "mono2Missing is an option to specify if set the offfspring genotype to missing if their parent genotypes are monomorphic"
 
 filtersnpBinning::usage = "filtersnpBinning  "
+
+getsnpbin::usage = "getsnpbin  "
 
 (* Exported symbols added here with SymbolName::usage *) 
 
@@ -89,7 +92,7 @@ magicsnpBinning[inputmagicSNP_?(ListQ[#] || StringQ[#] &), OptionsPattern[]] :=
         magicSNP = magicAllelicCode[magicSNP];
         magicSNP[[3, 2 ;;]] = "NA";
         (*possible genotypes: "N","1","2", "11","12","22","1N","2N","NN"*)
-        Do[magicSNP[[i, 2 ;;]] = Map[ToString, magicSNP[[i, 2 ;;]]] /. {"21" -> "12","N1"|"N2"->"NN"},{i,5,Length[magicSNP]}];
+        Do[magicSNP[[i, 2 ;;]] = Map[ToString, magicSNP[[i, 2 ;;]]] /. {"21" -> "12", "N1"->"1N","N2"->"2N"},{i,5,Length[magicSNP]}];
         nsnp = Length[magicSNP[[2]]]-1;
         binls = List /@ Range[nsnp];
         binls = getsnpbin[magicSNP, binls,isparallel,outputfiles[[3]],starttime];
@@ -117,20 +120,15 @@ getrowspan[nsnp_, nseg_] :=
     ]
           
 getsnpbin[magicSNP_,binlist_,isparallel_,outputfile_,starttime_] :=
-    Module[ {binlist2 = binlist,resultbins},
+    Module[ {binlist2 = binlist,ishalf},
         If[ binlist2 ==Automatic,
             binlist2 = List /@ Range[Length[magicSNP[[2, 2 ;;]]]]
         ];
-        If[ Intersection[{"1N", "2N"}, Union[Flatten[magicSNP[[5 ;;, 2 ;;]]]]] ==={},
-            resultbins = getcalledbin[magicSNP,binlist2,isparallel,outputfile],
-            Print["To implement of marker binning for genotypes 1N and 2N!"];
-            Abort[];
-        ];
-        resultbins
+        ishalf=Intersection[{"1N", "2N"}, Union[Flatten[magicSNP[[5 ;;, 2 ;;]]]]] =!={};        
+        getcalledbin[magicSNP,binlist2,isparallel,outputfile,ishalf]
     ]    
-    
   
-bincalled[snpgeno_, snpidls_, rowspan_, outputfile_] :=
+bincalled[snpgeno_, snpidls_, rowspan_, outputfile_,ishalf_] :=
     Module[ {nsnp, outstream, i, ii,jj, ls, res,nmiss},
         nsnp = Dimensions[snpgeno][[2]];
         Quiet[Close[outputfile]];
@@ -141,9 +139,14 @@ bincalled[snpgeno_, snpidls_, rowspan_, outputfile_] :=
             nmiss = Count[#, 0] & /@ Transpose[snpgeno];
             Write[outstream, Join[{{"Marker-ID","#Missing"}},Transpose[{snpidls,nmiss}]]];
         ];
-        Do[
-         ls = Sign[snpgeno[[All, i]]*snpgeno[[All, i + 1 ;;]]];
-         ls *= Sign[Abs[snpgeno[[All, i]] - snpgeno[[All, i + 1 ;;]]]];
+        Do[ 
+         ls = Abs[snpgeno[[All, i]] - snpgeno[[All, i + 1 ;;]]];
+         ls *= snpgeno[[All, i]]*snpgeno[[All, i + 1 ;;]];         
+         If[ishalf,         	
+         	(*special rule for "1N", "2N"*)
+         	ls *= Sign[ls-12]*Sign[ls-30]
+         ];
+         ls=Sign[ls];
          ls = 1 - Sign[Total[ls]];
          jj = Pick[Range[i + 1, nsnp], ls, 1];
          res = Thread[{i, jj}];
@@ -153,7 +156,7 @@ bincalled[snpgeno_, snpidls_, rowspan_, outputfile_] :=
         Close[outstream];
     ]
   
-parallelbincalled[snpgeno_, snpidls_, outputfile_] :=
+parallelbincalled[snpgeno_, snpidls_, outputfile_,ishalf_] :=
     Module[ {nsnp, spanls, filels, countls, count,outstream, i},
         nsnp = Dimensions[snpgeno][[2]];
         spanls = getrowspan[nsnp-1, Max[1, IntegerLength[nsnp-1] - 2] $KernelCount];
@@ -165,7 +168,7 @@ parallelbincalled[snpgeno_, snpidls_, outputfile_] :=
         SetSharedVariable[count,countls,spanls,filels];        
         count = 0;
         Monitor[ParallelDo[
-          bincalled[snpgeno, snpidls, spanls[[i]], filels[[i]]];
+          bincalled[snpgeno, snpidls, spanls[[i]], filels[[i]],ishalf];
           count += countls[[i]], {i, Length[filels]}, 
           DistributedContexts -> {"MagicDataFilter`", 
             "MagicDataFilter`Private`"}, Method -> "FinestGrained"], 
@@ -177,15 +180,20 @@ parallelbincalled[snpgeno_, snpidls_, outputfile_] :=
         DeleteFile[#] & /@ Rest[filels];
     ]    
 
-getcalledbin[magicSNP_, binlist_, isparallel_,outputfile_] :=
-    Module[ {magicsnp, snpgeno, snpidls,nsnp,adjmtx,nodeweight},
+getcalledbin[magicSNP_, binlist_, isparallel_,outputfile_,ishalf_] :=
+    Module[ {magicsnp,nf,snpgeno, snpidls,nsnp,adjmtx,nodeweight,rule},
         magicsnp = getsubMagicSNP[magicSNP, All, binlist[[All, 1]]];
-        snpgeno = magicsnp[[5 ;;, 2 ;;]] /. {"N" | "NN" | "1N" | "2N" | "N1" | "N2" -> 0, "11" | "1" -> 1, "22" | "2" -> 2, "12" -> 3};
+        nf=magicsnp[[1,2]];
+        If[ishalf,
+        	rule=Dispatch[{"N" | "NN"-> 0, "11" | "1" -> 1, "22" | "2" -> 2, "12" -> 3, "1N"->4, "2N"->5}],
+        	rule=Dispatch[{"N" | "NN"-> 0, "11" | "1" -> 1, "22" | "2" -> 2, "12" -> 3}]
+        ];
+        snpgeno = magicsnp[[5+nf ;;, 2 ;;]] /. rule;
         snpidls = magicsnp[[2, 2;;]];
         nsnp = Length[magicsnp[[2]]]-1;
         If[ isparallel,
-            parallelbincalled[snpgeno, snpidls, outputfile],
-            bincalled[snpgeno, snpidls, 1;;nsnp - 1, outputfile]
+            parallelbincalled[snpgeno, snpidls, outputfile,ishalf],
+            bincalled[snpgeno, snpidls, 1;;nsnp - 1, outputfile,ishalf]
         ];
         {adjmtx,nodeweight} = readDuplicatefile[FileNameJoin[{Directory[], outputfile}]];
         binningAdjacency[adjmtx,nodeweight]

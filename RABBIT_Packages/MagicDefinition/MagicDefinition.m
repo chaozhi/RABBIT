@@ -232,7 +232,7 @@ independenceGTest[data_?MatrixQ] :=
     First[independenceGTest[{data}]]
 independenceGTest[data_?ListQ] :=
     Module[ {count = data, rowsum, colsum, nn, expect, temp, g2, df, 
-      pvalue, neglogpvalue, lod, pos, res},
+      pvalue, neglogpvalue, lod, pos, res,i},
         res = ConstantArray[0, {Length[data], 4}];
         rowsum = Total[count, {3}];
         colsum = Total[count, {2}];
@@ -245,9 +245,10 @@ independenceGTest[data_?ListQ] :=
             count = Flatten[#] & /@ count;
             temp = Log[count /. {0 -> 1}] - Log[Flatten[#] & /@ expect];
             g2 = 2 MapThread[#1.#2 &, {count, temp}];
-            pvalue = MapThread[SurvivalFunction[ChiSquareDistribution[#1], #2] &, {df, g2}];
+            pvalue = MapThread[Quiet[SurvivalFunction[ChiSquareDistribution[#1], #2]] &, {df, g2}];
             neglogpvalue = -Log[10, pvalue];
-            lod = InverseSurvivalFunction[ChiSquareDistribution[1], #1] & /@pvalue;
+            (*lod = InverseSurvivalFunction[ChiSquareDistribution[1], #1] & /@pvalue;*)
+            lod = Table[If[df[[i]] == 1, g2[[i]],Quiet[InverseSurvivalFunction[ChiSquareDistribution[1],pvalue[[i]]]]], {i, Length[df]}];
             lod *= Log[10, E]/2;
             res[[pos]] = Transpose[{g2, df, neglogpvalue, lod}];
         ];

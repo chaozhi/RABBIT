@@ -1,12 +1,12 @@
 (* Paclet Info File *)
 
-(* created 2016/02/22*)
+(* created 2017/01/22*)
 
 Paclet[
-    Name -> "MagicImpute",
+    Name -> "MagicDataFilter",
     Version -> "0.0.1",
     MathematicaVersion -> "6+",
-    Description -> "A package for genotype imputation in experimental populations.",
+    Description -> "This package provides functions for clearning  genotypic data of multiparental populations.",
     Creator -> "Chaozhi Zheng",
     Extensions -> 
         {

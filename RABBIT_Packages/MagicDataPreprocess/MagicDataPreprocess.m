@@ -890,20 +890,31 @@ magicInbredGenotypeCall[magicsnp_] :=
     magicRawGenotypeCall[magicsnp, None,None,True,True]
 
 magicRawGenotypeCall[magicsnp_, qualityscore_, callthreshold_,isfounderinbred_, isoffspringinbred_] :=
-    Module[ {thresholds,callsnp = magicsnp, nfounder, ls, i},
+    Module[ {thresholds,callsnp = magicsnp, nfounder, ls, temp,readgeno,readcall,rule},
         thresholds = Flatten[{callthreshold}];
         nfounder = callsnp[[1, 2]];
         ls = callsnp[[5 ;;, 2 ;;]];
-        Monitor[
-         Do[ls[[i]] = ToExpression[StringSplit[ls[[i]], "|"]], {i, 
-           Length[ls]}], ProgressIndicator[i, {1, Length[ls]}]];
+        readgeno = Union[Flatten[Union[#] & /@ ls[[;; nfounder]]]];      
+        temp = ToExpression[StringSplit[readgeno, "|"]];  
         If[ isfounderinbred,
-            ls[[;; nfounder]] = inbredRawGenotypeCall[ls[[;; nfounder]]],
-            ls[[;; nfounder]] = rawGenotypeCall[ls[[;; nfounder]], qualityscore, First[thresholds]]
+        	readcall = inbredRawGenotypeCall[temp];
+            rule = Dispatch[Thread[readgeno -> readcall]];
+            ls[[;; nfounder]] =(ls[[;; nfounder]] /. rule),
+            (**)
+            readcall = rawGenotypeCall[temp, qualityscore, Last[thresholds]];
+            rule = Dispatch[Thread[readgeno -> readcall]];
+            ls[[;; nfounder]]  = ls[[;; nfounder]]  /. rule;
         ];
+        readgeno = Union[Flatten[Union[#] & /@ ls[[nfounder + 1 ;;]]]];      
+        temp = ToExpression[StringSplit[readgeno, "|"]];  
         If[ isoffspringinbred,
-            ls[[nfounder + 1 ;;]] = inbredRawGenotypeCall[ls[[nfounder + 1 ;;]]]/.{"1"->"11","2"->"22","N"->"NN"},
-            ls[[nfounder + 1 ;;]] = rawGenotypeCall[ls[[nfounder + 1 ;;]], qualityscore, Last[thresholds]]
+            readcall = inbredRawGenotypeCall[temp];
+            rule = Dispatch[Thread[readgeno -> readcall]];
+            ls[[nfounder + 1 ;;]] =(ls[[nfounder + 1 ;;]] /. rule)/.{"1"->"11","2"->"22","N"->"NN"},
+            (**)            
+            readcall = rawGenotypeCall[temp, qualityscore, Last[thresholds]];
+            rule = Dispatch[Thread[readgeno -> readcall]];
+            ls[[nfounder + 1 ;;]] = ls[[nfounder + 1 ;;]] /. rule;            
         ];
         callsnp[[5 ;;, 2 ;;]] = ls;
         callsnp

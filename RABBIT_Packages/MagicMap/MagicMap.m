@@ -496,6 +496,7 @@ calsimilarity[magicSNP_,  model_, popDesign_,epsF_, eps_,rowspan_,similartype_,o
         If[ isprint,
             starttime = SessionTime[];
         ];
+        (*Print["rowspan=",rowspan];*)
         (*Put[magicSNP, model, popDesign, epsF, minphredscore,maxfoundererror, foundergenocallbound, 
                                 isfounderinbred,isfounderdepth, isoffspringdepth, isprint,"tempmap.txt"];
         Abort[];*)
@@ -544,8 +545,8 @@ calsimilarity[magicSNP_,  model_, popDesign_,epsF_, eps_,rowspan_,similartype_,o
         bool = ii[[{1,-1}]]==={1,nsnp-1};
         totcount = Total[ii];
         count = 0;
-        Do[ 
-            (*Print["todel here2: Kernel = ", $KernelID,". i = ",i];*)
+        Do[             
+            (*Print["todel here1: Kernel = ", $KernelID,". i = ",i];*)
             jj = Range[i + 1, nsnp];
             count +=nsnp-i;
             missingcode = "NN" | "N" | "1N" | "2N" | "N1" | "N2";
@@ -554,10 +555,10 @@ calsimilarity[magicSNP_,  model_, popDesign_,epsF_, eps_,rowspan_,similartype_,o
             If[ jj==={},
                 Continue[]
             ];
-            If[ MatchQ[similartype,"independence"|"both"],
+            If[ MatchQ[similartype,"independence"|"both"],            	
                 ls = DeleteCases[Transpose[calledgeno[[Join[{i}, jj]]]], {missingcode, __}];
                 ls = Table[crossTabulate[DeleteCases[ls[[All, {1, k}]], {_, missingcode}]], {k, 2, Length[jj] + 1}];
-                res = independenceGTest[ls[[All, 1]]];
+                res = independenceGTest[ls[[All, 1]]];                
                 If[ Head[res]===independenceGTest,
                     Print["Wrong inputdata for independence G-Test!,inputdata = ",ls[[All, 1]]];
                     Abort[];
@@ -574,7 +575,8 @@ calsimilarity[magicSNP_,  model_, popDesign_,epsF_, eps_,rowspan_,similartype_,o
                 If[ res=!={},
                     res[[All,-3;;]] = N[Round[res[[All,-3;;]],10^(-5)]]/.{_Round -> "Noninformative"};
                 ];
-            ];
+            ];           
+            
             If[ res=!={},
                 Write[outstream, #] & /@ res;
             ];
@@ -1074,7 +1076,8 @@ Options[magicMapConstruct] = DeleteDuplicates[Join[Options[magicGrouping],Option
 magicMapConstruct[pairwisedatafile_?FileExistsQ, ngroup_Integer?Positive,opts : OptionsPattern[]] :=
     Module[ {isbinning,nsnp,clusterlodtype, evsel,orderlodtype,computedtype,minlodsaving,snpid, maxrf = 1,morganrate, nmissing,rfmtx, linklodmtx, indeplodmtx,ii,jj,k,ls,miniclustersize,
        similarity, linkagegroups, singletons, eigenval, eigenvec, neighborstrength,neighborlod,neighbors,isfounderinbred,knnls,strongneighbors,knn,
-      minlodclustering, minlodordering,knnfun,knnsaving,refmap,outputid, isprint,estmap,estorder,outputfiles,starttime,temp,maxnconn,adjminlod,delscl,rule},
+      minlodclustering, minlodordering,knnfun,knnsaving,refmap,outputid, isprint,estmap,estorder,outputfiles,starttime,temp,maxnconn,adjminlod,delscl,rule,
+      indeplodmtx2,linklodmtx2, rfmtx2},
         {adjminlod,delscl,maxnconn,clusterlodtype,orderlodtype,minlodclustering, minlodordering,knnfun,knnsaving,miniclustersize,refmap,outputid,isprint} = 
             OptionValue@{minLodSegregateBin,delStrongCrossLink,nConnectedComponent,lodTypeClustering,lodTypeOrdering,minLodClustering,minLodOrdering,nNeighborFunction,nNeighborSaving,miniComponentSize,referenceMap,outputFileID,isPrintTimeElapsed};
         {clusterlodtype,orderlodtype} = ToLowerCase[#]&/@{clusterlodtype,orderlodtype};
@@ -1130,8 +1133,8 @@ magicMapConstruct[pairwisedatafile_?FileExistsQ, ngroup_Integer?Positive,opts : 
         (*Put[{clusterlodtype, indeplodmtx,linklodmtx, rfmtx, maxrf, minlodsaving, minlodclustering, miniclustersize,maxnconn},"tempbrent.txt"];*)
         minlodclustering = findminlodBrent[clusterlodtype, indeplodmtx,linklodmtx, rfmtx, maxrf, minlodsaving, minlodclustering, miniclustersize,maxnconn];
         similarity = getSimilarity[clusterlodtype, indeplodmtx,linklodmtx, rfmtx, maxrf, minlodclustering,Infinity,miniclustersize];
-        (*Put[similarity,"temp_sim.txt"];*)
-        {linkagegroups, singletons, eigenval, eigenvec} = magicGrouping[similarity,ngroup,FilterRules[{opts}, Options[magicGrouping]]];
+        (*Put[similarity,"temp_sim.txt"];*)        
+        {linkagegroups, singletons, eigenval, eigenvec} = magicGrouping[similarity,ngroup,FilterRules[{opts}, Options[magicGrouping]]];        
         If[ OptionValue[minLodClustering]===Automatic,
             If[ isprint,
                 Print[Style["The option value of minLodClustering is set to " <>ToString[minlodclustering] <> "!", {Black}]];
@@ -1141,25 +1144,26 @@ magicMapConstruct[pairwisedatafile_?FileExistsQ, ngroup_Integer?Positive,opts : 
             Print[Style["magicMapConstruct warning: the number " <> ToString[Count[Flatten[eigenval], _?(# < 10^(-10) &)]] <> 
                   " of clusters determined by multiplicity of zero eigenvalue > input #linkagegroup " <> ToString[ngroup] <> "!" <> 
                   " Try smaller option value of minLodClustering!", Red]];
-        ];
-        linkagegroups = relabelLinkagegroup[snpid,linkagegroups,refmap];
+        ];        
+        linkagegroups = relabelLinkagegroup[snpid,linkagegroups,refmap];        
         If[ isprint,
             Print["Size of "<>ToString[Length[linkagegroups]]<>" groups = ", Length[#] & /@ linkagegroups," and #ungrouped markers = ", Length[singletons]," after spectral clustering!",
                 "Time elapsed = ", Round[SessionTime[] - starttime,0.1], " Seconds."];
         ];
         If[ delscl,
             strongneighbors = getStrongestNeighbors[clusterlodtype, linklodmtx, indeplodmtx,minlodclustering, miniclustersize];
-            k = Length[singletons];
+            k = Length[singletons];            
             {linkagegroups,singletons} = removewronglinkednode[linkagegroups, singletons, strongneighbors];
             linkagegroups = DeleteCases[linkagegroups, {}];
             If[ isprint&&k!=Length[singletons],
                 Print["Size of "<>ToString[Length[linkagegroups]]<>" groups = ", Length[#] & /@ linkagegroups," and #ungrouped markers = ", Length[singletons]," after removing markers whose strongest neighbors are not in the same group!"];
             ];
-        ];        
+        ];      
         (*Spectral ordering*)
         If[ OptionValue[minLodOrdering]===Automatic,
             minlodordering = Table[
-                temp = getSimilarity[orderlodtype, indeplodmtx[[ii, ii]],linklodmtx[[ii, ii]], rfmtx[[ii, ii]], 
+            	{indeplodmtx2,linklodmtx2, rfmtx2}=If[MissingQ[#],#,#[[ii,ii]]]&/@{indeplodmtx,linklodmtx, rfmtx};
+                temp = getSimilarity[orderlodtype, indeplodmtx2,linklodmtx2, rfmtx2, 
                             maxrf,minlodclustering, minlodsaving,miniclustersize];
                 temp = adjConnectedComponents[temp];
                 temp = Count[(Length[#] & /@ temp) - miniclustersize, _?Positive];
@@ -1167,9 +1171,9 @@ magicMapConstruct[pairwisedatafile_?FileExistsQ, ngroup_Integer?Positive,opts : 
                 If[ temp==1,
                     minlodclustering,
                     maxnconn = 1;
-                    findminlodBrent[orderlodtype, indeplodmtx[[ii, ii]],linklodmtx[[ii, ii]], rfmtx[[ii, ii]], 
+                    findminlodBrent[orderlodtype, indeplodmtx2,linklodmtx2, rfmtx2, 
                                     maxrf, minlodsaving,Automatic, miniclustersize,maxnconn]
-                ], {ii, linkagegroups}];
+                ], {ii, linkagegroups}];     
             If[ isprint,
                 Print[Style["The option value of minLodOrdering is set to " <>ToString[minlodordering] <> "!", {Black}]];
             ],
@@ -1183,19 +1187,20 @@ magicMapConstruct[pairwisedatafile_?FileExistsQ, ngroup_Integer?Positive,opts : 
                 Print["magicMapConstruct: wrong minLodOrdering optionvalue: ",minlodordering,"!"];
                 Abort[];
             ]
-        ];
+        ];        
         knnls = Min[Length[#], Ceiling[knnfun[Length[#]]]] & /@ linkagegroups;
         (*Put[{orderlodtype,indeplodmtx,linklodmtx,rfmtx, maxrf,minlodordering,minlodsaving,miniclustersize,linkagegroups,knnls},"temp1.txt"];*)
         {similarity, linkagegroups, knnls,temp} = Transpose[Table[
             jj = linkagegroups[[ii]];
-            temp = getSimilarity[orderlodtype, indeplodmtx[[jj, jj]], linklodmtx[[jj, jj]], rfmtx[[jj, jj]], maxrf, 
-                      minlodordering[[ii]], minlodsaving, miniclustersize];
+            {indeplodmtx2,linklodmtx2, rfmtx2}=If[MissingQ[#],#,#[[jj,jj]]]&/@{indeplodmtx,linklodmtx, rfmtx};
+            temp = getSimilarity[orderlodtype, indeplodmtx2,linklodmtx2, rfmtx2, maxrf, 
+                      minlodordering[[ii]], minlodsaving, miniclustersize];            
             knn = First[estimateKNN[temp, knnls[[ii]]]];
             temp = toKNNSimilarity[temp, knn];
             ls = adjConnectedComponents[temp];
             k = Positive[(Length[#] & /@ ls) - miniclustersize];
             ls = Sort[Flatten[Pick[ls, k, True]]];
-            {temp[[ls, ls]], jj[[ls]], knn,Complement[jj, jj[[ls]]]}, {ii,Length[linkagegroups]}]];
+            {temp[[ls, ls]], jj[[ls]], knn,Complement[jj, jj[[ls]]]}, {ii,Length[linkagegroups]}]];        
         {similarity, linkagegroups, knnls,temp} = DeleteCases[#, {}]&/@{similarity, linkagegroups, knnls,temp};
         If[ isprint,
             Print["# NearestNeighbors = ",knnls];
@@ -1205,20 +1210,20 @@ magicMapConstruct[pairwisedatafile_?FileExistsQ, ngroup_Integer?Positive,opts : 
         If[ isprint&&k!=Length[singletons],
             Print["Size of groups = ", Length[#] & /@ linkagegroups," and #ungrouped markers = ", Length[singletons],
                 " after dropping components with size <= ",miniclustersize, " for each group!"];
-        ];
-        estorder = MapThread[#2[[spectralOrdering[#1,FilterRules[{opts}, Options[spectralOrdering]]]]]&,{similarity,linkagegroups}];
+        ];        
+        estorder = MapThread[#2[[spectralOrdering[#1,FilterRules[{opts}, Options[spectralOrdering]]]]]&,{similarity,linkagegroups}];        
         If[ isprint,
             If[ ngroup>1,
                 ls = {spetralEigenPlot[eigenval,ngroup,evsel,isprint]},
                 ls = {}
-            ];
+            ];            
             If[ refmap=!=None,
                 AppendTo[ls,Show[mymapplot[estorder, {"refmap ordering","estmap ordering"}, snpid, refmap]]];
             ];
             If[ ls=!={},
                 Print[GraphicsRow[ls,ImageSize->550 Length[ls]]]
             ];
-        ];
+        ];        
         {neighbors, neighborstrength,neighborlod} = getNeighbors[orderlodtype,indeplodmtx,linklodmtx,rfmtx, maxrf,minlodsaving,miniclustersize,knnsaving];
         Switch[orderlodtype,            
             "independence",
@@ -1228,7 +1233,7 @@ magicMapConstruct[pairwisedatafile_?FileExistsQ, ngroup_Integer?Positive,opts : 
             If[ isprint,
                 PrintTemporary["Genetic map function for initial map construction: scaled fraction = 1-Exp[-"<>ToString[N[Round[morganrate,10^(-2)]]]<>" distance(M)]"];
             ];
-        ];
+        ];        
         rule = Dispatch[Thread[ToString[#] & /@ estmap[[2 ;;, 5]] ->Range[Length[estmap] - 1]]];
         ls = StringSplit[estmap[[2 ;;, 6]], "|"] /. rule;
         estmap[[2 ;;, 6]] = toDelimitedString[ls];

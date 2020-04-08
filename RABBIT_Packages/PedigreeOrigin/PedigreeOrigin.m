@@ -28,6 +28,13 @@ pedAncestryCompatibleQ::usage = "pedAncestryCompatibleQ  "
 
 phiijk::usage = "phiijk  "
 
+fi::usage
+
+juncijjj::usage = "juncijjj  "
+
+phi123::usage = "phi123  "
+
+
 (* Exported symbols added here with SymbolName::usage *) 
 
 Begin["`Private`"]

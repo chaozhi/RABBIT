@@ -42,6 +42,12 @@ expandPedigreeInfor::usage = "expandPedigreeInfor returns a single large pedigre
 
 setNAMpedinfo::usage = "setNAMpedinfo [families,nself] returns pedinfor, where families is a list of {{commonparent,parent},{offspring1, ofspring2,..}} for each family."
 
+toJuliagenofile::usage = "toJuliagenofile[mmagenofile, juliagenofile] "
+
+toJuliapedfile::usage = "toJuliapedfilee[founders, mmapedfile, juliapedfile]   "
+
+toJuliatruefile::usage = "toJuliatruefile[mmatruefile, juliatruefile]   "
+
 Begin["`Private`"]
 (* Implementation of the package *)
 
@@ -58,7 +64,7 @@ expandPedigreeInfor[pedigreeinfor_] :=
         pedsize = Length[pedigree] - 1;
         res = Table[pedigree, {noffspring}];
         Do[
-         res[[i, 2 ;;, {2, 4}]] =res[[i, 2 ;;, {2, 4}]] /.Thread[Range[nfounder] -> funnelcode[[i]]];
+         res[[i, 2 ;;, {2, 4}]] = res[[i, 2 ;;, {2, 4}]] /.Thread[Range[nfounder] -> funnelcode[[i]]];
          res[[i, 2 ;;, {2, 4}]] = res[[i, 2 ;;, {2, 4}]] /.Thread[Range[nfounder + 1, pedsize] -> 
              Range[pedsize (i - 1) + nfounder + 1, pedsize i]], {i, noffspring}];
         ls = res;
@@ -83,7 +89,7 @@ splitPedigreeInfor[pedigreeInfor_] :=
         infor = Partition[Split[pedigreeInfor, #1[[1]] != key && #2[[1]] != key &], 2];
         description = infor[[All,1]];
         {pedigree, sampleInfor} = infor[[All, 2]];
-        sampleInfor=sampleInfor[[All,;;3]];
+        sampleInfor = sampleInfor[[All,;;3]];
         pedigree = Join[pedigree[[All, ;; -3]], Transpose[{pedigree[[All, -2 ;;]]}], 2];
         sampleInfor[[2 ;;, -1]] = ToString[#] & /@ sampleInfor[[2 ;;, -1]];
         sampleInfor[[2 ;;, -1]] = StringSplit[#, "-"] & /@ sampleInfor[[2 ;;, -1]];
@@ -135,9 +141,9 @@ simPedigreeInfor[pedigree_List, OptionsPattern[]] :=
             Print["simPedigreeInfor: there are no individuals having the given gender in the last generation!"];
             Abort[];
         ];
-        If[Length[pos]>=samplesize,
-        	pos = Sort[RandomSample[pos, samplesize]],
-        	pos = RandomChoice[pos, samplesize];
+        If[ Length[pos]>=samplesize,
+            pos = Sort[RandomSample[pos, samplesize]],
+            pos = RandomChoice[pos, samplesize];
         ];
         memberlist = Sort[pedigree[[pos, 2]]];
         (*funnelcode = Table[RandomSample[Range[nFounder]], {samplesize}];*)
@@ -151,12 +157,12 @@ simPedigreeInfor[pedigree_List, OptionsPattern[]] :=
     ]
 
 simPedigreeInfor[popcode_String, opts : OptionsPattern[]] :=
- Module[{samplegender, isoogamy, ped},
-  samplegender = OptionValue[sampleGender];
-  isoogamy = !MatchQ[ToLowerCase[samplegender],"hermaphrodite"|"notavailable"];
-  ped = compilePopPedigree[popcode, isoogamy];
-  simPedigreeInfor[ped, opts]
-  ]
+    Module[ {samplegender, isoogamy, ped},
+        samplegender = OptionValue[sampleGender];
+        isoogamy = !MatchQ[ToLowerCase[samplegender],"hermaphrodite"|"notavailable"];
+        ped = compilePopPedigree[popcode, isoogamy];
+        simPedigreeInfor[ped, opts]
+    ]
   
 simPedigreeInfor[inipop_List, mateScheme_, opts:OptionsPattern[]] :=
     simPedigreeInfor[simPedigree[inipop, mateScheme], opts]   
@@ -313,7 +319,7 @@ simulatepopfgl[pedigree_, sampleInfor_,isfounderinbred_,isOogamy_,chrLength_,int
             ];
             inipop = setIniPop[nFounder, isOogamy];
             iniPopFGL = setIniPopFGL[inipop, founderFGL, chrLength];
-            popfgl = simMagicFgl[pedigree, iniPopFGL, interferStrength, isObligate, isOogamy, pedigreeMemberList -> All];            
+            popfgl = simMagicFgl[pedigree, iniPopFGL, interferStrength, isObligate, isOogamy, pedigreeMemberList -> All];
             If[ !(Complement[memberlist, popfgl[[2 ;;, 2]]] === {}),
                 Print["magicGeneDropping: population size in the last generation is smaller than samplesize!"];
                 Abort[]
@@ -411,8 +417,8 @@ magicGeneDropping[inputfounderHaplo_?(ListQ[#]||StringQ[#]&), inputpedigreeInfor
             ];
             pedigreeInfor = Import[pedigreeInfor, "CSV"]
         ];
-        {pedigree, sampleInfor} = Rest[splitPedigreeInfor[pedigreeInfor]];       
-        nFounder = Count[pedigree[[2 ;;, 4]], {0, 0}]; 
+        {pedigree, sampleInfor} = Rest[splitPedigreeInfor[pedigreeInfor]];
+        nFounder = Count[pedigree[[2 ;;, 4]], {0, 0}];
         nOffspring = Length[sampleInfor] - 1;
         If[ StringQ[founderHaplo],
             If[ !FileExistsQ[founderHaplo],
@@ -421,11 +427,11 @@ magicGeneDropping[inputfounderHaplo_?(ListQ[#]||StringQ[#]&), inputpedigreeInfor
             ];
             founderHaplo = Import[founderHaplo, "CSV"];
         ];
-        founderHaplo[[4 ;;, 2 ;;]] = Map[ToString, founderHaplo[[4 ;;, 2 ;;]], {2}];     
+        founderHaplo[[4 ;;, 2 ;;]] = Map[ToString, founderHaplo[[4 ;;, 2 ;;]], {2}];
         nSNP = Length[First[founderHaplo]] - 1;
-        (*If there are too many founder haplotypes, take only the beginning*) 
+        (*If there are too many founder haplotypes, take only the beginning*)
         If[ MatchQ[Union[Flatten[founderHaplo[[4 ;;, 2 ;;]]]], {"1", "2", "N"} | {"1", "2"}],
-        	(*If founderhaplo contains inbred founders or outbred founders?*)
+            (*If founderhaplo contains inbred founders or outbred founders?*)
             If[ Length[founderHaplo]-3<nFounder (1 + Boole[! isfounderinbred]),
                 Print["magicpopGeneDropping: no enough input founders!"];
                 Abort[];
@@ -434,20 +440,19 @@ magicGeneDropping[inputfounderHaplo_?(ListQ[#]||StringQ[#]&), inputpedigreeInfor
             If[ !isfounderinbred,
                 founderHaplo = toOutbredFounder[founderHaplo];
                 founderHaplo[[4 ;;, 1]] =  "Founder" <> ToString[#] & /@ Range[Length[founderHaplo] - 3];
-                
             ],
             If[ Length[founderHaplo]-3<nFounder,
                 Print["magicpopGeneDropping: no enough input founders!"];
                 Abort[];
             ];
             founderHaplo = Take[founderHaplo, 3 + nFounder];
-        ];   
-        If[isdropmono,
-		  (*drop markers that are observed to be definitely monomorphic in founders!*)
-		  pos = MemberQ[{{"1"}, {"2"}, {"11"}, {"22"}}, Union[#]] & /@ Transpose[founderHaplo[[4 ;;, 2 ;;]]];
-		  pos = Flatten[Position[pos, False]];
-		  founderHaplo = founderHaplo[[All, Join[{1}, 1 + pos]]];
-		 ];
+        ];
+        If[ isdropmono,
+          (*drop markers that are observed to be definitely monomorphic in founders!*)
+            pos = MemberQ[{{"1"}, {"2"}, {"11"}, {"22"}}, Union[#]] & /@ Transpose[founderHaplo[[4 ;;, 2 ;;]]];
+            pos = Flatten[Position[pos, False]];
+            founderHaplo = founderHaplo[[All, Join[{1}, 1 + pos]]];
+        ];
         {isfounderGBS,isoffspringGBS} = checkreaddepth[founderdepth,offspringdepth,nFounder,nOffspring,nSNP];
         checkfounderSNP[founderHaplo,isfounderinbred,isfounderGBS&&isoffspringGBS];
         starttime = SessionTime[];
@@ -597,27 +602,93 @@ toOutbredFounder[founderHaplo_] :=
         fhaplo
     ]
     
-setNAMpedinfo[families_, nself_] := 
- Module[{ped, rule, nfam, founders, funnel, popsize, sample,i,g},
-  ped = {{"Generation", "MemberID", 
-     "Female=1/Male=2/Hermaphrodite=0", {"MotherID", "FatherID"}}};
-  nfam = Length[families];
-  ped = Join[ped, Table[{0, i, 0, {0, 0}}, {i, nfam + 1}]];
-  ped = Join[ped, Table[{1, nfam + 1 + i, 0, {1, i + 1}}, {i, nfam}]];
-  ped = Join[ped, Flatten[Table[Table[{g, g*nfam + 1 + i, 
-        0, {(g - 1)*nfam + 1 + i, (g - 1)*nfam + 1 + i}}, {i,nfam}], {g, 2, nself + 1}], 1]];
-  founders = Join[{families[[1, 1, 1]]}, families[[All, 1, 2]]];
-  rule = Dispatch[Thread[Range[1, nfam + 1] -> founders]];
-  ped[[2 ;;, {2, 4}]] = ped[[2 ;;, {2, 4}]] /. rule;
-  funnel = Range[nfam + 1];
-  popsize = Length[#] & /@ families[[All, 2]];
-  sample = Flatten[Table[{0, ped[[-nfam - 1 + i, 2]], funnel}, {i, 
-      Length[popsize]}, {popsize[[i]]}], 1];
-  sample[[All, 1]] = Flatten[families[[All, 2]]];
-  sample = Join[{{"ProgenyID", "MemberID", "Funnelcode"}}, sample];
-  mergePedigreeInfor[ped, sample]
-  ]
-      
+setNAMpedinfo[families_, nself_] :=
+    Module[ {ped, rule, nfam, founders, funnel, popsize, sample,i,g},
+        ped = {{"Generation", "MemberID", 
+           "Female=1/Male=2/Hermaphrodite=0", {"MotherID", "FatherID"}}};
+        nfam = Length[families];
+        ped = Join[ped, Table[{0, i, 0, {0, 0}}, {i, nfam + 1}]];
+        ped = Join[ped, Table[{1, nfam + 1 + i, 0, {1, i + 1}}, {i, nfam}]];
+        ped = Join[ped, Flatten[Table[Table[{g, g*nfam + 1 + i, 
+              0, {(g - 1)*nfam + 1 + i, (g - 1)*nfam + 1 + i}}, {i,nfam}], {g, 2, nself + 1}], 1]];
+        founders = Join[{families[[1, 1, 1]]}, families[[All, 1, 2]]];
+        rule = Dispatch[Thread[Range[1, nfam + 1] -> founders]];
+        ped[[2 ;;, {2, 4}]] = ped[[2 ;;, {2, 4}]] /. rule;
+        funnel = Range[nfam + 1];
+        popsize = Length[#] & /@ families[[All, 2]];
+        sample = Flatten[Table[{0, ped[[-nfam - 1 + i, 2]], funnel}, {i, 
+            Length[popsize]}, {popsize[[i]]}], 1];
+        sample[[All, 1]] = Flatten[families[[All, 2]]];
+        sample = Join[{{"ProgenyID", "MemberID", "Funnelcode"}}, sample];
+        mergePedigreeInfor[ped, sample]
+    ]
+
+toJuliagenofile[mmagenofile_, juliagenofile_] :=
+    Module[ {magicgeno, nf, ls},
+        magicgeno = Import[mmagenofile];
+        nf = magicgeno[[1, 2]];
+        magicgeno = Transpose[magicgeno[[2 ;;]]];
+        ls = Union[Flatten[magicgeno[[2 ;;, 4 ;;]]]];
+        If[ Union[Head[#] & /@ ls] === {String},
+            magicgeno[[2 ;;, 4 ;;]] = magicgeno[[2 ;;, 4 ;;]] /. Thread[ls -> StringReplace[ls, {"|" -> "||"}]];
+        ];
+        (*reseting for gender*)
+        magicgeno[[2 ;;, 2]] = magicgeno[[2 ;;, 2]] /. {"X" -> "chrx"};
+        magicgeno[[1, 4 ;;]] = StringSplit[magicgeno[[1, 4 ;;]], "_"][[All, 1]];
+        (*rename offspring*)
+        magicgeno[[1, nf + 4 ;;]] = StringReplace[magicgeno[[1, nf + 4 ;;]], 
+          "ProgenyLine" -> "Offspring"];
+        csvExport[juliagenofile, magicgeno]
+    ]
+     
+toJuliapedfile[founders_, mmapedfile_, juliapedfile_] :=
+    Module[ {pedinfo, ped, sample, isfunnel, key},
+        pedinfo = Import[mmapedfile];
+        {ped, sample} = splitPedigreeInfor[pedinfo][[2 ;; 3]];
+        (*transform ped*)
+        ped = Flatten[#] & /@ ped;
+        ped[[1]] = {"generation", "member", "gender", "mother", "father"};
+        ped[[2 ;;, 3]] = ped[[2 ;;, 3]] /. {0 -> "notapplicable", 1 -> "female",2 -> "male"};
+        ped[[2 ;;, {2, 4, 5}]] = ped[[2 ;;, {2, 4, 5}]] /.Thread[ped[[2 ;; Length[founders] + 1, 2]] -> founders];
+        ped = ped[[All, {2, 4, 5, 3}]];
+        (*transform sample*)
+        isfunnel = ! (And @@ Map[# == Range[Length[founders]] &, sample[[2 ;;, 3]] ]);
+        sample = sample[[All, ;; 2]];
+        sample[[1, ;; 2]] = {"offspring", "member"};
+        sample[[2 ;;, 1]] = StringReplace[sample[[2 ;;, 1]], "ProgenyLine" -> "Offspring"];
+        key = "RABBIT-pedfile";
+        pedinfo = Join[{{key, "designinfo"}}, ped, {{key, "sampleinfo"}}, sample];
+        key = "RABBIT-pedfile";
+        pedinfo = Join[{{key, "designinfo"}}, ped, {{key, "sampleinfo"}}, sample];
+        If[ isfunnel,
+            pedinfo = 
+              Join[{"#funnel-based cross scheme so that each offspring is produced with founders being randomly permuted."}, pedinfo];
+        ];
+        csvExport[juliapedfile, pedinfo]
+    ]  
+  
+ toJuliatruefile[mmatruefile_, juliatruefile_] :=
+     Module[ {xpos,malepos,trueval, trueval2, nf, rule,i,j},
+         trueval = Import[mmatruefile];
+         nf = trueval[[1, 2]];
+         xpos = Flatten[Position[trueval[[3, 2 ;;]], "X"]];
+         If[ Length[xpos] > 1,
+             malepos = Flatten[Position[StringContainsQ[trueval[[5 + nf ;;, 1]], "Male"],True]];
+             If[ Length[malepos] > 1,
+                 rule = Table[i -> ToString[i] <> "|" <> ToString[i], {i, nf}];
+                 trueval[[malepos + 4 + nf, xpos + 1]] = 
+                  trueval[[malepos + 4 + nf, xpos + 1]] /. rule;
+             ]
+         ];
+         rule = toDelimitedString[Flatten[Table[{i, j}, {i, nf}, {j, nf}], 1], "|"];
+         rule = Thread[Range[Length[rule]] -> rule ];
+         trueval[[5 + nf ;;, 2 ;;]] = trueval[[5 + nf ;;, 2 ;;]] /. rule;
+         trueval2 = Transpose[trueval[[2 ;;]]];
+          (*rename offspring*)
+         trueval2[[1, nf + 4 ;;]] = StringReplace[StringSplit[trueval2[[1, nf + 4 ;;]], "_"][[All, 1]],"ProgenyLine" -> "Offspring"];
+         csvExport[juliatruefile, trueval2]
+     ]
+  
       
 End[]
 
