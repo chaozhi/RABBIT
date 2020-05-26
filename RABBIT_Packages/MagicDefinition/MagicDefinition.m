@@ -72,8 +72,6 @@ renameDuplicates::usage = "renameDuplicates  "
 notebookEvaluate::usage = "notebookEvaluate  "
 
 
-
-
 Begin["`Private`"]
 (* Implementation of the package *)
     
@@ -146,7 +144,8 @@ csvExport[file_String, table_,nrow_Integer:100] :=
         Join @@ result
     ]*)
     
-readTable[file_String?FileExistsQ, format_String]:=Import[file,format]    
+readTable[file_String?FileExistsQ, format_String] :=
+    Import[file,format]    
     
 readDictTable[file_String?FileExistsQ, format_String] :=
     Module[ {data, sep},
@@ -190,7 +189,7 @@ myParallelNeeds[contextlist_List, OptionsPattern[]] :=
         path = DeleteDuplicates[Join[Flatten[{path}],{Directory[]}]];
         $Path = DeleteDuplicates[Join[$Path, path]];
         ParallelEvaluate[$Path = DeleteDuplicates[Join[$Path, path]]];
-        ParallelNeeds[#] & /@ contextlist;        
+        ParallelNeeds[#] & /@ contextlist;
     ]    
 
 
@@ -242,19 +241,24 @@ independenceGTest[data_?ListQ] :=
             {rowsum, colsum, df, count} = {rowsum, colsum, df, count}[[All, pos]];
             nn = Total[rowsum, {2}];
             expect = MapThread[KroneckerProduct[#1, #2] &, {rowsum, colsum}]/N[nn];
-            count = Flatten[#] & /@ count;
-            temp = Log[count /. {0 -> 1}] - Log[Flatten[#] & /@ expect];
+            count = Flatten[#] & /@ count;            
+            temp = Log[count /. {0 -> 1}] - Log[Flatten[#] & /@ (expect/.{0.0->1})];
             g2 = 2 MapThread[#1.#2 &, {count, temp}];
             pvalue = MapThread[Quiet[SurvivalFunction[ChiSquareDistribution[#1], #2]] &, {df, g2}];
             neglogpvalue = -Log[10, pvalue];
             (*lod = InverseSurvivalFunction[ChiSquareDistribution[1], #1] & /@pvalue;*)
-            lod = Table[If[df[[i]] == 1, g2[[i]],Quiet[InverseSurvivalFunction[ChiSquareDistribution[1],pvalue[[i]]]]], {i, Length[df]}];
+            lod = Table[If[ df[[i]] == 1,
+                            g2[[i]],
+                            Quiet[InverseSurvivalFunction[ChiSquareDistribution[1],pvalue[[i]]]]
+                        ], {i, Length[df]}];
             lod *= Log[10, E]/2;
             res[[pos]] = Transpose[{g2, df, neglogpvalue, lod}];
         ];
         res
     ]
         
+
+          
 randomIntegerPartition[n_, dist_] :=
     Module[ {size, res, sum, pos},
         size = 2 Ceiling[n/Mean[dist]];

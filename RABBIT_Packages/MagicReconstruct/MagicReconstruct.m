@@ -603,8 +603,8 @@ getchrsetdata[data_, chrset_] :=
         Rest[getsubMagicSNP[Join[{{None, None}}, data], chrset, All]]
     ]
 
-plothaploprob[condprob_, truefgldiplo_,offspringls_,opts_] :=
-    Module[ {diplorule, nfounder, offprob, truegeno, gg, label,line,ls,g1, g2,g3},        
+plothaploprob[condprob_, truefgldiplo_,offspringls_,markermap_,opts_] :=
+    Module[ {diplorule, nfounder, offprob, truegeno, gg, label,line,ls,g1, g2,g3,nls},        
         If[ truefgldiplo =!= None,
         	nfounder = truefgldiplo[[1, 2]];
             diplorule = Flatten[Outer[List, Range[nfounder], Range[nfounder]], 1];
@@ -628,20 +628,21 @@ plothaploprob[condprob_, truefgldiplo_,offspringls_,opts_] :=
           g1 = MatrixPlot[Reverse[offprob], FrameLabel -> {"Haplotype", "SNP index"}, 
             ColorFunctionScaling -> False, MaxPlotPoints -> Infinity, 
             AspectRatio -> 1/2.5, DataRange -> {{1, Dimensions[offprob][[2]]}, {1, Length[offprob]}}];
-          g2 = If[ truefgldiplo =!= None,
-                   {ls = truegeno[[line]] /. {i_, i_} :> i;
-                    ls = Transpose[{Range[Length[ls]], ls}];
-                    ListPlot[Select[ls, MatchQ[#, {_, _Integer}] &],PlotRange -> {{1, Dimensions[offprob][[2]]}, {1,Length[offprob]}}, 
-                        PlotRangePadding -> 0,PlotMarkers -> {"\[Times]", 10}, PlotStyle -> Red],
-                    ls = Select[ls, MatchQ[#, {_, _List}] &];
-                    ls = Flatten[Thread[#] & /@ ls, 1];
-                    ListPlot[ls, PlotRange -> {{1, Dimensions[offprob][[2]]}, {1,Length[offprob]}}, PlotRangePadding -> 0, 
-                     PlotMarkers -> {"\[EmptyCircle]", 14}, PlotStyle -> Blue]},
-                   ListPlot[{1}, PlotMarkers -> {Automatic, 0}]
-               ];
           If[ truefgldiplo =!= None,
-          	g3=ListLinePlot[Thread[{#, {0.3, Length[offprob] + 0.7}}] & /@Accumulate[Tally[truefgldiplo[[3, 2 ;;]]][[All, 2]]],
-                PlotStyle -> Directive[Dashed, Thick, Brown]];
+          	nls = Accumulate[Tally[truefgldiplo[[3, 2 ;;]]][[All, 2]]],
+          	nls = Length[#] & /@ SplitBy[markermap[[2 ;;]], #[[2]] &];
+          	nls = Join[{-0.5}, Accumulate[nls]] + 0.5;
+          ];
+          g2 = ListLinePlot[Thread[{#, {0.3, Length[offprob] + 0.7}}] & /@ nls,PlotStyle -> Directive[Dashed, Thick, Gray]]; 
+          If[ truefgldiplo =!= None,
+            g3={ls = truegeno[[line]] /. {i_, i_} :> i;
+                ls = Transpose[{Range[Length[ls]], ls}];
+                ListPlot[Select[ls, MatchQ[#, {_, _Integer}] &],PlotRange -> {{1, Dimensions[offprob][[2]]}, {1,Length[offprob]}}, 
+                    PlotRangePadding -> 0,PlotMarkers -> {"\[Times]", 10}, PlotStyle -> Red],
+                ls = Select[ls, MatchQ[#, {_, _List}] &];
+                ls = Flatten[Thread[#] & /@ ls, 1];
+                ListPlot[ls, PlotRange -> {{1, Dimensions[offprob][[2]]}, {1,Length[offprob]}}, PlotRangePadding -> 0, 
+                 PlotMarkers -> {"\[EmptyCircle]", 14}, PlotStyle -> Blue]};
           	gg={g1,g2,g3},
           	gg={g1,g2}
           ];
@@ -650,8 +651,8 @@ plothaploprob[condprob_, truefgldiplo_,offspringls_,opts_] :=
         gg
     ]
     
-plotgenoprob[condprob_, truefgldiplo_,offspringls_,opts_] :=
-    Module[ {nfounder, x,types, truegeno, gg, offprob,label, line,g1, g2, g3},
+plotgenoprob[condprob_, truefgldiplo_,offspringls_,markermap_,opts_] :=
+    Module[ {nfounder, x,types, truegeno, gg, offprob,label, line,g1, g2, g3,nls},
     	nfounder = x /. Flatten[Solve[x (x + 1)/2 == Dimensions[condprob][[2]] && x > 0, x]];
     	types = origGenotype[nfounder];
         If[ truefgldiplo =!= None,
@@ -674,10 +675,17 @@ plotgenoprob[condprob_, truefgldiplo_,offspringls_,opts_] :=
                      PlotRange -> {{1, Dimensions[offprob][[2]]}, {1, Length[offprob]}}, PlotRangePadding -> 0, 
                      PlotMarkers -> {"\[Times]", 10}, PlotStyle -> Red],
                    ListPlot[{1}, PlotMarkers -> {Automatic, 0}]
-               ];          
+               ];
           If[ truefgldiplo =!= None,
-          	g3 = ListLinePlot[Thread[{#, {0.3, Length[offprob] + 0.7}}] & /@Accumulate[Tally[truefgldiplo[[3, 2 ;;]]][[All, 2]]], 
-            PlotStyle -> Directive[Dashed, Thick, Brown]];
+          	nls = Accumulate[Tally[truefgldiplo[[3, 2 ;;]]][[All, 2]]],
+          	nls = Length[#] & /@ SplitBy[markermap[[2 ;;]], #[[2]] &];
+          	nls = Join[{-0.5}, Accumulate[nls]] + 0.5;
+          ];
+          g2 = ListLinePlot[Thread[{#, {0.3, Length[offprob] + 0.7}}] & /@ nls,PlotStyle -> Directive[Dashed, Thick, Gray]]; 
+          If[ truefgldiplo =!= None,
+            g3=ListPlot[Transpose[{Range[Length[truegeno[[line]]]], truegeno[[line]]}],
+                     PlotRange -> {{1, Dimensions[offprob][[2]]}, {1, Length[offprob]}}, PlotRangePadding -> 0, 
+                     PlotMarkers -> {"\[Times]", 10}, PlotStyle -> Red];
           	gg={g1,g2,g3},
           	gg={g1,g2}
           ];          
@@ -690,7 +698,7 @@ plotgenoprob[condprob_, truefgldiplo_,offspringls_,opts_] :=
 plotAncestryProb[summaryfile_String?FileExistsQ, inputtruefgldiplo_?(ListQ[#] ||StringQ[#]||#===None&),
 	opts : OptionsPattern[]] :=
     Module[ {summary, nfounder, nfgl,noffspring, truefgldiplo = inputtruefgldiplo, 
-      isgeno,chrsubset, gg, pos, condprob, types, line,isfounderinbred,offspringls},
+      isgeno,chrsubset, gg, pos, condprob, types, line,isfounderinbred,offspringls,markermap},
         {isgeno,chrsubset} = OptionValue@{isPlotGenoProb,linkageGroupSet};        
         If[truefgldiplo=!=None,
 	        If[ StringQ[truefgldiplo],
@@ -715,6 +723,7 @@ plotAncestryProb[summaryfile_String?FileExistsQ, inputtruefgldiplo_?(ListQ[#] ||
     		summary[[{2, 5, 7, 8}]] =getchrsetdata[#, chrsubset] & /@ summary[[{2, 5, 7, 8}]],
     		summary[[{2, 7}]] =getchrsetdata[#, chrsubset] & /@ summary[[{2, 7}]]
     	];
+    	markermap = Transpose[summary[[2]][[;; 3]]];
         nfounder = Length[summary[[6, 2 ;;, 2]]];
         (*noffspring = (Length[summary[[7]]] - 3)/nfounder;*)
         offspringls = StringDelete[summary[[7]][[4 ;; ;; nfounder, 1]], "_haplotype1"];
@@ -735,9 +744,9 @@ plotAncestryProb[summaryfile_String?FileExistsQ, inputtruefgldiplo_?(ListQ[#] ||
         ];        
         If[ isgeno,
         	(*genoprob*)        	
-        	gg = plotgenoprob[condprob, truefgldiplo,offspringls,FilterRules[{opts}, Options[ListPlot]]],
+        	gg = plotgenoprob[condprob, truefgldiplo,offspringls,markermap,FilterRules[{opts}, Options[ListPlot]]],
         	(*haploprob*)
-        	gg = plothaploprob[condprob, truefgldiplo,offspringls,FilterRules[{opts}, Options[ListPlot]]];
+        	gg = plothaploprob[condprob, truefgldiplo,offspringls,markermap,FilterRules[{opts}, Options[ListPlot]]];
         ];         
         gg
     ]

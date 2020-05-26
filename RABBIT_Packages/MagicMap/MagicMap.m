@@ -40,6 +40,8 @@ referenceMap::usage = "referenceMap is an option to specify the filename of a re
 
 minLodSaving::usage = "minLodSaving is an option to specify the minimum LOD score for saving results. For a given pair of markers, If the LOD of linkage analysis or independence test is smaller than the threshold, the two-locus analysis will not be saved. "
 
+minLD::usage = "minLD is an option"
+
 minLodClustering::usage = "minLodClustering is an option to specify the minimum LOD score for clustering. The similarity between two markers is set to 0 if its LOD socre is smaller than the LOD threshold. "
 
 minLodOrdering::usage = "minLodOrdering is an option to specify the minimum LOD score for ordering. The similarity between two markers is set to 0 if its LOD socre is smaller than the LOD threshold. . "
@@ -145,6 +147,27 @@ getCosegregateBin::usage = "getCosegregateBin  "
 getSimilarity2::usage = "getSimilarity2  "
 
 getautoCosegregateBin::usage = "getautoCosegregateBin  "
+
+getcorrtab::usage = "getcorrtab  "
+
+stratifiedcrosstab::usage = "stratifiedcrosstab  "
+
+stratifiedGTest::usage = "stratifiedGTest  "
+
+getcrosstab::usage = "getcrosstab  "
+
+minLDSaving::usage = "minLDSaving  "
+
+calGTest::usage = "calGTest  "
+
+calcrosstab::usage = "calcrosstab  "
+
+calGTestStat::usage = "calGTestStat  "
+
+calcrosstabcorr::usage = "calcrosstabcorr  "
+
+minrfSegregateBin::usage = "minrfSegregateBin  "
+
 
 Begin["`Private`"] (* Begin Private Context *) 
 
@@ -437,7 +460,7 @@ findFractionMLE[obsgeno12_, fhaploprior12list_, maxfraction_, ismaleX_,
         res = Select[res, (#[[5]] == loglrmax &)];
         rmax = Min[Commonest[res[[All, 3]]]];
         res = Select[res, (#[[3]] == rmax &)];
-        {res[[All, ;; 2]], rmax, (loglrmax - loglupbound) Log[10,E], loglrmax}
+        {res[[All, ;; 2]], rmax, (loglrmax - loglupbound) Log[10,E]}
     ]
   
 (*basiclogl[fhaplocode1_, fhaplocode2_, geno1_, geno2_, ismalex_, priorcode_] /; fhaplocode1 > fhaplocode2 :=
@@ -486,20 +509,17 @@ calInterSNPsimilarity[roughMap_, magicSNP_, model_, popDesign_, epsF_,
         res
     ]
   
-
-    
-calsimilarity[magicSNP_,  model_, popDesign_,epsF_, eps_,rowspan_,similartype_,outputfile_,precisiongoal_, accuracygoal_, itmax_,lodbound_,
+calsimilarity2[magicSNP_,  model_, popDesign_,epsF_, eps_,rowspan_,similartype_,outputfile_,precisiongoal_, accuracygoal_, itmax_,ldbound_,lodbound_,
     minphredscore_, maxfoundererror_, foundergenocallbound_,isfounderinbred_, isfounderdepth_, isoffspringdepth_,isprint_] :=
     Module[ {starttime,snpid,nmissing,fhaploset1, fhaploset2, fhaplorule1, fhaplorule1Rev, fhaplorule2, fhaplorule2Rev,obsgeno, samplefamilies, 
         priortranset,ismaleX, bool,count,totcount,res,i,j,k,ii,jj,missingcode,ls,outstream,nsnp,fractionupbound = 1,morganrate,calledgeno, 
-        qualityscore, genothreshold},
+        qualityscore, genothreshold,pos,corr},
         If[ isprint,
             starttime = SessionTime[];
         ];
         (*Print["rowspan=",rowspan];*)
         (*Put[magicSNP, model, popDesign, epsF, minphredscore,maxfoundererror, foundergenocallbound, 
-                                isfounderinbred,isfounderdepth, isoffspringdepth, isprint,"tempmap.txt"];
-        Abort[];*)
+                                isfounderinbred,isfounderdepth, isoffspringdepth, isprint,"tempmap.txt"];*)
         {morganrate,snpid,fhaploset1, fhaploset2,fhaplorule1, fhaplorule1Rev, fhaplorule2, fhaplorule2Rev,obsgeno, samplefamilies, priortranset, ismaleX} = 
             mapPreprocessing[magicSNP, model, popDesign, epsF, minphredscore,maxfoundererror, foundergenocallbound, 
                                 isfounderinbred,isfounderdepth, isoffspringdepth, isprint];
@@ -523,7 +543,7 @@ calsimilarity[magicSNP_,  model_, popDesign_,epsF_, eps_,rowspan_,similartype_,o
             If[ MatchQ[similartype,"independence"],
                 fhaplorule1 = fhaplorule2 = Missing["NotApplicable"]
             ];
-            Write[outstream, {{"SimilarityType",similartype},{"MinLodSaving",lodbound},{"MorganRate",morganrate},
+            Write[outstream, {{"SimilarityType",similartype},{"MinLDSaving",ldbound},{"MinLodSaving",lodbound},{"MorganRate",morganrate},
                               {"SNPName",snpid},{"isFounderInbred",isfounderinbred},
                               {"FounderHaplotypeRule",{fhaplorule1, fhaplorule2}},{"nmissing",nmissing}}];
             Write[outstream, Transpose[{{"founderAllelicError", "offspringAllelicError","minPhredQualScore",  "priorFounderCallThreshold", 
@@ -532,11 +552,11 @@ calsimilarity[magicSNP_,  model_, popDesign_,epsF_, eps_,rowspan_,similartype_,o
                                           isfounderdepth,isoffspringdepth, precisiongoal, accuracygoal, itmax,outputfile}}]];
             Switch[similartype,
                 "linkage",
-                Write[outstream, {"SNP1", "SNP2", "FounderHaplotype", "RecombinationFraction", "LinkageLOD", "LinkageMaxLogl"}],
+                Write[outstream, {"SNP1", "SNP2", "FounderHaplotype", "RecombinationFraction", "LinkageLOD"}],
                 "independence",
-                Write[outstream, {"SNP1", "SNP2", "G2Statistic", "DegreeOfFreedom", "-Log10PValue", "IndependenceLod"}],
+                Write[outstream, {"SNP1", "SNP2","Correlation", "G2Statistic","DegreeOfFreedom", "IndependenceLod"}],
                 "both",
-                Write[outstream, {"SNP1", "SNP2", "G2Statistic", "DegreeOfFreedom", "-Log10PValue", "IndependenceLod","FounderHaplotype", "RecombinationFraction", "LinkageLOD", "LinkageMaxLogl"}],
+                Write[outstream, {"SNP1", "SNP2","Correlation", "G2Statistic","DegreeOfFreedom", "IndependenceLod","FounderHaplotype", "RecombinationFraction", "LinkageLOD"}],
                 _,
                 Print["Similarity type must be \"independence\" or \"linkage\"!"];
                 Abort[];
@@ -545,71 +565,590 @@ calsimilarity[magicSNP_,  model_, popDesign_,epsF_, eps_,rowspan_,similartype_,o
         bool = ii[[{1,-1}]]==={1,nsnp-1};
         totcount = Total[ii];
         count = 0;
-        Do[             
-            (*Print["todel here1: Kernel = ", $KernelID,". i = ",i];*)
+        If[ ToLowerCase[model]=="depmodel",
+            missingcode = "NN" | "N" | "1N" | "2N" | "N1" | "N2" | "12" |"21",
+            missingcode = "NN" | "N" | "1N" | "2N" | "N1" | "N2";
+        ];
+        Do[ 
             jj = Range[i + 1, nsnp];
             count +=nsnp-i;
-            missingcode = "NN" | "N" | "1N" | "2N" | "N1" | "N2";
             ls = Table[DeleteCases[Transpose[calledgeno[[{i, j}]]], {missingcode, _} | {_, missingcode}], {j,jj}];
             jj = Pick[jj, # =!= {} & /@ ls];
             If[ jj==={},
                 Continue[]
             ];
-            If[ MatchQ[similartype,"independence"|"both"],            	
+            (*Put[calledgeno,i,jj,missingcode,samplefamilies,"temptestg.txt"];
+            Abort[];*)
+            If[ MatchQ[similartype,"independence"|"both"],
                 ls = DeleteCases[Transpose[calledgeno[[Join[{i}, jj]]]], {missingcode, __}];
                 ls = Table[crossTabulate[DeleteCases[ls[[All, {1, k}]], {_, missingcode}]], {k, 2, Length[jj] + 1}];
-                res = independenceGTest[ls[[All, 1]]];                
+                (*Gtest return: "G2Statistic", "DegreeOfFreedom", "-Log10PValue", "IndependenceLod"*)
+                res = independenceGTest[ls[[All, 1]]];
                 If[ Head[res]===independenceGTest,
-                    Print["Wrong inputdata for independence G-Test!,inputdata = ",ls[[All, 1]]];
+                    Print["Wrong input for independence G-Test! input = ",ls[[All, 1]]];
                     Abort[];
                 ];
-                res = Join[Thread[{i, jj}], res, 2];
-                res = DeleteCases[res,_?(#[[6]]<=lodbound&)];
-                jj = res[[All,2]],
+                (*element of res:{"SNP1", "SNP2", "G2Statistic", "DegreeOfFreedom", "IndependenceLod"}*)
+                res = Join[Thread[{i, jj}], res[[All,{1,2,4}]], 2];
+                pos = Flatten[Position[Thread[res[[All, -1]] >= lodbound], True]];
+                If[ Length[pos]==0,
+                    jj = {};
+                    res = {},
+                    jj = jj[[pos]];
+                    res = res[[pos]];
+                    If[ ToLowerCase[model]=="depmodel",
+                        (*corr for a list of 2x2 contingency tables*)
+                        corr = Abs[corr2x2tab[ls[[pos]][[All, 1]]]],
+                        corr = Abs[corr3x3tab[ls[[pos]]]]
+                    ];  
+                    (*element of res:{"SNP1", "SNP2", "G2Statistic", "DegreeOfFreedom", "IndependenceLod", "Correlation"}*)
+                    res = Join[res,List/@corr,2];
+                    (*element of res:{"SNP1", "SNP2", Correlation", "G2Statistic","DegreeOfFreedom", "IndependenceLod"}*)
+                    res[[All,3;;6]]=res[[All,{6,3,4,5}]];
+                ],
                 res = Thread[{i, jj}]
             ];
             If[ MatchQ[similartype,"linkage"|"both"]&&jj=!={},
                 res = Join[res,Table[findFractionMLE[obsgeno[[{i,j}]], {fhaploset1[[i]],fhaploset2[[j]]}, fractionupbound, ismaleX, 
                             samplefamilies,priortranset,fhaplorule1, fhaplorule2, precisiongoal, accuracygoal, itmax], {j,jj}],2];
-                res = DeleteCases[res,_?(#[[-2]]<=lodbound&)];
+                res = DeleteCases[res,_?(#[[-1]]<=lodbound&)];
                 If[ res=!={},
-                    res[[All,-3;;]] = N[Round[res[[All,-3;;]],10^(-5)]]/.{_Round -> "Noninformative"};
+                    res[[All,-2;;]] = N[Round[res[[All,-2;;]],10^(-5)]]/.{_Round -> "Noninformative"};
                 ];
-            ];           
-            
+            ];
             If[ res=!={},
                 Write[outstream, #] & /@ res;
             ];
             If[ bool&&(Mod[i,10]==0),
-                PrintTemporary["Time elapsed = ", Round[SessionTime[]-starttime,0.01]," seconds. #row = ", i, " out of ",nsnp-1,
+                PrintTemporary["Time elapsed = ", Round[SessionTime[]-starttime,0.01]," seconds. #row = ", i, " out of ",nsnp,
                     ". #pairs = ", count, " out of ", totcount];
             ], {i,ii}];
         Close[outstream];
         removeDownValues[basiclogl[_?IntegerQ, _?IntegerQ, ___]];
     ]
+    
+calsimilarity3[magicSNP_,  model_, popDesign_,epsF_, eps_,rowspan_,similartype_,outputfile_,precisiongoal_, accuracygoal_, itmax_,ldbound_,lodbound_,
+    minphredscore_, maxfoundererror_, foundergenocallbound_,isfounderinbred_, isfounderdepth_, isoffspringdepth_,isprint_] :=
+    Module[ {starttime,snpid,nmissing,fhaploset1, fhaploset2, fhaplorule1, fhaplorule1Rev, fhaplorule2, fhaplorule2Rev,obsgeno, samplefamilies, 
+        priortranset,ismaleX, bool,count,totcount,res,i,j,ii,jj,missingcode,ls,outstream,nsnp,fractionupbound = 1,morganrate,calledgeno, 
+        qualityscore, genothreshold,pos,samplepop,crosstab,rowname, colname, rho,samplefamilies2},
+        If[ isprint,
+            starttime = SessionTime[];
+        ];
+        PrintTemporary["markers=",rowspan];
+        (*Put[magicSNP, model, popDesign, epsF, minphredscore,maxfoundererror, foundergenocallbound, 
+                                isfounderinbred,isfounderdepth, isoffspringdepth, isprint,"tempmap.txt"];*)
+        {morganrate,snpid,fhaploset1, fhaploset2,fhaplorule1, fhaplorule1Rev, fhaplorule2, fhaplorule2Rev,obsgeno, samplefamilies, priortranset, ismaleX} = 
+            mapPreprocessing[magicSNP, model, popDesign, epsF, minphredscore,maxfoundererror, foundergenocallbound, 
+                                isfounderinbred,isfounderdepth, isoffspringdepth, isprint];
+        basicloglconst = {priortranset, fhaplorule1, fhaplorule1Rev, fhaplorule2, fhaplorule2Rev,model, epsF, eps, minphredscore,isoffspringdepth};
+        removeDownValues[basiclogl[_?IntegerQ, _?IntegerQ, ___]];
+        missingcode = "NN" | "N" | "1N" | "2N" | "N1" | "N2";
+        If[ isoffspringdepth,
+            qualityscore = 30;
+            genothreshold = 0.95;
+            calledgeno = rawGenotypeCall[obsgeno, qualityscore, genothreshold]/. {"21" -> "12"},
+            calledgeno = obsgeno/. {"21" -> "12"};
+            nmissing = Count[#, missingcode] & /@ calledgeno,
+            nmissing = Count[#, missingcode] & /@ obsgeno;
+        ];
+        Quiet[Close[outputfile]];
+        Put[outputfile];
+        outstream = OpenWrite[outputfile];
+        nsnp = Length[fhaploset2];
+        ii = Range[nsnp-1][[rowspan]];
+        If[ First[ii]==1,
+            If[ MatchQ[similartype,"independence"],
+                fhaplorule1 = fhaplorule2 = Missing["NotApplicable"]
+            ];
+            Write[outstream, {{"SimilarityType",similartype},{"MinLDSaving",ldbound},{"MinLodSaving",lodbound},{"MorganRate",morganrate},
+                              {"SNPName",snpid},{"isFounderInbred",isfounderinbred},
+                              {"FounderHaplotypeRule",{fhaplorule1, fhaplorule2}},{"nmissing",nmissing}}];
+            Write[outstream, Transpose[{{"founderAllelicError", "offspringAllelicError","minPhredQualScore",  "priorFounderCallThreshold", 
+                                         "isFounderAllelicDepth","isOffspringAllelicDepth", "PrecisionGoal", "AccuracyGoal", "MaxIterations","outputFile"}, 
+                                        {epsF, eps,minphredscore, foundergenocallbound,
+                                          isfounderdepth,isoffspringdepth, precisiongoal, accuracygoal, itmax,outputfile}}]];
+            Switch[similartype,
+                "linkage",
+                Write[outstream, {"SNP1", "SNP2", "FounderHaplotype", "RecombinationFraction", "LinkageLOD"}],
+                "independence",
+                Write[outstream, {"SNP1", "SNP2","Correlation", "G2Statistic", "DegreeOfFreedom", "IndependenceLod"}],
+                "both",
+                Write[outstream, {"SNP1", "SNP2","Correlation", "G2Statistic", "DegreeOfFreedom", "IndependenceLod","FounderHaplotype", "RecombinationFraction", "LinkageLOD"}],
+                _,
+                Print["Similarity type must be \"independence\" or \"linkage\"!"];
+                Abort[];
+            ];
+        ];
+        bool = ii[[{1,-1}]]==={1,nsnp-1};
+        totcount = Total[ii];
+        count = 0;
+        If[ ToLowerCase[model]=="depmodel",
+            missingcode = "NN" | "N" | "1N" | "2N" | "N1" | "N2" | "12" |"21",
+            missingcode = "NN" | "N" | "1N" | "2N" | "N1" | "N2";
+        ];
+        samplepop = Table[0, {Length[First[calledgeno]]}];
+        samplefamilies2 = {#[[1, 1]], Union @@ #[[All, 2]]} & /@SplitBy[SortBy[samplefamilies, First], First];
+        Do[samplepop[[samplefamilies2[[i, 2]]]] = i, {i, Length[samplefamilies2]}];
+        Do[             
+            jj = Range[i + 1, nsnp];
+            count +=nsnp-i;
+            (*Put[calledgeno,i,jj,missingcode,samplepop,samplefamilies,"temptestg.txt"];
+            Abort[];*)
+            If[ MatchQ[similartype,"independence"|"both"],
+                ls = Transpose[Join[{samplepop}, calledgeno[[Join[{i}, jj]]]]];
+                ls = DeleteCases[ls, {_, missingcode, __}];
+                If[ ls==={},
+                    Continue[]
+                ];                
+                (*assuming the population in col1 is grouped*)
+                ls = SplitBy[SortBy[ls,First], First][[All, All, 2 ;;]];
+                ls = Pick[ls, Length[Union[#[[All, 1]]]] >= 2 & /@ ls];
+                If[ ls==={},
+                    Continue[]
+                ];
+                {crosstab, rowname, colname, rho, pos} = stratifiedcrosstab[ls, missingcode];
+                jj = jj[[pos]];
+                If[ jj==={},
+                    Continue[]
+                ];                
+                (*element of res:{"SNP1","SNP2","Correlation"}*)
+                res = Thread[{i, jj, rho}];
+                pos = Flatten[Position[Thread[res[[All, -1]] >= ldbound], True]];
+                If[ Length[pos] == 0,
+                    jj = {};
+                    res = {},
+                    jj = jj[[pos]];
+                    (*element of res:{"SNP1","SNP2","Correlation","G2Statistic","DegreeOfFreedom","IndependenceLod"}*)
+                    (*If[ i==1,
+                        Put[res,pos,crosstab,rowname, colname,"temptest.txt"];
+                        Abort[];
+                    ];*)
+                    (*crosstab=Total[#] & /@ crosstab[[pos]];     
+                    {rowname, colname} = #[[pos,1]]&/@{rowname, colname};               
+                    res = Join[res[[pos]], calGTest[crosstab], 2];       
+                    (*res[[All,3]] = getcorrtab[crosstab, rowname, colname][[All,1]];*)*)
+                    res = Join[res[[pos]], stratifiedGTest[crosstab[[pos]]], 2];
+                    pos = Flatten[Position[Thread[res[[All, -1]] >= lodbound], True]];
+                    jj = jj[[pos]];
+                    res  = res[[pos]];
+                ],
+                res = Thread[{i, jj}]
+            ];
+            If[ MatchQ[similartype,"linkage"|"both"]&&jj=!={},
+                res = Join[res,Table[findFractionMLE[obsgeno[[{i,j}]], {fhaploset1[[i]],fhaploset2[[j]]}, fractionupbound, ismaleX, 
+                            samplefamilies,priortranset,fhaplorule1, fhaplorule2, precisiongoal, accuracygoal, itmax], {j,jj}],2];
+                res = DeleteCases[res,_?(#[[-1]]<=lodbound&)];
+                If[ res=!={},
+                    res[[All,-2;;]] = N[Round[res[[All,-2;;]],10^(-5)]]/.{_Round -> "Noninformative"};
+                ];
+            ];
+            Print["i=",i,";res=",res//MatrixForm];
+            Abort[];
+            If[ res=!={},
+                Write[outstream, #] & /@ res;
+            ];
+            If[ bool&&(Mod[i,10]==0),
+                PrintTemporary["Time elapsed = ", Round[SessionTime[]-starttime,0.01]," seconds. #row = ", i, " out of ",nsnp,
+                    ". #pairs = ", count, " out of ", totcount];
+            ], {i,ii}];
+        Close[outstream];
+        removeDownValues[basiclogl[_?IntegerQ, _?IntegerQ, ___]];
+    ]
+    
+    
+calsimilarity[magicSNP_,  model_, popDesign_,epsF_, eps_,rowspan_,similartype_,outputfile_,precisiongoal_, accuracygoal_, itmax_,ldbound_,lodbound_,
+    minphredscore_, maxfoundererror_, foundergenocallbound_,isfounderinbred_, isfounderdepth_, isoffspringdepth_,isprint_] :=
+    Module[ {starttime,snpid,nmissing,fhaploset1, fhaploset2, fhaplorule1, fhaplorule1Rev, fhaplorule2, fhaplorule2Rev,obsgeno, samplefamilies, 
+        priortranset,ismaleX, bool,count,totcount,isdepmodel,res,i,j,ii,jj,missingcode,ls,outstream,nsnp,fractionupbound = 1,morganrate,calledgeno, 
+        qualityscore, genothreshold,pos,crosstab, rho},
+        If[ isprint,
+            starttime = SessionTime[];
+        ];
+        Print["markers=",rowspan, ", ", DateString[]];
+        (*Put[magicSNP, model, popDesign, epsF, minphredscore,maxfoundererror, foundergenocallbound, 
+                                isfounderinbred,isfounderdepth, isoffspringdepth, isprint,"tempmap.txt"];*)
+        {morganrate,snpid,fhaploset1, fhaploset2,fhaplorule1, fhaplorule1Rev, fhaplorule2, fhaplorule2Rev,obsgeno, samplefamilies, priortranset, ismaleX} = 
+            mapPreprocessing[magicSNP, model, popDesign, epsF, minphredscore,maxfoundererror, foundergenocallbound, 
+                                isfounderinbred,isfounderdepth, isoffspringdepth, isprint];
+        basicloglconst = {priortranset, fhaplorule1, fhaplorule1Rev, fhaplorule2, fhaplorule2Rev,model, epsF, eps, minphredscore,isoffspringdepth};
+        removeDownValues[basiclogl[_?IntegerQ, _?IntegerQ, ___]];
+        missingcode = "NN" | "N" | "1N" | "2N" | "N1" | "N2";
+        If[ isoffspringdepth,
+            qualityscore = 30;
+            genothreshold = 0.95;
+            calledgeno = rawGenotypeCall[obsgeno, qualityscore, genothreshold]/. {"21" -> "12"},
+            calledgeno = obsgeno/. {"21" -> "12"};
+            nmissing = Count[#, missingcode] & /@ calledgeno,
+            nmissing = Count[#, missingcode] & /@ obsgeno;
+        ];
+        Quiet[Close[outputfile]];
+        Put[outputfile];
+        outstream = OpenWrite[outputfile];
+        nsnp = Length[fhaploset2];
+        ii = Range[nsnp-1][[rowspan]];
+        If[ First[ii]==1,
+            If[ MatchQ[similartype,"independence"],
+                fhaplorule1 = fhaplorule2 = Missing["NotApplicable"]
+            ];
+            Write[outstream, {{"SimilarityType",similartype},{"MinLDSaving",ldbound},{"MinLodSaving",lodbound},{"MorganRate",morganrate},
+                              {"SNPName",snpid},{"isFounderInbred",isfounderinbred},
+                              {"FounderHaplotypeRule",{fhaplorule1, fhaplorule2}},{"nmissing",nmissing}}];
+            Write[outstream, Transpose[{{"founderAllelicError", "offspringAllelicError","minPhredQualScore",  "priorFounderCallThreshold", 
+                                         "isFounderAllelicDepth","isOffspringAllelicDepth", "PrecisionGoal", "AccuracyGoal", "MaxIterations","outputFile"}, 
+                                        {epsF, eps,minphredscore, foundergenocallbound,
+                                          isfounderdepth,isoffspringdepth, precisiongoal, accuracygoal, itmax,outputfile}}]];
+            Switch[similartype,
+                "linkage",
+                Write[outstream, {"SNP1", "SNP2", "FounderHaplotype", "RecombinationFraction", "LinkageLOD"}],
+                "independence",
+                Write[outstream, {"SNP1", "SNP2","Correlation", "G2Statistic", "DegreeOfFreedom", "IndependenceLod"}],
+                "both",
+                Write[outstream, {"SNP1", "SNP2","Correlation", "G2Statistic", "DegreeOfFreedom", "IndependenceLod","FounderHaplotype", "RecombinationFraction", "LinkageLOD"}],
+                _,
+                Print["Similarity type must be \"independence\" or \"linkage\"!"];
+                Abort[];
+            ];
+        ];
+        bool = ii[[{1,-1}]]==={1,nsnp-1};
+        totcount = Total[ii];
+        count = 0;
+        isdepmodel = ToLowerCase[model]=="depmodel";
+        If[ isdepmodel,
+            missingcode = "NN" | "N" | "1N" | "2N" | "N1" | "N2" | "12" |"21",
+            missingcode = "NN" | "N" | "1N" | "2N" | "N1" | "N2";
+        ];
+        (*samplepop = Table[0, {Length[First[calledgeno]]}];
+        samplefamilies2 = {#[[1, 1]], Union @@ #[[All, 2]]} & /@SplitBy[SortBy[samplefamilies, First], First];
+        Do[samplepop[[samplefamilies2[[i, 2]]]] = i, {i, Length[samplefamilies2]}];*)        
+        Do[             
+            jj = Range[i + 1, nsnp];
+            count +=nsnp-i;            
+            (*Put[calledgeno,i,jj,missingcode,samplefamilies,"temptestg.txt"];
+            Abort[];*)
+            If[ MatchQ[similartype,"independence"|"both"],
+            	(*ls = Transpose[Join[{samplepop}, calledgeno[[Join[{i}, jj]]]]];
+                ls = DeleteCases[ls, {_, missingcode, __}];
+                If[ ls==={},
+                    Continue[]
+                ];
+                ls = SplitBy[SortBy[ls,First], First][[All, All, 2 ;;]];
+                ls = Pick[ls, Length[Union[#[[All, 1]]]] >= 2 & /@ ls];
+                If[ ls==={},
+                    Continue[]
+                ];
+                crosstab = Total[calcrosstab[#, missingcode, isdepmodel]&/@ls]; *)
+                ls = DeleteCases[Transpose[calledgeno[[Join[{i}, jj]]]], {missingcode, __}];
+                If[ ls==={},
+                    Continue[]
+                ];
+                crosstab = calcrosstab[ls, missingcode, isdepmodel];
+                rho = Abs[calcrosstabcorr[crosstab][[All,1]]];             
+                (*element of res:{"SNP1","SNP2","Correlation"}*)
+                res = Thread[{i, jj, rho}];
+                pos = Flatten[Position[Thread[res[[All, -1]] >= ldbound], True]];
+                If[ Length[pos] == 0,
+                    jj = {};
+                    res = {},
+                    jj = jj[[pos]];
+                    (*element of res:{"SNP1","SNP2","Correlation","G2Statistic","DegreeOfFreedom","IndependenceLod"}*)
+                    (*Put[res,pos,crosstab,rowname, colname,"temptest.txt"];*)                    
+                    res = Join[res[[pos]], calGTest[crosstab[[pos]]], 2];
+                    pos = Flatten[Position[Thread[res[[All, -1]] >= lodbound], True]];
+                    jj = jj[[pos]];
+                    res  = res[[pos]];
+                ],
+                res = Thread[{i, jj}]
+            ];
+            If[ MatchQ[similartype,"linkage"|"both"]&&jj=!={},
+                res = Join[res,Table[findFractionMLE[obsgeno[[{i,j}]], {fhaploset1[[i]],fhaploset2[[j]]}, fractionupbound, ismaleX, 
+                            samplefamilies,priortranset,fhaplorule1, fhaplorule2, precisiongoal, accuracygoal, itmax], {j,jj}],2];                
+                res = DeleteCases[res,_?(#[[-1]]<=lodbound&)];
+                If[ res=!={},
+                    res[[All,-2;;]] = N[Round[res[[All,-2;;]],10^(-5)]]/.{_Round -> "Noninformative"};
+                ];
+            ];            
+            If[ res=!={},
+                Write[outstream, #] & /@ res;
+            ];
+            If[ bool&&(Mod[i,10]==0),
+                PrintTemporary["Time elapsed = ", Round[SessionTime[]-starttime,0.01]," seconds. #row = ", i, " out of ",nsnp,
+                    ". #pairs = ", count, " out of ", totcount];
+            ], {i,ii}];
+        Close[outstream];
+        removeDownValues[basiclogl[_?IntegerQ, _?IntegerQ, ___]];
+    ]
+    
+calcrosstab[data_, missingcode_, isdep_] :=
+    Module[ {data2, rowpos, temp, res, genoname, pos,i},
+        genoname = If[ isdep,
+                       {"11", "22"},
+                       {"11", "12", "22"}
+                   ];
+        data2 = DeleteCases[data, {missingcode, __}];
+        rowpos = Flatten[Position[data2[[All, 1]], #]] & /@ genoname;
+        temp = Transpose[data2[[All, 2 ;;]]];
+        res = Table[Count[temp[[i, pos]], #] & /@ genoname, {i, Length[temp]}, {pos,rowpos}];
+        (*colsum = Total[#] & /@ res;
+        pos = Flatten[Position[Thread[colsum[[All, -1]] > colsum[[All, 1]]], True]];
+        res[[pos]] = Transpose[Reverse[Transpose[#]]] & /@ res[[pos]];*)
+        res
+    ]
+
+calcrosstabcorr[counts_] :=
+    Module[ {rowsum, colsum, nn, nrowls, ncolls, xls, yls, xyls, exy, ex, 
+      ey, ex2, ey2, covxy, covx, covy, rho,i},
+        rowsum = Total[counts, {3}];
+        colsum = Total[counts, {2}];
+        nn = N[Total[rowsum, {2}]];
+        {nrowls, ncolls} = Transpose[Dimensions[#] & /@ counts];
+        xls = Range[0, # - 1] & /@ nrowls;
+        yls = Range[0, # - 1] & /@ ncolls;
+        xyls = Table[KroneckerProduct[xls[[i]], yls[[i]]], {i, Length[xls]}];
+        Table[
+         exy = Total[xyls[[i]] counts[[i]], 2];
+         ex = xls[[i]].rowsum[[i]];
+         ey = yls[[i]].colsum[[i]];
+         ex2 = (xls[[i]]^2).rowsum[[i]];
+         ey2 = (yls[[i]]^2).colsum[[i]];
+         covxy = exy*nn[[i]] - ex*ey;
+         covx = ex2*nn[[i]] - ex^2;
+         covy = ey2*nn[[i]] - ey^2;
+         If[ covx == 0 || covy == 0,
+             covx = covy = 0.0;
+             rho = Missing[],
+             rho = covxy/Sqrt[covx covy];
+         ];
+         {rho, covxy, covx, covy}, {i, Length[xyls]}]
+    ]      
   
+calGTest[counts_] :=
+    Module[ {gstat, df},
+        {gstat,df} = Transpose[calGTestStat[counts]];
+        calGTest[gstat,df]
+    ]
+
+calGTestStat[counts_] :=
+    Module[ {data = counts, res, rowsum, colsum, df, pos, nn, expect, temp,g2,i},
+        res = ConstantArray[0, {Length[data], 2}];
+        rowsum = Total[data, {3}];
+        pos = Position[rowsum, 0];
+        pos = {#[[1, 1]], List /@ #[[All, 2]]} & /@SplitBy[SortBy[pos, First], First];
+        If[ pos =!= {},
+            Do[
+              data[[pos[[i, 1]]]] = Delete[data[[pos[[i, 1]]]], pos[[i, 2]]];
+              rowsum[[pos[[i, 1]]]] = Delete[rowsum[[pos[[i, 1]]]], pos[[i, 2]]];
+              0, {i, Length[pos]}];
+        ];
+        colsum = Total[data, {2}];
+        pos = Position[colsum, 0];
+        pos = {#[[1, 1]], List /@ #[[All, 2]]} & /@SplitBy[SortBy[pos, First], First];
+        If[ pos =!= {},
+            Do[
+              data[[pos[[i, 1]]]] = Transpose[Delete[Transpose[data[[pos[[i, 1]]]]], pos[[i, 2]]]];
+              colsum[[pos[[i, 1]]]] = Delete[colsum[[pos[[i, 1]]]], pos[[i, 2]]];
+              0, {i, Length[pos]}];
+        ];
+        df = ((Length[#] & /@ rowsum) - 1) ((Length[#] & /@ colsum) - 1);
+        pos = Intersection @@ (Flatten[
+              Position[(Length[#] > 1 & /@ #), True]] & /@ {rowsum, colsum});
+        If[ pos =!= {},
+            {rowsum, colsum, df, data} = {rowsum, colsum, df, data}[[All, pos]];
+            nn = Total[rowsum, {2}];
+            expect = MapThread[KroneckerProduct[#1, #2] &, {rowsum, colsum}]/N[nn];
+            data = Flatten[#] & /@ data;
+            temp = Log[data /. {0 -> 1}] - Log[Flatten[#] & /@ (expect/.{0.0->1})];
+            g2 = 2 MapThread[#1.#2 &, {data, temp}];
+            res[[pos]] = Transpose[{g2, df}]
+        ];
+        res
+    ]
+    
+calGTest[gstat_,df_] :=
+    Module[ {res, pos, gstat2, df2, pvalue,i},
+        res = ConstantArray[0, {Length[gstat], 3}];
+        res[[All, ;; 2]] = Transpose[{gstat,df}];
+        pos = Flatten[Position[res[[All, 2]], 1]];
+        res[[pos, 3]] = res[[pos, 1]];
+        pos = Flatten[Position[res[[All, 2]] - 1, _?Positive]];
+        {gstat2, df2} = {res[[pos, 1]], res[[pos, 2]]};
+        pvalue = MapThread[Quiet[SurvivalFunction[ChiSquareDistribution[#2], #1]] &, {gstat2,df2}];
+        res[[pos, 3]] = 
+        Table[If[ df2[[i]] == 1,
+                  gstat2[[i]],
+                  Quiet[InverseSurvivalFunction[ChiSquareDistribution[1],pvalue[[i]]]]
+              ], {i, Length[df2]}];
+        res[[All, 3]] *= Log[10, E]/2;
+        res
+    ]
+          
+getcrosstab[data_, missingcode_] :=
+    Module[ {data2, rowname, rowpos, temp, colname, res,m,pos},
+        data2 = DeleteCases[data, {missingcode, __}];
+        rowname = Union[data2[[All, 1]]];
+        rowpos = Flatten[Position[data2[[All, 1]], #]] & /@ rowname;
+        temp = Transpose[data2[[All, 2 ;;]]];
+        colname = DeleteCases[Union[#], missingcode] & /@ temp;
+        res = Table[Count[temp[[m, pos]], #] & /@ colname[[m]], {m,Length[colname]}, {pos, rowpos}];
+        {res, Table[rowname, {Length[colname]}], colname}
+    ]
+
+stratifiedcrosstab[popdata_, missingcode_] :=
+    Module[ {crosstab, rowname, colname, pos, a,b,m,rho},
+        {crosstab, rowname, colname} = 
+         Transpose[#] & /@ Transpose[getcrosstab[#, missingcode] & /@ popdata];
+        Do[
+         b = Length[#] > 1 & /@ colname[[m]];
+         colname[[m]] = Pick[colname[[m]], b];
+         rowname[[m]] = Pick[rowname[[m]], b];
+         crosstab[[m]] = Pick[crosstab[[m]], b], {m, Length[colname]}];
+        pos = Flatten[Position[Length[#] > 0 & /@ colname, True]];
+        {crosstab, rowname, colname} = #[[pos]] & /@ {crosstab, rowname, colname};
+        rho = Table[
+            a = getcorrtab[crosstab[[m]], rowname[[m]], colname[[m]]];
+            crosstab[[m]] = a[[All,5]];
+            a = Total[a[[All, 2 ;; 4]], {1}];
+            If[ a[[2]] a[[3]] == 0,
+                0,
+                a[[1]]/Sqrt[a[[2]] a[[3]]]
+            ], {m,Length[crosstab]}];
+        {crosstab, rowname, colname, rho, pos}
+    ]
+
+getcorrtab[counts_, rowid_, colid_] :=
+    Module[ {newcounts,rowsum, colsum, nn, rule, xls, yls, xyls, exy, ex, ey, ex2, 
+      ey2, covxy, covx, covy, rho,i},
+        rowsum = Total[counts, {3}];
+        colsum = Total[counts, {2}];
+        nn = N[Total[rowsum, {2}]];
+        rule = {"11" -> 0.0, "22" -> 1.0, "12" | "21" -> 0.5};
+        xls = rowid /. rule;
+        yls = colid /. rule;
+        xyls = Table[KroneckerProduct[xls[[i]], yls[[i]]], {i, Length[xls]}];
+        newcounts = counts;
+        Table[
+         exy = Total[xyls[[i]] counts[[i]], 2];
+         ex = xls[[i]].rowsum[[i]];
+         ey = yls[[i]].colsum[[i]];
+         ex2 = (xls[[i]]^2).rowsum[[i]];
+         ey2 = (yls[[i]]^2).colsum[[i]];
+         covxy = exy*nn[[i]] - ex*ey;
+         covx = ex2*nn[[i]] - ex^2;
+         covy = ey2*nn[[i]] - ey^2;
+         If[ covxy < 0,
+             {covxy, covx, covy} = {-covxy, covy, covx},
+             newcounts[[i]] = Transpose[Reverse[Transpose[counts[[i]]]]];
+         ];
+         If[ covx == 0 || covy == 0,
+             covx = covy = 0.0;
+             rho = Missing[],
+             rho = covxy/Sqrt[covx covy];
+         ];
+         {rho, covxy, covx, covy,newcounts[[i]]}, {i, Length[xyls]}]
+    ]    
+
+stratifiedGTest[crosstab_] :=
+    Module[ {res, stat, gstat, df},
+        res = ConstantArray[0, {Length[crosstab], 3}];
+        stat = Map[calGTestStat, crosstab];
+        {gstat,df} = Transpose[Total[stat, {2}]];
+        calGTest[gstat,df]
+    ]
+  
+            
+(*getcorr2x2tab[count_?ListQ] :=
+    Module[ {rowsum, colsum, nls, covxy,covx,covy,sg,pos},
+        If[ Union[Dimensions[#] & /@ count] =!= {{2, 2}},
+            Print["input is not a list of 2x2 contingent tables"]
+        ];
+        rowsum = Total[count, {3}];
+        colsum = Total[count, {2}];
+        nls = N[Total[colsum, {2}]];
+        covxy = (nls count[[All, 2, 2]] - rowsum[[All, 2]]*colsum[[All, 2]]);
+        covx = (Times @@ Transpose[rowsum]);
+        covy = (Times @@ Transpose[colsum]);
+        sg = Sign[covxy];
+        If[ Length[Union[sg]] > 1,
+            pos = Flatten[Position[sg, -1]];
+            {covx[[pos]], covy[[pos]]} = {covy[[pos]], covx[[pos]]};
+            covxy[[pos]] = Abs[covxy[[pos]]],
+            If[ !MemberQ[Union[sg],1],
+                {covx, covy} = {covy, covx};
+                covxy = Abs[covxy]
+            ]
+        ];
+        Transpose[{covxy/Sqrt[covx*covy],covxy,covx,covy}]
+    ]*)
+    
+corr2x2tab[data_?ListQ] :=
+    Module[ {rowsum, colsum, nls, res},
+        If[ Union[Dimensions[#] & /@ data] =!= {{2, 2}},
+            Print["input is not a list of 2x2 contingent tables"]
+        ];
+        rowsum = Total[data, {3}];
+        colsum = Total[data, {2}];
+        nls = N[Total[colsum, {2}]];
+        res = (nls data[[All, 2, 2]] - rowsum[[All, 2]]*colsum[[All, 2]]);
+        res/Sqrt[(Times @@ Transpose[rowsum])*(Times @@ Transpose[colsum])]
+    ]
+    
+corr3x3tab[data_?ListQ] :=
+    Module[ {rowsum, colsum, nn, res, dims, rulels, xyls, pos, exy, ex, 
+      ey, ex2, ey2,i,j},
+        rowsum = Total[data[[All, 1]], {3}];
+        colsum = Total[data[[All, 1]], {2}];
+        nn = N[Total[rowsum, {2}]];
+        res = Table[0, {Length[data]}];
+        dims = Dimensions[#] & /@ data[[All, 1]];
+        rulels = Flatten[Table[{i, j} -> {Range[0, i - 1], Range[0, j - 1], 
+             KroneckerProduct[Range[0, i - 1], Range[0, j - 1]]}, {i, 2, 3}, {j, 2, 3}], 1];
+        xyls = Replace[dims, rulels, {1}];
+        pos = Flatten[Position[Length[#] & /@ xyls, 3]];
+        Do[
+         exy = Total[xyls[[i, 3]] data[[i, 1]], 2];
+         ex = xyls[[i, 1]].rowsum[[i]];
+         ey = xyls[[i, 2]].colsum[[i]];
+         ex2 = (xyls[[i, 1]]^2).rowsum[[i]];
+         ey2 = (xyls[[i, 2]]^2).colsum[[i]];
+         res[[i]] = exy*nn[[i]] - ex*ey;
+         res[[i]] /= Sqrt[ex2*nn[[i]] - ex^2]*Sqrt[ey2*nn[[i]] - ey^2], {i, pos}];
+        res
+    ]
+      
 getrowspan[nsnp_, nseg_] :=
     Module[ {ls, ls2},
-        ls = Accumulate[Range[nsnp - 1, 1, -1]];
+        (*ls = Accumulate[Range[nsnp - 1, 1, -1]];*)
+        ls = Range[nsnp - 1];
         ls2 = Round[Range[nseg - 1] Last[ls]/nseg];
         ls = Union[Join[Flatten[Position[ls - #, _?Positive, {1}, 1, Heads -> False] & /@ls2], {1, nsnp}]];
         Thread[Most[ls] ;; Rest[ls] - 1]
     ]
 
-parallelsimilarity[magicSNP_, model_, popDesign_, epsF_, eps_,similartype_,outputfile_, precisiongoal_, accuracygoal_, itmax_, lodbound_, 
+parallelsimilarity[magicSNP_, model_, popDesign_, epsF_, eps_,similartype_,outputfile_, precisiongoal_, accuracygoal_, itmax_, ldbound_,lodbound_, 
   minphredscore_, maxfoundererror_, foundergenocallbound_, isfounderinbred_, isfounderdepth_, isoffspringdepth_, isprint_] :=
-    Module[ {filels, nsnp, spanls, countls, count, outstream,i},
-        nsnp = Length[magicSNP[[2]]] - 1;
-        spanls = getrowspan[nsnp, Max[2,IntegerLength[nsnp]-1] $KernelCount];
+    Module[ {filels, nsnp, nseg,spanls, countls, count, outstream,i},
+        nsnp = Length[magicSNP[[2]]] - 1;        
+        If[ nsnp<=$KernelCount+1,
+            nseg = 1,
+            If[ nsnp<=10*$KernelCount,
+            	nseg = $KernelCount,
+            	If[ nsnp<=100*$KernelCount,
+            		nseg = 2*$KernelCount,
+            		nseg = 3*$KernelCount
+        		]
+        	]
+        ];        
+        spanls = getrowspan[nsnp, nseg];
         filels = "temporaryfile" <> ToString[#] <> ".txt" & /@ Range[Length[spanls]];
         filels[[1]] = outputfile;
         filels = FileNameJoin[{Directory[], #}]&/@filels;
-        countls = Range[nsnp - 1, 1, -1];
-        countls = Total[countls[[#]]] & /@ spanls;
+        countls = Sqrt[N[Range[nsnp - 1, 1, -1]]];
+        (*countls = Table[1,{nsnp-1}];*)
+        countls = Round[Total[countls[[#]]]] & /@ spanls;
         SetSharedVariable[count,spanls,countls,filels];
         count = 0;
         Monitor[ParallelDo[
-          calsimilarity[magicSNP,  model, popDesign,epsF, eps, spanls[[i]], similartype,filels[[i]], precisiongoal, accuracygoal, itmax, lodbound, 
+          calsimilarity[magicSNP,  model, popDesign,epsF, eps, spanls[[i]], similartype,filels[[i]], precisiongoal, accuracygoal, itmax, ldbound,lodbound, 
            minphredscore, maxfoundererror, foundergenocallbound, isfounderinbred, isfounderdepth, isoffspringdepth,isprint];
           count += countls[[i]], {i, Length[filels]},
           DistributedContexts->{"MagicMap`", "MagicMap`Private`"},
@@ -622,6 +1161,7 @@ parallelsimilarity[magicSNP_, model_, popDesign_, epsF_, eps_,similartype_,outpu
         DeleteFile[#] & /@ Rest[filels];
     ]
 
+  
 calmagicibd[inputmagicSNP_, popDesign_, isfounderinbred_, isfounderdepth_, isoffspringdepth_] :=
     Module[ {ischrX, magicSNP = inputmagicSNP, deltd, founderHaplo, 
       obsGeno, snpMap, haploMap, nFounder, posA, posX, foundergender, 
@@ -661,19 +1201,21 @@ Options[magicPairwiseSimilarity] = {
         },    
     outputFileID -> "", 
     isPrintTimeElapsed ->True,
-    isRunInParallel -> True,
+    isRunInParallel -> True,   
+    minLDSaving ->0.0,
     minLodSaving ->1
 }
         
 magicPairwiseSimilarity[inputmagicSNP_?(ListQ[#] || StringQ[#] &),inputmodel_String,inputpopDesign_?(ListQ[#] || StringQ[#] &), opts : OptionsPattern[]] :=
     Module[ {starttime,nfounder,magicSNP = inputmagicSNP, model = inputmodel,popDesign = inputpopDesign,epsF,eps,ibdprob,
-        lodtype,outputfile,outputid,isprint,isparallel,minphredscore,maxfoundererror = 0,lodbound,
+        lodtype,outputfile,outputid,isprint,isparallel,minphredscore,maxfoundererror = 0,ldbound,lodbound,
         foundergenocallbound,isfounderinbred,isfounderdepth,isoffspringdepth, precisiongoal = 10, accuracygoal = 10, itmax = 100},
         {epsF,eps} = OptionValue@{founderAllelicError,offspringAllelicError};
         {isfounderdepth,isoffspringdepth,minphredscore,foundergenocallbound} =
             OptionValue[Thread[sequenceDataOption -> {isFounderAllelicDepth,isOffspringAllelicDepth,minPhredQualScore,priorFounderCallThreshold}]];
-        {isfounderinbred,lodtype,lodbound,outputid,isprint,isparallel} = 
-            OptionValue@{isFounderInbred,computingLodType,minLodSaving,outputFileID,isPrintTimeElapsed,isRunInParallel};
+        {isfounderinbred,lodtype,ldbound,lodbound,outputid,isprint,isparallel} = 
+            OptionValue@{isFounderInbred,computingLodType,minLDSaving,minLodSaving,outputFileID,isPrintTimeElapsed,isRunInParallel};
+        (*minLDSaving ->0.0*)
         If[ StringQ[lodtype],
             lodtype = ToLowerCase[lodtype];
         ];
@@ -720,7 +1262,7 @@ magicPairwiseSimilarity[inputmagicSNP_?(ListQ[#] || StringQ[#] &),inputmodel_Str
         (*Put[magicSNP, model, popDesign, epsF, eps,lodtype,outputfile,precisiongoal, accuracygoal, itmax,lodbound,
                     minphredscore, maxfoundererror, foundergenocallbound,isfounderinbred, isfounderdepth, isoffspringdepth,isprint,"temp.txt"];
         Abort[];*)
-        If[ ToLowerCase[model]==="jointmodel"&&(lodtype=!="independence"),
+        If[ ToLowerCase[model]==="jointmodel",
             ibdprob = calmagicibd[magicSNP, popDesign, isfounderinbred, isfounderdepth,isoffspringdepth];
             model = If[ ibdprob>0.85,
                         "depModel",
@@ -734,9 +1276,9 @@ magicPairwiseSimilarity[inputmagicSNP_?(ListQ[#] || StringQ[#] &),inputmodel_Str
             ];
         ];
         If[ isparallel,
-            parallelsimilarity[magicSNP, model, popDesign, epsF, eps, lodtype,outputfile, precisiongoal, accuracygoal, itmax, lodbound, 
+            parallelsimilarity[magicSNP, model, popDesign, epsF, eps, lodtype,outputfile, precisiongoal, accuracygoal, itmax, ldbound,lodbound, 
                         minphredscore, maxfoundererror, foundergenocallbound, isfounderinbred,isfounderdepth, isoffspringdepth, isprint],
-            calsimilarity[magicSNP, model, popDesign, epsF, eps,All,lodtype,outputfile,precisiongoal, accuracygoal, itmax,lodbound,
+            calsimilarity[magicSNP, model, popDesign, epsF, eps,All,lodtype,outputfile,precisiongoal, accuracygoal, itmax,ldbound,lodbound,
                     minphredscore, maxfoundererror, foundergenocallbound,isfounderinbred, isfounderdepth, isoffspringdepth,isprint]
         ];
         If[ isprint,
@@ -746,42 +1288,49 @@ magicPairwiseSimilarity[inputmagicSNP_?(ListQ[#] || StringQ[#] &),inputmodel_Str
     ] 
     
 (************************************************************************************************)    
-(*linkage={"SNP1", "SNP2", "FounderHaplotype", "RecombinationFraction", "LinkageLOD", "LinkageMaxLogl"}*)
-(*both={"SNP1", "SNP2", "G2Statistic", "DegreeOfFreedom", "-Log10PValue", "IndependenceLod",
-"FounderHaplotype", "RecombinationFraction", "LinkageLOD", "LinkageMaxLogl"}*)     
+(*linkage={"SNP1", "SNP2", "FounderHaplotype", "RecombinationFraction", "LinkageLOD"}*)
+(*both={"SNP1", "SNP2","Correlation", "G2Statistic", "DegreeOfFreedom", "IndependenceLod",
+"FounderHaplotype", "RecombinationFraction", "LinkageLOD"}*)     
 Options[readPairwiseDatafile] = {minLodSaving ->1}    
   
 readPairwiseDatafile[datafile_?FileExistsQ, opts : OptionsPattern[]] :=
-    Module[ {ressimilarity,lodtype, minlodsaving,minlodsave,snpid,isfounderinbred,fphaserule,nmissing,nsnp, morganrate, rule, 
-        rfmtx, linklodmtx,indeplodmtx},
+    Module[ {ressimilarity,lodtype, minldsaving,minlodsaving,minlodsave,snpid,isfounderinbred,fphaserule,nmissing,nsnp, morganrate, rule, 
+        rfmtx, linklodmtx,cormtx,indeplodmtx},
         minlodsave = OptionValue[minLodSaving];
         rfmtx = linklodmtx = indeplodmtx = Missing["NotAvailable"];
         ressimilarity = ReadList[datafile];
-        {lodtype, minlodsaving, morganrate, snpid, isfounderinbred,fphaserule,nmissing} = ressimilarity[[1, All,2]];
+        {lodtype, minldsaving,minlodsaving, morganrate, snpid, isfounderinbred,fphaserule,nmissing} = ressimilarity[[1, All,2]];
         lodtype = ToLowerCase[lodtype];
         nsnp = Length[snpid];
         ressimilarity = ressimilarity[[4;;]];
-        If[minlodsave>minlodsaving,
-        	If[MatchQ[lodtype, "independence" | "both"],ressimilarity = Select[ressimilarity, #[[6]] > minlodsave &]];
-        	If[MatchQ[lodtype,"linkage"|"both"],ressimilarity = Select[ressimilarity, #[[-2]] > minlodsave &]];
+        If[ minlodsave>minlodsaving,
+            If[ MatchQ[lodtype, "independence" | "both"],
+                ressimilarity = Select[ressimilarity, #[[6]] > minlodsave &]
+            ];
+            If[ MatchQ[lodtype,"linkage"|"both"],
+                ressimilarity = Select[ressimilarity, #[[-1]] > minlodsave &]
+            ];
         ];
         If[ MatchQ[lodtype,"independence"|"both"],
+            rule = Join[Thread[ressimilarity[[All, ;; 2]] -> ressimilarity[[All, 3]]],
+                Thread[(Reverse[#] & /@ ressimilarity[[All, ;; 2]]) ->ressimilarity[[All, 3]]]];
+            cormtx = SparseArray[rule, {nsnp, nsnp}];
             rule = ressimilarity[[All, ;; 2]] -> ressimilarity[[All, 6]];
             rule = Join[{{i_, i_} -> Infinity}, Thread[rule]];
             indeplodmtx = SparseArray[rule, {nsnp, nsnp}];
             indeplodmtx += Transpose[indeplodmtx]
         ];
         If[ MatchQ[lodtype,"linkage"|"both"],
-            ressimilarity[[All, -3]] = ressimilarity[[All, -3]] /. {"Noninformative" -> 1};
-            rule = Join[Thread[ressimilarity[[All, ;; 2]] -> ressimilarity[[All, -3]]],
-                Thread[(Reverse[#] & /@ ressimilarity[[All, ;; 2]]) ->ressimilarity[[All, -3]]]];
-            rfmtx = SparseArray[rule, {nsnp, nsnp}, Max[ressimilarity[[All, -3]]]];
-            rule = ressimilarity[[All, ;; 2]] -> ressimilarity[[All, -2]];
+            ressimilarity[[All, -2]] = ressimilarity[[All, -2]] /. {"Noninformative" -> 1};
+            rule = Join[Thread[ressimilarity[[All, ;; 2]] -> ressimilarity[[All, -2]]],
+                Thread[(Reverse[#] & /@ ressimilarity[[All, ;; 2]]) ->ressimilarity[[All, -2]]]];
+            rfmtx = SparseArray[rule, {nsnp, nsnp}, Max[ressimilarity[[All, -2]]]];
+            rule = ressimilarity[[All, ;; 2]] -> ressimilarity[[All, -1]];
             rule = Join[{{i_, i_} -> Infinity}, Thread[rule]];
             linklodmtx = SparseArray[rule, {nsnp, nsnp}];
             linklodmtx += Transpose[linklodmtx];
         ];
-        {lodtype,isfounderinbred,Max[minlodsave,minlodsaving], morganrate,nmissing,snpid, rfmtx, linklodmtx, indeplodmtx}
+        {lodtype,isfounderinbred,minldsaving,Max[minlodsave,minlodsaving], morganrate,nmissing,snpid, rfmtx, linklodmtx, cormtx,indeplodmtx}
     ]
 
 adjConnectedComponents[similarity_] :=
@@ -971,26 +1520,20 @@ getCosegregateAdj[computedtype_, rfmtx_, linklodmtx_, indeplodmtx_, adjminlod_] 
         SparseArray[adj]
     ]
 
-getCosegregateBin[computedtype_, nmissing_, snpid_, rfmtx_,linklodmtx_, indeplodmtx_,adjminlod_,
-    maxrf_, minlodsaving_, miniclustersize_, knnsaving_, outputfile_] :=
-    Module[ {neighbors, neighborstrength, neighborlod,adjmtx, nodeweight, binlist, bins,selectedbin,binindicator,clusters,rule,ls,i,represent},
-        adjmtx = getCosegregateAdj[computedtype, rfmtx, linklodmtx,indeplodmtx, adjminlod];
+getrfCosegregateBin[computedtype_, nmissing_, snpid_, rfmtx_,linklodmtx_, cormtx_,indeplodmtx_,maxrfbin_,
+    maxrf_, minld_,minlodsaving_, miniclustersize_, knnsaving_, outputfile_] :=
+    Module[ {adjminlod2,neighbors, neighborstrength, neighborlod,adjmtx, nodeweight, binlist, bins,selectedbin,binindicator,clusters,rule,ls,i,represent},
+        (*adjminlod2 = If[TrueQ[Element[adjminlod,Reals]],adjminlod,10];*)
+        adjminlod2=10;
+        adjmtx = SparseArray[Boole[NonPositive[rfmtx - maxrfbin]]];
+        adjmtx *= SparseArray[Boole[Positive[linklodmtx-adjminlod2]]];
+        If[ computedtype == "both",
+            adjmtx *=  SparseArray[Boole[NonNegative[cormtx - (1-maxrfbin-0.01)]]];
+            adjmtx *= SparseArray[Boole[Positive[indeplodmtx-adjminlod2]]];
+        ];
         nodeweight = Max[nmissing] + 1 - nmissing;
         binlist = binningAdjacency[adjmtx, nodeweight];
-        (*split large bin*)
-        (*ls = Length[#] & /@ binlist;
-        pos = Flatten[Position[Thread[ls > 15], True]];
-        ls = Map[Partition[#, UpTo[10]] &, binlist[[pos]]];
-        binlist[[pos]] = 
-          If[ Length[Last[#]] < 5,
-              ReplacePart[#[[;;-2]], -1 -> Flatten[#[[-2 ;;]]]],
-              #
-          ] & /@ ls;
-        pos = Complement[Range[Length[binlist]], pos];
-        binlist[[pos]] = List /@ binlist[[pos]];
-        binlist = Flatten[binlist, 1];*)
-        (**)
-        {neighbors, neighborstrength, neighborlod} = getNeighbors[computedtype, indeplodmtx, linklodmtx, rfmtx, maxrf, minlodsaving, 
+        {neighbors, neighborstrength, neighborlod} = getNeighbors[computedtype, indeplodmtx, cormtx,linklodmtx, rfmtx, maxrf, minld,minlodsaving, 
             miniclustersize, knnsaving];
         bins = Table[Transpose[{i, neighbors[[i]], neighborstrength[[i]],neighborlod[[i]]}], {i, binlist}];
         selectedbin = binindicator = ConstantArray[0, {Length[snpid]}];
@@ -1011,12 +1554,55 @@ getCosegregateBin[computedtype_, nmissing_, snpid_, rfmtx_,linklodmtx_, indeplod
          If[ MissingQ[#],
              #,
              #[[represent, represent]]
-         ] & /@ {rfmtx, linklodmtx, indeplodmtx}]
+         ] & /@ {rfmtx, linklodmtx, cormtx, indeplodmtx}]
+    ]
+    
+getCosegregateBin[computedtype_, nmissing_, snpid_, rfmtx_,linklodmtx_, cormtx_,indeplodmtx_,adjminlod_,
+    maxrf_, minld_,minlodsaving_, miniclustersize_, knnsaving_, outputfile_] :=
+    Module[ {neighbors, neighborstrength, neighborlod,adjmtx, nodeweight, binlist, bins,selectedbin,binindicator,clusters,rule,ls,i,represent},
+        adjmtx = getCosegregateAdj[computedtype, rfmtx, linklodmtx,indeplodmtx, adjminlod];
+        nodeweight = Max[nmissing] + 1 - nmissing;
+        binlist = binningAdjacency[adjmtx, nodeweight];
+        (*split large bin*)
+        (*ls = Length[#] & /@ binlist;
+        pos = Flatten[Position[Thread[ls > 15], True]];
+        ls = Map[Partition[#, UpTo[10]] &, binlist[[pos]]];
+        binlist[[pos]] = 
+          If[ Length[Last[#]] < 5,
+              ReplacePart[#[[;;-2]], -1 -> Flatten[#[[-2 ;;]]]],
+              #
+          ] & /@ ls;
+        pos = Complement[Range[Length[binlist]], pos];
+        binlist[[pos]] = List /@ binlist[[pos]];
+        binlist = Flatten[binlist, 1];*)
+        (**)
+        {neighbors, neighborstrength, neighborlod} = getNeighbors[computedtype, indeplodmtx, cormtx,linklodmtx, rfmtx, maxrf, minld,minlodsaving, 
+            miniclustersize, knnsaving];
+        bins = Table[Transpose[{i, neighbors[[i]], neighborstrength[[i]],neighborlod[[i]]}], {i, binlist}];
+        selectedbin = binindicator = ConstantArray[0, {Length[snpid]}];
+        Do[binindicator[[bins[[i, All, 1]]]] = i;
+           selectedbin[[bins[[i, 1, 1]]]] = i, {i, Length[bins]}];
+        clusters = Join[Transpose[{snpid, binindicator, selectedbin}],SortBy[Flatten[bins, 1], First], 2];
+        (*randomize the ordering of markers in each bin*)
+        clusters = SortBy[clusters, #[[2]] &];
+        clusters = Flatten[RandomSample[#] & /@ SplitBy[clusters, #[[2]] &], 1];
+        clusters = Join[{{"Marker-ID", "Bin-ID", "Representive", "MarkerNo","NearestNeighbor", "NeighborSimilarity", "NeighborLod"}},clusters];
+        rule = Dispatch[Thread[ToString[#] & /@ clusters[[2 ;;, 4]] ->Range[Length[clusters] - 1]]];
+        ls = StringSplit[clusters[[2 ;;, 5]], "|"] /. rule;
+        clusters[[2 ;;, 5]] = toDelimitedString[ls];
+        clusters[[2 ;;, 4]] = Range[Length[clusters] - 1];
+        csvExport[outputfile, clusters];
+        represent = binlist[[All, 1]];
+        Join[{snpid[[represent]]}, 
+         If[ MissingQ[#],
+             #,
+             #[[represent, represent]]
+         ] & /@ {rfmtx, linklodmtx, cormtx, indeplodmtx}]
     ]
 
 
-getautoCosegregateBin[computedtype_, nmissing_, snpid_, rfmtx_,linklodmtx_, indeplodmtx_,
-    maxrf_, minlodsaving_, miniclustersize_, knnsaving_, outputfile_,isprint_] :=
+getautoCosegregateBin[computedtype_, nmissing_, snpid_, rfmtx_,linklodmtx_, cormtx_,indeplodmtx_,
+    maxrf_,minld_, minlodsaving_, miniclustersize_, knnsaving_, outputfile_,isprint_] :=
     Module[ {minadj,maxadj,adjminlod,cond,res,ratio},
         minadj = 0;
         maxadj = Infinity;
@@ -1024,7 +1610,7 @@ getautoCosegregateBin[computedtype_, nmissing_, snpid_, rfmtx_,linklodmtx_, inde
         cond = False;
         While[True,
           res = getCosegregateBin[computedtype, nmissing, snpid, rfmtx, 
-            linklodmtx, indeplodmtx, adjminlod, maxrf, minlodsaving, 
+            linklodmtx, cormtx,indeplodmtx, adjminlod, maxrf, minld,minlodsaving, 
             miniclustersize, knnsaving, outputfile];
           ratio = N[Length[snpid]/Length[First[res]]];
           If[ isprint,
@@ -1059,27 +1645,27 @@ Options[magicMapConstruct] = DeleteDuplicates[Join[Options[magicGrouping],Option
       {miniComponentSize->5,
       nConnectedComponent->1,
       lodTypeClustering->"both",
-      lodTypeOrdering->"both",      
-      minLodSaving -> 1, 
+      lodTypeOrdering->"both",
       minLodClustering -> Automatic,  
       minLodOrdering -> Automatic,
-      nNeighborFunction ->(Sqrt[#]&),
+      nNeighborFunction ->(Min[20,Sqrt[#]]&),
       nNeighborSaving -> 10,  
       referenceMap ->None,
       (*SCL: Strongest Cross Link: for each locus anotherl ocus is shown with wich it has the strongest linkage outside its own group*)   
       delStrongCrossLink->True,   
       minLodSegregateBin -> Infinity,
+      minrfSegregateBin -> 0,
       outputFileID -> "",
       isPrintTimeElapsed ->True}
   ]]
 
 magicMapConstruct[pairwisedatafile_?FileExistsQ, ngroup_Integer?Positive,opts : OptionsPattern[]] :=
-    Module[ {isbinning,nsnp,clusterlodtype, evsel,orderlodtype,computedtype,minlodsaving,snpid, maxrf = 1,morganrate, nmissing,rfmtx, linklodmtx, indeplodmtx,ii,jj,k,ls,miniclustersize,
+    Module[ {isbinning,nsnp,clusterlodtype, evsel,orderlodtype,computedtype,minlodsaving,snpid, maxrf = 1,morganrate, nmissing,rfmtx, linklodmtx, cormtx,indeplodmtx,ii,jj,k,ls,miniclustersize,
        similarity, linkagegroups, singletons, eigenval, eigenvec, neighborstrength,neighborlod,neighbors,isfounderinbred,knnls,strongneighbors,knn,
-      minlodclustering, minlodordering,knnfun,knnsaving,refmap,outputid, isprint,estmap,estorder,outputfiles,starttime,temp,maxnconn,adjminlod,delscl,rule,
-      indeplodmtx2,linklodmtx2, rfmtx2},
-        {adjminlod,delscl,maxnconn,clusterlodtype,orderlodtype,minlodclustering, minlodordering,knnfun,knnsaving,miniclustersize,refmap,outputid,isprint} = 
-            OptionValue@{minLodSegregateBin,delStrongCrossLink,nConnectedComponent,lodTypeClustering,lodTypeOrdering,minLodClustering,minLodOrdering,nNeighborFunction,nNeighborSaving,miniComponentSize,referenceMap,outputFileID,isPrintTimeElapsed};
+      minld,minldsaving,minlodclustering, minlodordering,knnfun,knnsaving,refmap,outputid, isprint,estmap,estorder,outputfiles,starttime,temp,maxnconn,adjminlod,adjmaxrf,delscl,rule,
+      indeplodmtx2,cormtx2,linklodmtx2, rfmtx2},
+        {adjminlod,adjmaxrf,delscl,maxnconn,clusterlodtype,orderlodtype,minlodclustering, minlodordering,knnfun,knnsaving,miniclustersize,refmap,outputid,isprint} = 
+            OptionValue@{minLodSegregateBin,minrfSegregateBin,delStrongCrossLink,nConnectedComponent,lodTypeClustering,lodTypeOrdering,minLodClustering,minLodOrdering,nNeighborFunction,nNeighborSaving,miniComponentSize,referenceMap,outputFileID,isPrintTimeElapsed};
         {clusterlodtype,orderlodtype} = ToLowerCase[#]&/@{clusterlodtype,orderlodtype};
         evsel = OptionValue[eigenVectorSelection];
         outputfiles = outputid <> #&/@{"_pairwise_linkagemap.csv","_pairwise_binning.csv"};
@@ -1095,19 +1681,24 @@ magicMapConstruct[pairwisedatafile_?FileExistsQ, ngroup_Integer?Positive,opts : 
             0,
             maxnconn = Max[1,Min[Round[maxnconn],ngroup]];
         ];
-        {computedtype,isfounderinbred,minlodsaving, morganrate, nmissing,snpid, rfmtx, linklodmtx, indeplodmtx} = readPairwiseDatafile[pairwisedatafile,FilterRules[{opts}, Options[readPairwiseDatafile]]];
+        {computedtype,isfounderinbred,minldsaving,minlodsaving, morganrate, nmissing,snpid, rfmtx, linklodmtx, cormtx,indeplodmtx} = readPairwiseDatafile[pairwisedatafile,FilterRules[{opts}, Options[readPairwiseDatafile]]];
+        minld = minldsaving;
         computedtype = ToLowerCase[computedtype];
-        isbinning = MatchQ[computedtype, "linkage" | "both"]&&adjminlod=!=Infinity;
+        isbinning = MatchQ[computedtype, "linkage" | "both"]&&(adjminlod=!=Infinity || adjmaxrf>=0);
         (*Print["{isbinning,computedtype,adjminlod}=", {isbinning,computedtype,adjminlod}];*)
         If[ isbinning,
             nsnp = Length[snpid];
-            (*Put[computedtype, nmissing, snpid, rfmtx, linklodmtx, indeplodmtx, maxrf, minlodsaving, miniclustersize,knnsaving,"tempneighbor.txt"];
+            (*Put[computedtype, nmissing, snpid, rfmtx, linklodmtx, cormtx,indeplodmtx, maxrf, minlodsaving, miniclustersize,knnsaving,"tempneighbor.txt"];
             Abort[];*)
-            If[ adjminlod===Automatic,
-                {adjminlod,snpid, rfmtx, linklodmtx, indeplodmtx} = getautoCosegregateBin[computedtype, nmissing, snpid, rfmtx, linklodmtx, indeplodmtx, 
-                    maxrf, minlodsaving, miniclustersize,knnsaving, outputfiles[[2]], isprint],
-                {snpid, rfmtx, linklodmtx, indeplodmtx} = getCosegregateBin[computedtype, nmissing, snpid, rfmtx, linklodmtx,indeplodmtx,
-                    adjminlod,maxrf, minlodsaving, miniclustersize, knnsaving,outputfiles[[2]]];
+            If[adjmaxrf>=0,
+            	{snpid, rfmtx, linklodmtx, cormtx,indeplodmtx} = getrfCosegregateBin[computedtype, nmissing, snpid, rfmtx, linklodmtx,
+	                    cormtx,indeplodmtx,adjmaxrf,maxrf, minld,minlodsaving, miniclustersize, knnsaving,outputfiles[[2]]],
+	            If[ adjminlod===Automatic,
+	                {adjminlod,snpid, rfmtx, linklodmtx, cormtx,indeplodmtx} = getautoCosegregateBin[computedtype, nmissing, snpid, rfmtx, linklodmtx,
+	                    cormtx,indeplodmtx,maxrf, minld,minlodsaving, miniclustersize,knnsaving, outputfiles[[2]], isprint],
+	                {snpid, rfmtx, linklodmtx, cormtx,indeplodmtx} = getCosegregateBin[computedtype, nmissing, snpid, rfmtx, linklodmtx,
+	                    cormtx,indeplodmtx,adjminlod,maxrf, minld,minlodsaving, miniclustersize, knnsaving,outputfiles[[2]]];
+	            ]	            
             ];
             If[ isprint,
                 Print["#SNPs = ", nsnp, "; #Bins = ",Length[snpid]];
@@ -1131,10 +1722,11 @@ magicMapConstruct[pairwisedatafile_?FileExistsQ, ngroup_Integer?Positive,opts : 
         ];
         (*Spectral clustering*)
         (*Put[{clusterlodtype, indeplodmtx,linklodmtx, rfmtx, maxrf, minlodsaving, minlodclustering, miniclustersize,maxnconn},"tempbrent.txt"];*)
-        minlodclustering = findminlodBrent[clusterlodtype, indeplodmtx,linklodmtx, rfmtx, maxrf, minlodsaving, minlodclustering, miniclustersize,maxnconn];
-        similarity = getSimilarity[clusterlodtype, indeplodmtx,linklodmtx, rfmtx, maxrf, minlodclustering,Infinity,miniclustersize];
-        (*Put[similarity,"temp_sim.txt"];*)        
-        {linkagegroups, singletons, eigenval, eigenvec} = magicGrouping[similarity,ngroup,FilterRules[{opts}, Options[magicGrouping]]];        
+        minlodclustering = findminlodBrent[clusterlodtype, indeplodmtx,cormtx,linklodmtx, rfmtx, maxrf, minld,minlodsaving, minlodclustering, miniclustersize,maxnconn];
+        similarity = getSimilarity[clusterlodtype, indeplodmtx,cormtx,linklodmtx, rfmtx, maxrf, minld,minlodclustering,Infinity,miniclustersize];
+        (*Put[similarity,ngroup,"tempgroup.txt"];*)
+        (*Abort[];*)
+        {linkagegroups, singletons, eigenval, eigenvec} = magicGrouping[similarity,ngroup,FilterRules[{opts}, Options[magicGrouping]]];
         If[ OptionValue[minLodClustering]===Automatic,
             If[ isprint,
                 Print[Style["The option value of minLodClustering is set to " <>ToString[minlodclustering] <> "!", {Black}]];
@@ -1144,36 +1736,39 @@ magicMapConstruct[pairwisedatafile_?FileExistsQ, ngroup_Integer?Positive,opts : 
             Print[Style["magicMapConstruct warning: the number " <> ToString[Count[Flatten[eigenval], _?(# < 10^(-10) &)]] <> 
                   " of clusters determined by multiplicity of zero eigenvalue > input #linkagegroup " <> ToString[ngroup] <> "!" <> 
                   " Try smaller option value of minLodClustering!", Red]];
-        ];        
-        linkagegroups = relabelLinkagegroup[snpid,linkagegroups,refmap];        
+        ];
+        linkagegroups = relabelLinkagegroup[snpid,linkagegroups,refmap];
         If[ isprint,
             Print["Size of "<>ToString[Length[linkagegroups]]<>" groups = ", Length[#] & /@ linkagegroups," and #ungrouped markers = ", Length[singletons]," after spectral clustering!",
                 "Time elapsed = ", Round[SessionTime[] - starttime,0.1], " Seconds."];
         ];
         If[ delscl,
             strongneighbors = getStrongestNeighbors[clusterlodtype, linklodmtx, indeplodmtx,minlodclustering, miniclustersize];
-            k = Length[singletons];            
+            k = Length[singletons];
             {linkagegroups,singletons} = removewronglinkednode[linkagegroups, singletons, strongneighbors];
             linkagegroups = DeleteCases[linkagegroups, {}];
             If[ isprint&&k!=Length[singletons],
                 Print["Size of "<>ToString[Length[linkagegroups]]<>" groups = ", Length[#] & /@ linkagegroups," and #ungrouped markers = ", Length[singletons]," after removing markers whose strongest neighbors are not in the same group!"];
             ];
-        ];      
+        ];         
         (*Spectral ordering*)
         If[ OptionValue[minLodOrdering]===Automatic,
             minlodordering = Table[
-            	{indeplodmtx2,linklodmtx2, rfmtx2}=If[MissingQ[#],#,#[[ii,ii]]]&/@{indeplodmtx,linklodmtx, rfmtx};
-                temp = getSimilarity[orderlodtype, indeplodmtx2,linklodmtx2, rfmtx2, 
-                            maxrf,minlodclustering, minlodsaving,miniclustersize];
+                {indeplodmtx2,cormtx2,linklodmtx2, rfmtx2} = If[ MissingQ[#],
+                                                                 #,
+                                                                 #[[ii,ii]]
+                                                             ]&/@{indeplodmtx,cormtx,linklodmtx, rfmtx};
+                temp = getSimilarity[orderlodtype, indeplodmtx2,cormtx2,linklodmtx2, rfmtx2, 
+                            maxrf,minld,minlodclustering, minlodsaving,miniclustersize];
                 temp = adjConnectedComponents[temp];
                 temp = Count[(Length[#] & /@ temp) - miniclustersize, _?Positive];
                 (**)
                 If[ temp==1,
                     minlodclustering,
                     maxnconn = 1;
-                    findminlodBrent[orderlodtype, indeplodmtx2,linklodmtx2, rfmtx2, 
-                                    maxrf, minlodsaving,Automatic, miniclustersize,maxnconn]
-                ], {ii, linkagegroups}];     
+                    findminlodBrent[orderlodtype, indeplodmtx2,cormtx2,linklodmtx2, rfmtx2, 
+                                    maxrf, minld,minlodsaving,Automatic, miniclustersize,maxnconn]
+                ], {ii, linkagegroups}];
             If[ isprint,
                 Print[Style["The option value of minLodOrdering is set to " <>ToString[minlodordering] <> "!", {Black}]];
             ],
@@ -1187,20 +1782,23 @@ magicMapConstruct[pairwisedatafile_?FileExistsQ, ngroup_Integer?Positive,opts : 
                 Print["magicMapConstruct: wrong minLodOrdering optionvalue: ",minlodordering,"!"];
                 Abort[];
             ]
-        ];        
+        ];
         knnls = Min[Length[#], Ceiling[knnfun[Length[#]]]] & /@ linkagegroups;
         (*Put[{orderlodtype,indeplodmtx,linklodmtx,rfmtx, maxrf,minlodordering,minlodsaving,miniclustersize,linkagegroups,knnls},"temp1.txt"];*)
         {similarity, linkagegroups, knnls,temp} = Transpose[Table[
             jj = linkagegroups[[ii]];
-            {indeplodmtx2,linklodmtx2, rfmtx2}=If[MissingQ[#],#,#[[jj,jj]]]&/@{indeplodmtx,linklodmtx, rfmtx};
-            temp = getSimilarity[orderlodtype, indeplodmtx2,linklodmtx2, rfmtx2, maxrf, 
-                      minlodordering[[ii]], minlodsaving, miniclustersize];            
+            {indeplodmtx2,cormtx2,linklodmtx2, rfmtx2} = If[ MissingQ[#],
+                                                             #,
+                                                             #[[jj,jj]]
+                                                         ]&/@{indeplodmtx,cormtx,linklodmtx, rfmtx};
+            temp = getSimilarity[orderlodtype, indeplodmtx2,cormtx2,linklodmtx2, rfmtx2, maxrf, 
+                      minld,minlodordering[[ii]], minlodsaving, miniclustersize];
             knn = First[estimateKNN[temp, knnls[[ii]]]];
             temp = toKNNSimilarity[temp, knn];
             ls = adjConnectedComponents[temp];
             k = Positive[(Length[#] & /@ ls) - miniclustersize];
             ls = Sort[Flatten[Pick[ls, k, True]]];
-            {temp[[ls, ls]], jj[[ls]], knn,Complement[jj, jj[[ls]]]}, {ii,Length[linkagegroups]}]];        
+            {temp[[ls, ls]], jj[[ls]], knn,Complement[jj, jj[[ls]]]}, {ii,Length[linkagegroups]}]];
         {similarity, linkagegroups, knnls,temp} = DeleteCases[#, {}]&/@{similarity, linkagegroups, knnls,temp};
         If[ isprint,
             Print["# NearestNeighbors = ",knnls];
@@ -1210,21 +1808,21 @@ magicMapConstruct[pairwisedatafile_?FileExistsQ, ngroup_Integer?Positive,opts : 
         If[ isprint&&k!=Length[singletons],
             Print["Size of groups = ", Length[#] & /@ linkagegroups," and #ungrouped markers = ", Length[singletons],
                 " after dropping components with size <= ",miniclustersize, " for each group!"];
-        ];        
-        estorder = MapThread[#2[[spectralOrdering[#1,FilterRules[{opts}, Options[spectralOrdering]]]]]&,{similarity,linkagegroups}];        
+        ];
+        estorder = MapThread[#2[[spectralOrdering[#1,FilterRules[{opts}, Options[spectralOrdering]]]]]&,{similarity,linkagegroups}];
         If[ isprint,
             If[ ngroup>1,
                 ls = {spetralEigenPlot[eigenval,ngroup,evsel,isprint]},
                 ls = {}
-            ];            
+            ];
             If[ refmap=!=None,
                 AppendTo[ls,Show[mymapplot[estorder, {"refmap ordering","estmap ordering"}, snpid, refmap]]];
             ];
             If[ ls=!={},
                 Print[GraphicsRow[ls,ImageSize->550 Length[ls]]]
             ];
-        ];        
-        {neighbors, neighborstrength,neighborlod} = getNeighbors[orderlodtype,indeplodmtx,linklodmtx,rfmtx, maxrf,minlodsaving,miniclustersize,knnsaving];
+        ];
+        {neighbors, neighborstrength,neighborlod} = getNeighbors[orderlodtype,indeplodmtx,cormtx,linklodmtx,rfmtx, maxrf,minld,minlodsaving,miniclustersize,knnsaving];
         Switch[orderlodtype,            
             "independence",
             estmap = formRoughMap[snpid,neighbors,neighborstrength,neighborlod,estorder, singletons,eigenval,eigenvec],
@@ -1233,7 +1831,7 @@ magicMapConstruct[pairwisedatafile_?FileExistsQ, ngroup_Integer?Positive,opts : 
             If[ isprint,
                 PrintTemporary["Genetic map function for initial map construction: scaled fraction = 1-Exp[-"<>ToString[N[Round[morganrate,10^(-2)]]]<>" distance(M)]"];
             ];
-        ];        
+        ];
         rule = Dispatch[Thread[ToString[#] & /@ estmap[[2 ;;, 5]] ->Range[Length[estmap] - 1]]];
         ls = StringSplit[estmap[[2 ;;, 6]], "|"] /. rule;
         estmap[[2 ;;, 6]] = toDelimitedString[ls];
@@ -1258,31 +1856,31 @@ calKendallTau[estorder_, snpid_,inputrefmap_] :=
         Round[KendallTau[#, Range[Length[#]]] & /@ order, 0.01]
     ]
 
-getSimilarity[clusterlodtype_, indeplodmtx_, linklodmtx_, 
-    rfmtx_, maxrf_, minlod_,minlodmini_,miniclustersize_] :=
+getSimilarity[clusterlodtype_, indeplodmtx_, cormtx_,linklodmtx_, 
+    rfmtx_, maxrf_, minld_,minlod_,minlodmini_,miniclustersize_] :=
     Module[ {lodmtx,aa,ww,f},
         lodmtx = getNeighborLodMtx[clusterlodtype,indeplodmtx,linklodmtx, minlod, minlodmini,miniclustersize];
-        (*lodmtx *= SparseArray[1 - IdentityMatrix[Length[lodmtx]]]; (*set diagonal to zeros; uses too much memory*)*)
         lodmtx = SparseArray[DeleteCases[ArrayRules[lodmtx], _ -> Infinity],Dimensions[lodmtx]];
-        (*aa = lodmtx+SparseArray[DiagonalMatrix[((Max[#] & /@ lodmtx) /. {0 | 0. -> Max[lodmtx]})]];*)
-        aa = lodmtx;
-        If[ clusterlodtype=!="independence",
+        aa = lodmtx+SparseArray[DiagonalMatrix[((Max[#] & /@ lodmtx) /. {0 | 0. -> Max[lodmtx]})]];
+        If[ clusterlodtype==="independence",
+            (*Boole[Positive[cormtx-minld]]*)
+            (*aa = cormtx*Boole[Positive[cormtx-minld]]*Sign[aa],*)
+            0,
             f = fractiontosimilarity[rfmtx, maxrf];
-            aa = f Sign[aa];
+            aa = f*Sign[aa];       
+            (*If[clusterlodtype=!="linkage", aa=aa*Boole[Positive[cormtx-minld]]]*)
             ww = lodmtx/(Max[lodmtx]+10^(-3.));
-            (*ww = Log[1.0+lodmtx];
-            ww /= Max[ww];*)            
             aa += ww Sign[aa] 10^(-5.);
         ];
         aa
     ]
-            
+                     
     
-findminlodBrent[lodtype_, indeplodmtx_, linklodmtx_,rfmtx_, maxrf_, minlodsaving_, minlod_,miniclustersize_,maxnconn_] :=
+findminlodBrent[lodtype_, indeplodmtx_,cormtx_, linklodmtx_,rfmtx_, maxrf_,minld_,minlodsaving_, minlod_,miniclustersize_,maxnconn_] :=
     Module[ {func,func0,similarity,len, bool,nconn,nungroup,nungroup0,minlod2,minlodstart,grid,step,fx,lod,flod},
         If[ minlod===Automatic,
             func0 = Function[{x},
-                     similarity = getSimilarity[lodtype, indeplodmtx, linklodmtx,rfmtx, maxrf, x,Infinity,miniclustersize];
+                     similarity = getSimilarity[lodtype, indeplodmtx, cormtx,linklodmtx,rfmtx, maxrf, minld,x,Infinity,miniclustersize];
                      len = Length[#] & /@ adjConnectedComponents[similarity];
                      bool = Positive[len-miniclustersize];
                      len = Pick[len,bool,#]&/@{True,False};
@@ -1348,13 +1946,13 @@ getNeighborLodMtx[orderlodtype_, indeplodmtx_,linklodmtx_, minlod_, minlodmini_,
     ]      
                    
 
-getNeighbors[orderlodtype_, indeplodmtx_, linklodmtx_, rfmtx_, maxrf_, minlod_, miniclustersize_, knnsaving_] :=
+getNeighbors[orderlodtype_, indeplodmtx_, cormtx_,linklodmtx_, rfmtx_, maxrf_,minld_, minlod_, miniclustersize_, knnsaving_] :=
     Module[ {knnsnp,simmtx,lodmtx,i,neighbors,neighbornode, neighborsim, neighborlod,nls,minlodmini = 0},
         If[ orderlodtype==="independence",
             knnsnp = Table[knnsaving, {i,Length[indeplodmtx]}],
             knnsnp = Table[Min[3 knnsaving, Max[knnsaving,Count[Most[ArrayRules[rfmtx[[i]]]], {_} -> 0.0]]], {i,Length[rfmtx]}];
         ];
-        simmtx = getSimilarity[orderlodtype, indeplodmtx, linklodmtx, rfmtx, maxrf,minlod, minlodmini, miniclustersize];
+        simmtx = getSimilarity[orderlodtype, indeplodmtx, cormtx,linklodmtx, rfmtx, maxrf,minld,minlod, minlodmini, miniclustersize];
         neighbors = Table[SortBy[DeleteCases[Most[ArrayRules[simmtx[[i]]]], {i} -> _], Last], {i, Length[simmtx]}];
         neighbors = Reverse[#] & /@ neighbors;
         neighbors = MapThread[Take[#1, UpTo[#2]] &, {neighbors, knnsnp}];
@@ -2182,17 +2780,17 @@ calitmax[inittemperature_, coolingratio_, freeze_, itmaxfreeze_] :=
                     
 withingroupRefine[{groupindex_,runindex_,kernelid_},outputfile_,refineinputlist_] :=
     Module[ {initorder, initdeltd,snpneighborhood, inputsnpid,refmap,inittemperature, coolingratio, freeze,deltloglbound,itmaxfreeze, 
-    	magicSNP, model, popDesign, epsF, eps, ischrX,minphredscore,foundercallthreshold, isimputefounder, isfounderinbred,
-    	isfounderdepth, isoffspringdepth,imputingbound,errorgenobound,checkul,
-    	isimputefounder2,fmiss,snporder, snpdeltd ,snpneighbor, temperature, temp, itmax,
+        magicSNP, model, popDesign, epsF, eps, ischrX,minphredscore,foundercallthreshold, isimputefounder, isfounderinbred,
+        isfounderdepth, isoffspringdepth,imputingbound,errorgenobound,checkul,
+        isimputefounder2,fmiss,snporder, snpdeltd ,snpneighbor, temperature, temp, itmax,
         meanwindowsize0 = 4, count = 0, maxstuck = 3,priorchrlength = 2.0,starttime,nrep,boolparent,booloff,dataprobset,imputedsubmagicsnp, samplelabel, 
         continuedmarkovprocess, maxfraction, samplemapR, offspringgender, nfounder, loglhis,meanwindowsize, outstream, imputestepsize = 3,
-        actionls, logldis, acceptdis,loglbefore,logl = -Infinity,windowsizels, acceptls, loglls, summary,it},        
+        actionls, logldis, acceptdis,loglbefore,logl = -Infinity,windowsizels, acceptls, loglls, summary,it},
         checkul = SystemOptions["CheckMachineUnderflow"];
         SetSystemOptions["CheckMachineUnderflow" -> False];
         {initorder, initdeltd,snpneighborhood, inputsnpid,refmap,inittemperature, coolingratio, freeze,deltloglbound,itmaxfreeze, 
-        		magicSNP, model, popDesign, epsF, eps, ischrX,minphredscore,foundercallthreshold, 
-        		isimputefounder, isfounderinbred,isfounderdepth, isoffspringdepth,imputingbound,errorgenobound} = refineinputlist;
+                magicSNP, model, popDesign, epsF, eps, ischrX,minphredscore,foundercallthreshold, 
+                isimputefounder, isfounderinbred,isfounderdepth, isoffspringdepth,imputingbound,errorgenobound} = refineinputlist;
         starttime = SessionTime[];
         (*each inter-marker distance follows an exponential distribution with mean priorchrlength in unit of Morgan*)
         {samplelabel, continuedmarkovprocess, maxfraction, samplemapR, offspringgender} = 
@@ -2325,8 +2923,7 @@ withingroupRefine[{groupindex_,runindex_,kernelid_},outputfile_,refineinputlist_
         temp = StringDelete[StringSplit[summary[[1]], "."][[2]], " Iteration = "];
         SetSystemOptions[checkul];
         {logl, snporder, snpdeltd,temp}
-
-]
+    ]
             
 (*refine is a list of {linkagegroup,replication, logl, snporder, snpdeltd,imputedsubmagicsnp,numberofiteration}*)
 (*roughtmap/refinemap has columns "MarkerID","LinkageGroupNo","Position(cM)","InterMarkerFraction"/"InterMarkerDistance(cM)",
@@ -2418,15 +3015,20 @@ magicMapRefine[skeletonmap_?(ListQ[#] || StringQ[#] &),inputbinning_?(ListQ[#] |
             ];
             binning = Import[binning,"CSV"];
         ];
-        {outputid, inittemperature, freeze} = OptionValue@{outputFileID,initTemperature, freezingTemperature};
+        {outputid, inittemperature, freeze} = OptionValue@{outputFileID,initTemperature, freezingTemperature};        
         If[ inittemperature <= freeze,
             mapfile = magicMapExpand[skeletonmap,binning, FilterRules[{opts}, Options[magicMapExpand]]];
             refinemapfiles = magicMapRefine[mapfile, magicSNP, model, popDesign,Sequence@@opts],
             mapexpandtemp = Max[inittemperature/2,freeze];
             refinemapfiles = magicMapRefine[skeletonmap, magicSNP, model, popDesign,
-                freezingTemperature -> mapexpandtemp,maxFreezeIteration -> 0,outputFileID -> outputid<>"_skeleton", Sequence@@opts];
+                freezingTemperature -> mapexpandtemp,
+                maxFreezeIteration -> 0,
+                outputFileID -> outputid<>"_skeleton", 
+                FilterRules[{opts}, Except[outputFileID|maxFreezeIteration|freezingTemperature]]];
             mapfile = magicMapExpand[refinemapfiles[[1]],binning, outputFileID -> "tempmap"];
-            refinemapfiles2 = magicMapRefine[mapfile, magicSNP, model, popDesign,initTemperature -> mapexpandtemp, Sequence@@opts];
+            refinemapfiles2 = magicMapRefine[mapfile, magicSNP, model, popDesign,
+            	initTemperature -> mapexpandtemp, 
+            	FilterRules[{opts}, Except[initTemperature]]];
             refinemapfiles = Join[refinemapfiles2,refinemapfiles];
             DeleteFile[mapfile]
         ];
@@ -2438,7 +3040,7 @@ magicMapRefine[inputroughmap_?(ListQ[#] || StringQ[#] &), inputmagicSNP_?(ListQ[
     Module[ {roughMap = inputroughmap,magicSNP = inputmagicSNP,popDesign = inputpopDesign,epsF, eps, ischrX = False,isimputefounder,
         isfounderdepth, isoffspringdepth, foundercallthreshold,minphredscore,isfounderinbred,outputid, isprint, isparallel,refineinputlist,
         refmap,nreplicate, inittemperature, coolingratio, freeze,deltloglbound, itmaxfreeze, outputfiles, initorder,background,imputingbound,errorgenobound,
-        initdeltd, snpneighborhood, lglist, filelist, refine, refinemap,res,i,outstream,starttime = 0,rule,temp,inputsnpid},
+        initdeltd, snpneighborhood, lglist, filelist, refine, refinemap,res,i,outstream,starttime = 0,rule,temp,inputsnpid},        
         {epsF, eps} = OptionValue@{founderAllelicError, offspringAllelicError};
         {isfounderdepth, isoffspringdepth, minphredscore,foundercallthreshold} = 
          OptionValue[Thread[sequenceDataOption -> {isFounderAllelicDepth, isOffspringAllelicDepth, minPhredQualScore,priorFounderCallThreshold}]];
@@ -2572,18 +3174,18 @@ magicMapRefine[inputroughmap_?(ListQ[#] || StringQ[#] &), inputmagicSNP_?(ListQ[
                      ];
         (*isimputeparent = isimputeparent||(!isfounderinbred);*)
         refineinputlist = {initorder, initdeltd,snpneighborhood, inputsnpid,refmap,inittemperature, coolingratio, freeze,deltloglbound,itmaxfreeze, 
-        		magicSNP, model, popDesign, epsF, eps, ischrX,minphredscore,foundercallthreshold, 
-        		isimputefounder, isfounderinbred,isfounderdepth, isoffspringdepth,imputingbound,errorgenobound};        
+                magicSNP, model, popDesign, epsF, eps, ischrX,minphredscore,foundercallthreshold, 
+                isimputefounder, isfounderinbred,isfounderdepth, isoffspringdepth,imputingbound,errorgenobound};
         If[ isparallel,
             SetSharedVariable[iterationmonitor, countmonitor,lglist,filelist,refineinputlist];
             Monitor[
-            	res = ParallelTable[withingroupRefine[Append[lglist[[i]],$KernelID],filelist[[i]],refineinputlist], {i, Length[lglist]}, 
-               		DistributedContexts -> {"MagicMap`","MagicMap`Private`"}, Method -> "FinestGrained"],
-             	Column[iterationmonitor, Background -> background,Frame -> All]
+                res = ParallelTable[withingroupRefine[Append[lglist[[i]],$KernelID],filelist[[i]],refineinputlist], {i, Length[lglist]}, 
+                       DistributedContexts -> {"MagicMap`","MagicMap`Private`"}, Method -> "FinestGrained"],
+                 Column[iterationmonitor, Background -> background,Frame -> All]
              ],
             Monitor[
-            	res = Table[withingroupRefine[Append[lglist[[i]],$KernelID],filelist[[i]],refineinputlist], {i,Length[lglist]}],
-              	Column[iterationmonitor, Background -> background, Frame -> All]
+                res = Table[withingroupRefine[Append[lglist[[i]],$KernelID],filelist[[i]],refineinputlist], {i,Length[lglist]}],
+                  Column[iterationmonitor, Background -> background, Frame -> All]
               ];
         ];
         (*If[ isprint,
@@ -2754,10 +3356,11 @@ magicMap[inputmagicSNP_?(ListQ[#] || StringQ[#] &), model_String, popDesign_?(Li
             Print["-------------------------------------------------------Refine LinkageMap-------------------------------------------------------------"];
         ];
         (*Print["skeletonmapfile, rfbinfile, magicsnpfile, model, popDesign=",{skeletonmapfile, rfbinfile, magicsnpfile, model, popDesign}];*)
+        (*Put[skeletonmapfile, rfbinfile, magicsnpfile, model, popDesign,{opts},"tempmap.txt"];*)        
         refinemapfiles = magicMapRefine[skeletonmapfile, rfbinfile, magicsnpfile, model, popDesign, FilterRules[{opts}, Options[magicMapRefine]]];
         If[ isprint,
             Print["--------------------------------------------------------Export finalMap--------------------------------------------------------------"];
-        ];
+        ];        
         If[ isbinning,
             finalmapfile = magicMapExpand[refinemapfiles[[1]], dupebinfile,FilterRules[{opts}, Options[magicMapExpand]]],
             map = Import[refinemapfiles[[1]]];
