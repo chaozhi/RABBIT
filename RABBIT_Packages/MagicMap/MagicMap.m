@@ -3002,9 +3002,13 @@ Options[magicMapRefine] =
   ]
         
 magicMapRefine[skeletonmap_?(ListQ[#] || StringQ[#] &),inputbinning_,  magicSNP_?(ListQ[#] || StringQ[#] &), 
-    model_String, popDesign_?(ListQ[#] || StringQ[#] &), opts : OptionsPattern[]] :=
-    Module[ {binning = inputbinning,outputid, inittemperature, freeze,mapexpandtemp,refinemapfiles,refinemapfiles2,mapfile},
-    	Print["opts=",opts];
+    model_String, popDesign_?(ListQ[#] || StringQ[#] &), options : OptionsPattern[]] :=
+    Module[ {opts,binning = inputbinning,outputid, inittemperature, freeze,mapexpandtemp,refinemapfiles,refinemapfiles2,mapfile},    	
+    	If[Quiet[Head[options]] === List,
+    		opts=options,
+    		opts={options}
+    	];
+    	(*Print["options = ",opts];*)
     	If[MissingQ[binning],
     		Return[magicMapRefine[skeletonmap, magicSNP, model, popDesign,Sequence@@opts]] 
     	];
@@ -3017,7 +3021,7 @@ magicMapRefine[skeletonmap_?(ListQ[#] || StringQ[#] &),inputbinning_,  magicSNP_
         ];
         {outputid, inittemperature, freeze} = OptionValue@{outputFileID,initTemperature, freezingTemperature};        
         If[ inittemperature <= freeze,
-            mapfile = magicMapExpand[skeletonmap,binning, FilterRules[{opts}, Options[magicMapExpand]]];            
+            mapfile = magicMapExpand[skeletonmap,binning, FilterRules[opts, Options[magicMapExpand]]];            
             refinemapfiles = magicMapRefine[mapfile, magicSNP, model, popDesign,Sequence@@opts],
             (*inittemperature > freeze*)
             mapexpandtemp = Max[inittemperature/2,freeze];
@@ -3025,11 +3029,11 @@ magicMapRefine[skeletonmap_?(ListQ[#] || StringQ[#] &),inputbinning_,  magicSNP_
                 freezingTemperature -> mapexpandtemp,
                 maxFreezeIteration -> 0,
                 outputFileID -> outputid<>"_skeleton", 
-                FilterRules[{opts}, Except[outputFileID|maxFreezeIteration|freezingTemperature]]];
+                FilterRules[opts, Except[outputFileID|maxFreezeIteration|freezingTemperature]]];
             mapfile = magicMapExpand[refinemapfiles[[1]],binning, outputFileID -> "tempmap"];
             refinemapfiles2 = magicMapRefine[mapfile, magicSNP, model, popDesign,
             	initTemperature -> mapexpandtemp, 
-            	FilterRules[{opts}, Except[initTemperature]]];
+            	FilterRules[opts, Except[initTemperature]]];
             refinemapfiles = Join[refinemapfiles2,refinemapfiles];
             DeleteFile[mapfile]
         ];
