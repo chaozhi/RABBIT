@@ -3003,7 +3003,7 @@ Options[magicMapRefine] =
 
 magicMapRefine[skeletonmap_?(ListQ[#] || StringQ[#] &),inputbinning_?(MissingQ[#] &),  magicSNP_?(ListQ[#] || StringQ[#] &), 
     model_String, popDesign_?(ListQ[#] || StringQ[#] &), opts : OptionsPattern[]] :=
-    magicMapRefine[skeletonmap, magicSNP, model, popDesign, Sequence@@opts]
+    magicMapRefine[skeletonmap, magicSNP, model, popDesign,opts]
         
 magicMapRefine[skeletonmap_?(ListQ[#] || StringQ[#] &),inputbinning_?(ListQ[#] || StringQ[#] &),  magicSNP_?(ListQ[#] || StringQ[#] &), 
     model_String, popDesign_?(ListQ[#] || StringQ[#] &), opts : OptionsPattern[]] :=
@@ -3018,7 +3018,7 @@ magicMapRefine[skeletonmap_?(ListQ[#] || StringQ[#] &),inputbinning_?(ListQ[#] |
         {outputid, inittemperature, freeze} = OptionValue@{outputFileID,initTemperature, freezingTemperature};        
         If[ inittemperature <= freeze,
             mapfile = magicMapExpand[skeletonmap,binning, FilterRules[{opts}, Options[magicMapExpand]]];
-            refinemapfiles = magicMapRefine[mapfile, magicSNP, model, popDesign,Sequence@@opts],
+            refinemapfiles = magicMapRefine[mapfile, magicSNP, model, popDesign,opts],
             mapexpandtemp = Max[inittemperature/2,freeze];
             refinemapfiles = magicMapRefine[skeletonmap, magicSNP, model, popDesign,
                 freezingTemperature -> mapexpandtemp,
