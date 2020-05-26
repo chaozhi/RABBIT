@@ -3000,14 +3000,14 @@ Options[magicMapRefine] =
       deltLoglThreshold -> 1, 
       maxFreezeIteration -> 15}
   ]
-
-magicMapRefine[skeletonmap_?(ListQ[#] || StringQ[#] &),inputbinning_?(MissingQ[#] &),  magicSNP_?(ListQ[#] || StringQ[#] &), 
-    model_String, popDesign_?(ListQ[#] || StringQ[#] &), opts : OptionsPattern[]] :=
-    magicMapRefine[skeletonmap, magicSNP, model, popDesign,opts]
         
-magicMapRefine[skeletonmap_?(ListQ[#] || StringQ[#] &),inputbinning_?(ListQ[#] || StringQ[#] &),  magicSNP_?(ListQ[#] || StringQ[#] &), 
+magicMapRefine[skeletonmap_?(ListQ[#] || StringQ[#] &),inputbinning_,  magicSNP_?(ListQ[#] || StringQ[#] &), 
     model_String, popDesign_?(ListQ[#] || StringQ[#] &), opts : OptionsPattern[]] :=
     Module[ {binning = inputbinning,outputid, inittemperature, freeze,mapexpandtemp,refinemapfiles,refinemapfiles2,mapfile},
+    	Print["opts=",opts];
+    	If[MissingQ[binning],
+    		Return[magicMapRefine[skeletonmap, magicSNP, model, popDesign,Sequence@@opts]] 
+    	];
         If[ StringQ[binning],
             If[ !FileExistsQ[binning],
                 Print["File ", binning," does not exist!"];
@@ -3017,8 +3017,9 @@ magicMapRefine[skeletonmap_?(ListQ[#] || StringQ[#] &),inputbinning_?(ListQ[#] |
         ];
         {outputid, inittemperature, freeze} = OptionValue@{outputFileID,initTemperature, freezingTemperature};        
         If[ inittemperature <= freeze,
-            mapfile = magicMapExpand[skeletonmap,binning, FilterRules[{opts}, Options[magicMapExpand]]];
-            refinemapfiles = magicMapRefine[mapfile, magicSNP, model, popDesign,opts],
+            mapfile = magicMapExpand[skeletonmap,binning, FilterRules[{opts}, Options[magicMapExpand]]];            
+            refinemapfiles = magicMapRefine[mapfile, magicSNP, model, popDesign,Sequence@@opts],
+            (*inittemperature > freeze*)
             mapexpandtemp = Max[inittemperature/2,freeze];
             refinemapfiles = magicMapRefine[skeletonmap, magicSNP, model, popDesign,
                 freezingTemperature -> mapexpandtemp,
