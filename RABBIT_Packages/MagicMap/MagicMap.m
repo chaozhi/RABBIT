@@ -1654,7 +1654,7 @@ Options[magicMapConstruct] = DeleteDuplicates[Join[Options[magicGrouping],Option
       (*SCL: Strongest Cross Link: for each locus anotherl ocus is shown with wich it has the strongest linkage outside its own group*)   
       delStrongCrossLink->True,   
       minLodSegregateBin -> Infinity,
-      minrfSegregateBin -> 0,
+      minrfSegregateBin -> -1,
       outputFileID -> "",
       isPrintTimeElapsed ->True}
   ]]
@@ -1662,7 +1662,7 @@ Options[magicMapConstruct] = DeleteDuplicates[Join[Options[magicGrouping],Option
 magicMapConstruct[pairwisedatafile_?FileExistsQ, ngroup_Integer?Positive,opts : OptionsPattern[]] :=
     Module[ {isbinning,nsnp,clusterlodtype, evsel,orderlodtype,computedtype,minlodsaving,snpid, maxrf = 1,morganrate, nmissing,rfmtx, linklodmtx, cormtx,indeplodmtx,ii,jj,k,ls,miniclustersize,
        similarity, linkagegroups, singletons, eigenval, eigenvec, neighborstrength,neighborlod,neighbors,isfounderinbred,knnls,strongneighbors,knn,
-      minld,minldsaving,minlodclustering, minlodordering,knnfun,knnsaving,refmap,outputid, isprint,estmap,estorder,outputfiles,starttime,temp,maxnconn,adjminlod,adjmaxrf,delscl,rule,
+      minld,minldsaving,minlodclustering,minlodordering0, minlodordering,knnfun,knnsaving,refmap,outputid, isprint,estmap,estorder,outputfiles,starttime,temp,maxnconn,adjminlod,adjmaxrf,delscl,rule,
       indeplodmtx2,cormtx2,linklodmtx2, rfmtx2},
         {adjminlod,adjmaxrf,delscl,maxnconn,clusterlodtype,orderlodtype,minlodclustering, minlodordering,knnfun,knnsaving,miniclustersize,refmap,outputid,isprint} = 
             OptionValue@{minLodSegregateBin,minrfSegregateBin,delStrongCrossLink,nConnectedComponent,lodTypeClustering,lodTypeOrdering,minLodClustering,minLodOrdering,nNeighborFunction,nNeighborSaving,miniComponentSize,referenceMap,outputFileID,isPrintTimeElapsed};
@@ -1752,23 +1752,29 @@ magicMapConstruct[pairwisedatafile_?FileExistsQ, ngroup_Integer?Positive,opts : 
             ];
         ];         
         (*Spectral ordering*)
-        If[ OptionValue[minLodOrdering]===Automatic,
+        If[ minlodordering===Automatic || MemberQ[minlodordering,Automatic],
+        	minlodordering0 = If[TrueQ[minlodordering===Automatic],Table[Automatic, {ii,Length[linkagegroups]}],minlodordering];
+        	Print["minlodordering0=",minlodordering0];
             minlodordering = Table[
-                {indeplodmtx2,cormtx2,linklodmtx2, rfmtx2} = If[ MissingQ[#],
-                                                                 #,
-                                                                 #[[ii,ii]]
-                                                             ]&/@{indeplodmtx,cormtx,linklodmtx, rfmtx};
-                temp = getSimilarity[orderlodtype, indeplodmtx2,cormtx2,linklodmtx2, rfmtx2, 
-                            maxrf,minld,minlodclustering, minlodsaving,miniclustersize];
-                temp = adjConnectedComponents[temp];
-                temp = Count[(Length[#] & /@ temp) - miniclustersize, _?Positive];
-                (**)
-                If[ temp==1,
-                    minlodclustering,
-                    maxnconn = 1;
-                    findminlodBrent[orderlodtype, indeplodmtx2,cormtx2,linklodmtx2, rfmtx2, 
-                                    maxrf, minld,minlodsaving,Automatic, miniclustersize,maxnconn]
-                ], {ii, linkagegroups}];
+            	ii=linkagegroups[[k]];
+            	If[TrueQ[minlodordering0[[k]]===Automatic],
+	                {indeplodmtx2,cormtx2,linklodmtx2, rfmtx2} = If[ MissingQ[#],
+	                                                                 #,
+	                                                                 #[[ii,ii]]
+	                                                             ]&/@{indeplodmtx,cormtx,linklodmtx, rfmtx};
+	                temp = getSimilarity[orderlodtype, indeplodmtx2,cormtx2,linklodmtx2, rfmtx2, 
+	                            maxrf,minld,minlodclustering, minlodsaving,miniclustersize];
+	                temp = adjConnectedComponents[temp];
+	                temp = Count[(Length[#] & /@ temp) - miniclustersize, _?Positive];	                
+	                (**)
+	                If[ temp==1,
+	                    minlodclustering,
+	                    maxnconn = 1;
+	                    findminlodBrent[orderlodtype, indeplodmtx2,cormtx2,linklodmtx2, rfmtx2, 
+	                                    maxrf, minld,minlodsaving,Automatic, miniclustersize,maxnconn]
+	                ],
+	                minlodordering0[[k]]
+            	], {k, Length[linkagegroups]}];
             If[ isprint,
                 Print[Style["The option value of minLodOrdering is set to " <>ToString[minlodordering] <> "!", {Black}]];
             ],
@@ -1781,8 +1787,11 @@ magicMapConstruct[pairwisedatafile_?FileExistsQ, ngroup_Integer?Positive,opts : 
                 True,
                 Print["magicMapConstruct: wrong minLodOrdering optionvalue: ",minlodordering,"!"];
                 Abort[];
-            ]
-        ];
+            ];
+            If[ isprint,
+        		Print[Style["The option value of minLodOrdering is " <>ToString[minlodordering] <> "!", {Black}]];
+        	];
+        ];        
         knnls = Min[Length[#], Ceiling[knnfun[Length[#]]]] & /@ linkagegroups;
         (*Put[{orderlodtype,indeplodmtx,linklodmtx,rfmtx, maxrf,minlodordering,minlodsaving,miniclustersize,linkagegroups,knnls},"temp1.txt"];*)
         {similarity, linkagegroups, knnls,temp} = Transpose[Table[
