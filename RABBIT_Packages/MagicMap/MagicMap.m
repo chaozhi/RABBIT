@@ -168,6 +168,8 @@ calcrosstabcorr::usage = "calcrosstabcorr  "
 
 minrfSegregateBin::usage = "minrfSegregateBin  "
 
+minGroupSize::usage = "minGroupSize  "
+
 
 Begin["`Private`"] (* Begin Private Context *) 
 
@@ -1341,16 +1343,16 @@ toSparseIndicatorKnn[lodmtx_, minlod_,minlodmini_,knn_] :=
     SparseArray[Sign[(Boole[Positive[lodmtx - minlod]]+ Boole[Positive[lodmtx - minlodmini]] Boole[Positive[toKNNSimilarity[lodmtx, Min[Length[lodmtx]-1,knn] + 1]]])]]       
 
 toSparseIndicator[lodmtx_, minlod_, minlodmini_, miniclustersize_] :=
-    Module[ {aa, components, len, temp, microclusters},
+    Module[ {aa},
         aa = SparseArray[Boole[Positive[lodmtx - minlod]]];
-        components = adjConnectedComponents[aa];
+        (*components = adjConnectedComponents[aa];
         If[ Length[components] > 1 && minlod > minlodmini,
             len = Sign[(Length[#] & /@ components) - miniclustersize - 1];
             microclusters = Union[Flatten[Pick[components, len, -1]]];
             temp = SparseArray[Boole[Positive[lodmtx - minlodmini]]];
             aa[[microclusters]] = temp[[microclusters]];
             aa[[All, microclusters]] = temp[[All, microclusters]];
-        ];
+        ];*)
         aa
     ]
      
@@ -1407,22 +1409,37 @@ dropMinicluster[similarity_,miniclustersize_,isprint_:True] :=
         {similarity[[connectedvertices, connectedvertices]], connectedvertices, singlevertices}
     ]   
     
-Options[magicGrouping] = Join[{miniComponentSize->5,isPrintTimeElapsed ->True},Options[spectralClustering]]
-    
+Options[magicGrouping] = Join[{miniComponentSize->5,minGroupSize->20,isPrintTimeElapsed ->True},Options[spectralClustering]]    
 magicGrouping[similarity_,ngroup_,opts : OptionsPattern[]] :=
-    Module[ {miniclustersize,isprint,similarity2, connectedvertices, linkagegroups, singletons, eigenval, eigenvec},
-        {miniclustersize,isprint} = OptionValue@{miniComponentSize,isPrintTimeElapsed};
+    Module[ {miniclustersize,mingroupsize,isprint,similarity2, len,pos,pos2,jj,count,connectedvertices, linkagegroups, singletons, eigenval, eigenvec},
+        {miniclustersize,mingroupsize,isprint} = OptionValue@{miniComponentSize,minGroupSize,isPrintTimeElapsed};
         If[ ngroup===1,
             {{Range[Length[similarity]]}, {},Missing["NotAvailable"],Missing["NotAvailable"]},
             {similarity2, connectedvertices, singletons} = dropMinicluster[similarity,miniclustersize,isprint];
-            {linkagegroups, eigenval, eigenvec} = spectralClustering[similarity2, ngroup,FilterRules[{opts}, Options[spectralClustering]]];
+            count = 0;
+            While[True,
+            	count++;
+            	{linkagegroups, eigenval, eigenvec} = spectralClustering[similarity2, ngroup,FilterRules[{opts}, Options[spectralClustering]]];
+            	len = Length[#]&/@linkagegroups;     
+            	Print["Spectral clustering it=",count, ", size of ",Length[len]," groups = ",len];       	 
+            	pos = Flatten[Position[len - mingroupsize, _?Negative]];
+            	If[pos === {},
+            		Break[],
+            		singletons = Union[singletons,connectedvertices[[Flatten[linkagegroups[[pos]]]]]];
+            		pos2 = Complement[Range[Length[linkagegroups]],pos];
+            		jj = Union[Flatten[linkagegroups[[pos2]]]];
+            		If[Length[jj]<ngroup*mingroupsize,Break[]];
+            		similarity2= similarity2[[jj,jj]];
+            		connectedvertices=connectedvertices[[jj]]
+            	];            	
+            	If[count>=10,Break[]];
+            ];
             linkagegroups = connectedvertices[[#]] & /@ linkagegroups;
             linkagegroups = DeleteCases[linkagegroups, {}];
             eigenvec = Thread[connectedvertices->Transpose[eigenvec]];
             {linkagegroups, singletons, eigenval, eigenvec}
         ]
-    ]   
-    
+    ]      
                 
 formeigenspectral[estorder_,singletons_,eigenval_,eigenvec_] :=
     Module[ {eigenspectral,eigenhead},
@@ -1661,9 +1678,9 @@ Options[magicMapConstruct] = DeleteDuplicates[Join[Options[magicGrouping],Option
 
 magicMapConstruct[pairwisedatafile_?FileExistsQ, ngroup_Integer?Positive,opts : OptionsPattern[]] :=
     Module[ {isbinning,nsnp,clusterlodtype, evsel,orderlodtype,computedtype,minlodsaving,snpid, maxrf = 1,morganrate, nmissing,rfmtx, linklodmtx, cormtx,indeplodmtx,ii,jj,k,ls,miniclustersize,
-       similarity, linkagegroups, singletons, eigenval, eigenvec, neighborstrength,neighborlod,neighbors,isfounderinbred,knnls,strongneighbors,knn,
+       similarity, similarityls,linkagegroups, singletons, eigenval, eigenvec, neighborstrength,neighborlod,neighbors,isfounderinbred,knnls,strongneighbors,knn,
       minld,minldsaving,minlodclustering,minlodordering0, minlodordering,knnfun,knnsaving,refmap,outputid, isprint,estmap,estorder,outputfiles,starttime,temp,maxnconn,adjminlod,adjmaxrf,delscl,rule,
-      indeplodmtx2,cormtx2,linklodmtx2, rfmtx2},
+      indeplodmtx2,cormtx2,linklodmtx2, rfmtx2,figbef, figafter,figafter2},
         {adjminlod,adjmaxrf,delscl,maxnconn,clusterlodtype,orderlodtype,minlodclustering, minlodordering,knnfun,knnsaving,miniclustersize,refmap,outputid,isprint} = 
             OptionValue@{minLodSegregateBin,minrfSegregateBin,delStrongCrossLink,nConnectedComponent,lodTypeClustering,lodTypeOrdering,minLodClustering,minLodOrdering,nNeighborFunction,nNeighborSaving,miniComponentSize,referenceMap,outputFileID,isPrintTimeElapsed};
         {clusterlodtype,orderlodtype} = ToLowerCase[#]&/@{clusterlodtype,orderlodtype};
@@ -1794,7 +1811,7 @@ magicMapConstruct[pairwisedatafile_?FileExistsQ, ngroup_Integer?Positive,opts : 
         ];        
         knnls = Min[Length[#], Ceiling[knnfun[Length[#]]]] & /@ linkagegroups;
         (*Put[{orderlodtype,indeplodmtx,linklodmtx,rfmtx, maxrf,minlodordering,minlodsaving,miniclustersize,linkagegroups,knnls},"temp1.txt"];*)
-        {similarity, linkagegroups, knnls,temp} = Transpose[Table[
+        {similarityls, linkagegroups, knnls,temp} = Transpose[Table[
             jj = linkagegroups[[ii]];
             {indeplodmtx2,cormtx2,linklodmtx2, rfmtx2} = If[ MissingQ[#],
                                                              #,
@@ -1808,7 +1825,7 @@ magicMapConstruct[pairwisedatafile_?FileExistsQ, ngroup_Integer?Positive,opts : 
             k = Positive[(Length[#] & /@ ls) - miniclustersize];
             ls = Sort[Flatten[Pick[ls, k, True]]];
             {temp[[ls, ls]], jj[[ls]], knn,Complement[jj, jj[[ls]]]}, {ii,Length[linkagegroups]}]];
-        {similarity, linkagegroups, knnls,temp} = DeleteCases[#, {}]&/@{similarity, linkagegroups, knnls,temp};
+        {similarityls, linkagegroups, knnls,temp} = DeleteCases[#, {}]&/@{similarityls, linkagegroups, knnls,temp};
         If[ isprint,
             Print["# NearestNeighbors = ",knnls];
         ];
@@ -1818,7 +1835,7 @@ magicMapConstruct[pairwisedatafile_?FileExistsQ, ngroup_Integer?Positive,opts : 
             Print["Size of groups = ", Length[#] & /@ linkagegroups," and #ungrouped markers = ", Length[singletons],
                 " after dropping components with size <= ",miniclustersize, " for each group!"];
         ];
-        estorder = MapThread[#2[[spectralOrdering[#1,FilterRules[{opts}, Options[spectralOrdering]]]]]&,{similarity,linkagegroups}];
+        estorder = MapThread[#2[[spectralOrdering[#1,FilterRules[{opts}, Options[spectralOrdering]]]]]&,{similarityls,linkagegroups}];
         If[ isprint,
             If[ ngroup>1,
                 ls = {spetralEigenPlot[eigenval,ngroup,evsel,isprint]},
@@ -1830,6 +1847,12 @@ magicMapConstruct[pairwisedatafile_?FileExistsQ, ngroup_Integer?Positive,opts : 
             If[ ls=!={},
                 Print[GraphicsRow[ls,ImageSize->550 Length[ls]]]
             ];
+            figbef = MatrixPlot[similarity,PlotLabel -> "Similarity before grouping"];
+            jj = Flatten[linkagegroups];
+            figafter = MatrixPlot[similarity[[jj, jj]], PlotLabel -> "Similarity after grouping"];
+            jj = Flatten[estorder];
+            figafter2 = MatrixPlot[similarity[[jj, jj]], PlotLabel -> "Similarity after ordering"];
+            Print[GraphicsRow[{figbef, figafter,figafter2}, ImageSize -> 1050]];
         ];
         {neighbors, neighborstrength,neighborlod} = getNeighbors[orderlodtype,indeplodmtx,cormtx,linklodmtx,rfmtx, maxrf,minld,minlodsaving,miniclustersize,knnsaving];
         Switch[orderlodtype,            

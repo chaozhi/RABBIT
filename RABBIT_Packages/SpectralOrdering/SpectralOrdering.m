@@ -82,9 +82,9 @@ spetralEigenPlot[eigenvalues_,ncluster_,evsel_,isprint_:False] :=
         ListPlot[ev, PlotMarkers -> {Automatic,12}, PlotRange -> All, 
           Filling -> Axis, Frame -> {{True, False}, {True, False}}, 
           FrameLabel -> {"i-th smallest", "Eigenvalue"}, 
-          LabelStyle -> Directive[FontSize -> 13, FontFamily -> "Helvetica", Black],
+          LabelStyle -> Directive[FontSize -> 12, FontFamily -> "Helvetica", Black],
           PlotStyle -> {Blue, Gray}, 
-          PlotLabel -> ToString[k]<>" eigenvectors (blue) are used for clustering."]
+          PlotLabel -> ToString[k]<>" eigenvectors (blue) for clustering"]
     ]
                   
 toRWTransition[aa_] :=
