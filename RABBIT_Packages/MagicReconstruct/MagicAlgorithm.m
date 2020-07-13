@@ -33,9 +33,15 @@ origPosteriorDecoding[startProb_, tranProb_, dataProb_] :=
     ]        
     
 origViterbiDecoding[startProb_, tranProb_, dataProb_] :=
-    Module[ {logpathprob,path,chr},
+    Module[ {logpathprob,path,chr,new,startp,tranp,datap},
         Table[
-          {logpathprob, path} = CtViterbi[startProb[[chr]], tranProb[[chr]], dataProb[[chr]]];
+          (*{logpathprob, path} = CtViterbi[startProb[[chr]], tranProb[[chr]], dataProb[[chr]]];*)          
+          new = Flatten[Position[Normal[startProb[[chr]]], _?Positive]];
+          startp = startProb[[chr]][[new]];
+          tranp = tranProb[[chr]][[All, new, new]];
+          datap = dataProb[[chr]][[All, new]];
+          {logpathprob, path} = CtViterbi[startp, tranp, datap];
+          path = new[[path]];
           {logpathprob, CtJumpFormat[path]}, {chr, Length[dataProb]}]
     ]
     

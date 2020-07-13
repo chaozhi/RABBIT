@@ -125,6 +125,7 @@ magicReconstruct[inputmagicSNP_?(ListQ[#] ||StringQ[#]&),model_String,inputpopDe
         Abort[];*)
         {sampleLabel, sampleMarkovProcess} = sampleDiscretePriorProcess[nFounder, popDesign, isfounderinbred,model, posA, posX, offspringgender, sampleid,deltd];
         {clusters,weights,clusterhaploMap} = getClusterhaploMap[haploMap,outputsmooth];
+        (*Print["sampleMarkovProcess=",sampleMarkovProcess];*)
         Quiet[Close[outputfile]];
         Put[outputfile];
         outstream = OpenAppend[outputfile];
@@ -164,11 +165,12 @@ individualReconstruct[ind_,model_,founderHaplo_, derivedGeno_,obsGeno_,epsF_, ep
         {startProb,tranProb} = sampleLabel[[ind+1,2]]/.sampleMarkovProcess;
         If[ !OrderedQ[haplocode],
             {startProb,tranProb} = relabelMarkovProcess[{startProb,tranProb}, haplocode,diplocode];
-        ];
+        ];        
         If[ isoffspringdepth,
             dataProb = lineMagicLikelihoodGBS[model,founderHaplo, derivedGeno,obsGeno[[ind]], epsF, eps,minphredscore, posA, posX, offspringgender[[ind]]],
             dataProb = lineMagicLikelihood[model,founderHaplo, obsGeno[[ind]], epsF, eps, posA, posX, offspringgender[[ind]]];
         ];
+        Put[startProb, tranProb, dataProb,"temptest.txt"];
         res = If[ algorithmname === "origPathSampling",
                   origalgorithm[startProb, tranProb, dataProb, samplesize],
                   origalgorithm[startProb, tranProb, dataProb]
