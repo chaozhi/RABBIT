@@ -1,4 +1,3 @@
-
 (* Mathematica Package *)
 
 (* Created by the Wolfram Workbench Feb 4, 2016 *)
@@ -150,7 +149,11 @@ magicImputeFounder[magicSNP_, model_, epsF_, eps_, popDesign_,minphredscore_,max
           MemberID/gender -> {startProb0,tranProb0}, not accounting for the ordering of funnelcode*)
         (*startProb0=a list of initial distribution for each linkage group;
         tranProb0= a list of transition prob matrices between consecutive markers for each linkage group*)        
+        (*Put[nFounder,popDesign, isfounderinbred,model, posA, posX, offspringgender, sampleid,deltd,"impute0.txt"];*)
         {samplelabel, sampleMarkovProcess} = sampleDiscretePriorProcess[nFounder,popDesign, isfounderinbred,model, posA, posX, offspringgender, sampleid,deltd];
+        If[Length[offspringgender] =!= Length[samplelabel] - 1,
+  			Print["Inconsistent number of offspring between genodata and popdesign!"]; Abort[]
+  		];
         isdepModel = ToLowerCase[model]==="depmodel";
         phase = Table[
             epsF2 = epsFls[[ch]];
@@ -176,11 +179,12 @@ magicImputeFounder[magicSNP_, model_, epsF_, eps_, popDesign_,minphredscore_,max
 	            ];	            
 	            nn = Round[Length[fhaploset]/2];	            	            
 	            (*Put[model,samplelabel, markovprocess, fhaploset, chrobsgeno, 
-	               epsF2, eps, minphredscore, isoffspringdepth, ismaleX,"imputetemp.txt"];*)
+	               epsF2, eps, minphredscore, isoffspringdepth, ismaleX,isprint,"imputetemp.txt"];
+	            Abort[];*)
 	            {fwphaseprob, fworigprob, fwphaseindex} = parentForwardCalculation[model,samplelabel, markovprocess, fhaploset, chrobsgeno, 
 	               epsF2, eps, minphredscore, isoffspringdepth, ismaleX,isprint];
-	            (*Put[fwphaseprob, fworigprob, fwphaseindex,model,samplelabel, markovprocess, fhaploset, chrobsgeno, epsF2, eps, minphredscore, isoffspringdepth, ismaleX,"imputetemp.txt"];
-	            Abort[];*)	            
+	            (*Put[fwphaseprob, fworigprob, fwphaseindex,model,samplelabel, markovprocess, fhaploset, chrobsgeno, epsF2, eps, minphredscore, isoffspringdepth, ismaleX,isprint,"imputetemp2.txt"];
+	            Abort[];*)            
 	            backtmin = If[ isextrareverse,
 	                           nn+1,
 	                           1
