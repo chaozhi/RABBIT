@@ -581,10 +581,16 @@ Options[simMagicFgl] = Options[calFglSummary] = {pedigreeMemberList->Automatic,o
 (*for each linkage group = {maternally derived chromosome, paternally derived chromosome}*)
 (*If ith individual is female (gender =1), the paternal dervied chromosome is the X chromosome*)
 (*popfgl[[1]] ={popPed,iniPopFGL, interferStrength,isObligate, isOogamy}*)
-simMagicFgl[popPed_,iniPopFGL_, interferStrength_,isObligate_,isOogamy_,opts : OptionsPattern[]] :=
-    Module[ {popfgl, nFounder,gender, chrLength,memberlist,pos,factor,i},
+simMagicFgl[inputpopPed_,iniPopFGL_, interferStrength_,isObligate_,isOogamy_,opts : OptionsPattern[]] :=
+    Module[ {popPed=inputpopPed,rule,popfgl, nFounder,gender, chrLength,memberlist,pos,factor,i},    	
         nFounder = Length[iniPopFGL]-1;
-        If[ popPed[[2 ;; nFounder + 1]] != iniPopFGL[[2 ;;, ;;-2]],
+        If[popPed[[2 ;; nFounder + 1,2]]=!= iniPopFGL[[2 ;;,2]],
+        	rule = Thread[popPed[[2 ;; nFounder + 1,2]]->iniPopFGL[[2 ;;nFounder + 1,2]]];    
+        	popPed[[2 ;;, {2,4}]]= popPed[[2 ;;, {2,4}]]/.rule;
+        ];        
+        If[ popPed[[2 ;; nFounder + 1,;;4]] =!= iniPopFGL[[2 ;;, ;;4]],        	
+        	(*Put[popPed,iniPopFGL,"temptest.txt"];
+            Print["here1"];*)               
             Print["Inconsistent founders between popPed and iniPopFGL!"];
             Abort[]
         ];
