@@ -34,6 +34,12 @@ juncijjj::usage = "juncijjj  "
 
 phi123::usage = "phi123  "
 
+ancestryJointDensity::usage = "ancestryJointDensity  "
+
+ancestryRateMatix::usage = "ancestryRateMatix  "
+
+clearAncestryMemory::usage = "clearAncestryMemory  "
+
 
 (* Exported symbols added here with SymbolName::usage *) 
 
@@ -792,7 +798,8 @@ ancestryJointDensity[junctions_] :=
         Do[density[[ii[[z]], ix[[z]]]] = Jiiij[[z]], {z, nFgl}];
         Do[density[[ii[[z]], xi[[z]]]] = Jiiji[[z]], {z, nFgl}];
         Do[density[[ix[[z]], ii[[z]]]] = Jijii[[z]], {z, nFgl}];
-        Do[density[[xi[[z]], ii[[z]]]] = Jijjj[[z]], {z, nFgl}];
+        (*dedug from Jijjj[[z]]->Jijjj[[All,z]], 2020/8/31*)
+        Do[density[[xi[[z]], ii[[z]]]] = Jijjj[[All,z]], {z, nFgl}];
         density[[ii, ii]] = Jiijj;
         density
     ]

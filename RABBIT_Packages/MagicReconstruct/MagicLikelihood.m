@@ -37,7 +37,7 @@ Begin["`Private`"] (* Begin Private Context *)
 (*assuming that prior for latent genotype (1,1), (1,2), (2,1), and (22) are equally probable*)    
 diploPrior[epsF_] :=
     Module[ {likeliF,likeliFibd0, likeliFibd1},
-        likeliFibd0 = {{1, 1, 1, 1}, 
+        likeliFibd0 = {{1.0, 1.0, 1.0, 1.0}, 
                        {1 - epsF, epsF, 1 - epsF, epsF}, 
                        {1 - epsF, 1 - epsF, epsF, epsF}, 
                        {epsF, 1 - epsF, epsF, 1 - epsF}, 
@@ -455,7 +455,6 @@ siteMarginLikeliDiploGBS[model_,sitefhaplo_, sitegeno_, epsF_, eps_,minphredscor
         Outer[Extract[#2, #1] &, pos, likelidiplo, 1, 1]
     ]
     
-
                
 
 (*likeli dimensions {noffspring, ntruehaplo=2}*)

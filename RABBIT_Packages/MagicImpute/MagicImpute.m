@@ -33,6 +33,8 @@ parentForwardCalculation::usage = "parentForwardCalculation  "
 
 parentBackwardMaximize::usage = "parentBackwardMaximize  "
 
+
+
 Begin["`Private`"]
 (* Implementation of the package *)
   
@@ -60,6 +62,8 @@ parentForwardCalculation[model_,samplelabel_, markovprocess_, inputfhaploset_, o
             sitedataprob = siteMagicLikelihoodGBS[model,fhaploset[[1, All, 1]], obsgeno[[1]], epsF,eps, minphredscore, ismaleX],
             sitedataprob = siteMagicLikelihood[model,fhaploset[[1, All, 1]], obsgeno[[1]], epsF,eps, ismaleX];
         ];
+        Put[isoffspringdepth,model,fhaploset, obsgeno, epsF,eps, minphredscore, ismaleX,sitedataprob,"tempimpute.txt"];
+        Abort[];
         isdepModel = ToLowerCase[model]==="depmodel";
         samplecode = sampleCode[samplelabel, isdepModel, ismaleX];              
         fworigprob[[1]] = Map[# startprob &, sitedataprob, {1}];
@@ -75,7 +79,8 @@ parentForwardCalculation[model_,samplelabel_, markovprocess_, inputfhaploset_, o
               sitedataprob = siteMagicLikelihood[model,fhaploset[[t, All, 1]], obsgeno[[t]], epsF,eps, ismaleX];
           ];          
           fworigprob[[t]] = MapThread[#1.#2 &, {fwphaseprob[[t-1]].fworigprob[[t-1]], tranprob}];
-          fworigprob[[t]] = Table[fworigprob[[t]],{Length[sitedataprob]}] sitedataprob;          
+          fworigprob[[t]] = Table[fworigprob[[t]],{Length[sitedataprob]}] sitedataprob;  
+                  
           {fwphaseprob[[t]], fworigprob[[t]]} = calPosteriorProb[fworigprob[[t]], fhaploset[[t, All, 2]]];          
 		  tinyprob = Max[fwphaseprob[[t]]] 10^(-10.);
 		  (*tinyprob = Max[fwphaseprob[[t]]] 10^(-20.);*)

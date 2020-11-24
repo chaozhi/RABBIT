@@ -170,7 +170,7 @@ individualReconstruct[ind_,model_,founderHaplo_, derivedGeno_,obsGeno_,epsF_, ep
             dataProb = lineMagicLikelihoodGBS[model,founderHaplo, derivedGeno,obsGeno[[ind]], epsF, eps,minphredscore, posA, posX, offspringgender[[ind]]],
             dataProb = lineMagicLikelihood[model,founderHaplo, obsGeno[[ind]], epsF, eps, posA, posX, offspringgender[[ind]]];
         ];
-        Put[startProb, tranProb, dataProb,"temptest.txt"];
+        (*Put[startProb, tranProb, dataProb,"temptest.txt"];*)
         res = If[ algorithmname === "origPathSampling",
                   origalgorithm[startProb, tranProb, dataProb, samplesize],
                   origalgorithm[startProb, tranProb, dataProb]
