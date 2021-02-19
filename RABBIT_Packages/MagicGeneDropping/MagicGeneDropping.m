@@ -315,8 +315,9 @@ simulatepopfgl[pedigree_, sampleInfor_,isfounderinbred_,isOogamy_,chrLength_,int
               ];
               inipop = setIniPop[nFounder, isOogamy];
               iniPopFGL = setIniPopFGL[inipop, founderFGL, chrLength];
-              (*Put[nFounder, isOogamy,inipop,iniPopFGL,"temptest2.txt"];
-              Print["here2"];*)
+              (*Put[nFounder, inipop,pedigree, iniPopFGL, interferStrength, isObligate, isOogamy,"temptest2.txt"];
+              Print["here2"];
+              Abort[];*)
               pedfgl = simMagicFgl[pedigree, iniPopFGL, interferStrength, isObligate, isOogamy, pedigreeMemberList -> All];
               First[Select[Rest[pedfgl], #[[2]] == lineid &, 1]], {ind, samplesize}];
               , ProgressIndicator[ind, {1, samplesize}]];

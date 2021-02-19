@@ -62,8 +62,8 @@ parentForwardCalculation[model_,samplelabel_, markovprocess_, inputfhaploset_, o
             sitedataprob = siteMagicLikelihoodGBS[model,fhaploset[[1, All, 1]], obsgeno[[1]], epsF,eps, minphredscore, ismaleX],
             sitedataprob = siteMagicLikelihood[model,fhaploset[[1, All, 1]], obsgeno[[1]], epsF,eps, ismaleX];
         ];
-        Put[isoffspringdepth,model,fhaploset, obsgeno, epsF,eps, minphredscore, ismaleX,sitedataprob,"tempimpute.txt"];
-        Abort[];
+        (*Put[isoffspringdepth,model,fhaploset, obsgeno, epsF,eps, minphredscore, ismaleX,sitedataprob,"tempimpute.txt"];
+        Abort[];*)
         isdepModel = ToLowerCase[model]==="depmodel";
         samplecode = sampleCode[samplelabel, isdepModel, ismaleX];              
         fworigprob[[1]] = Map[# startprob &, sitedataprob, {1}];

@@ -58,6 +58,8 @@ compilePopPedigree::usage = "compilePopPedigree  "
 
 nextGeneration::usage = "nextGeneration  "
 
+crossover::usage = "crossover  "
+
 Begin["`Private`"]
 (* Implementation of the package *)
 
@@ -634,7 +636,7 @@ simMagicFgl[inputpopPed_,iniPopFGL_, interferStrength_,isObligate_,isOogamy_,opt
 simMagicFgl[mateScheme_?(VectorQ[#, StringQ]&),iniPopFGL_,interferStrength_,isObligate_,isOogamy_,opts : OptionsPattern[]] :=
     Module[ {popped,iniPop,popfgl},
         iniPop = iniPopFGL[[All,;;-2]];
-        popped = simPedigree[iniPop,mateScheme];
+        popped = simPedigree[iniPop,mateScheme];        
         popfgl = simMagicFgl[popped, iniPopFGL, interferStrength,isObligate, isOogamy,opts];
         popfgl[[1]] = Join[popfgl[[1]],{mateScheme}];
         popfgl
