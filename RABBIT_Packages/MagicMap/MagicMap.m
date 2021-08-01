@@ -70,51 +70,10 @@ plotHeatMapGUI::usage = "plotHeatMapGUI[pairwisedatafile, mapfile] returns a gra
 
 nConnectedComponent::usage = "nConnectedComponent is an option to specify the number of connected components except of mini-components"
 
-getSimilarity::usage = "getSimilarity  "
-
-findminlodBrent::usage = "findminlodBrent  "
-
-toSparseIndicator::usage = "toSparseIndicator  "
-
-fractiontosimilarity::usage = "fractiontosimilarity  "
-
-getNeighborLodMtx::usage = "getNeighborLodMtx  "
-
-decomposeRoughMap::usage = "decomposeRoughMap  "
-
-isImputingFounder::usage = "isImputingFounder is an option"
-
-delStrongCrossLink::usage = "delStrongCrossLink is an option"
-
-dropMinicluster::usage = "dropMinicluster  "
-
-adjConnectedComponents::usage = "adjConnectedComponents  "
-
-mapPreprocessing::usage = "mapPreprocessing  "
-
-findFractionMLE::usage = "findFractionMLE  "
-
-calloglfunc::usage = "calloglfunc  "
-
-basiclogl::usage = "basiclogl  "
-
-calbasiclogl::usage = "calbasiclogl  "
-
-basicloglconst::usage = "basicloglconst  "
-
-calsimilarity::usage = "calsimilarity  "
 
 dupebinMarker::usage = "dupebinMarker is an option to specify if markers are going to be binned"
 
 magicMapExpand::usage = "magicMapExpand[skeletonmap,binning] adds binnned markers into the skeleton map." 
-
-calcurrentlogl::usage = "calcurrentlogl  "
-
-getPairPriorProb::usage = "getPairPriorProb  "
-
-gethaplotran::usage = "gethaplotran  "
-
-calbasicdataprob::usage = "calbasicdataprob  "
 
 maxFreezeIteration::usage = "maxFreezeIteration is an option to specify the max number of iterations with temperature below freezingTemperature "
 
@@ -124,52 +83,15 @@ minLodSegregateBin::usage = "minLodSegregateBin is an option to specifiy the min
 
 redoSimilarity::usage = "redoSimilarity is an option to specifiy if recaclualte pairwise similarity matrix."
 
-mymapplot::usage = "mymapplot  "
+minGroupSize::usage = "minGroupSize "
 
-groupForward::usage = "groupForward  "
+isImputingFounder::usage = "isImputingFounder "
 
-calmapdataprobset::usage = "calmapdataprobset  "
+delStrongCrossLink::usage = "delStrongCrossLink "
 
-updatePhasing::usage = "updatePhasing  "
+minrfSegregateBin::usage = "minrfSegregateBin "
 
-togroupstarttranrule::usage = "togroupstarttranrule  "
-
-groupForwardBackward::usage = "groupForwardBackward  "
-
-togroupstarttranprob::usage = "togroupstarttranprob  "
-
-caldataprobset::usage = "caldataprobset  "
-
-getCosegregateAdj::usage = "getCosegregateAdj  "
-
-getCosegregateBin::usage = "getCosegregateBin  "
-
-getSimilarity2::usage = "getSimilarity2  "
-
-getautoCosegregateBin::usage = "getautoCosegregateBin  "
-
-getcorrtab::usage = "getcorrtab  "
-
-stratifiedcrosstab::usage = "stratifiedcrosstab  "
-
-stratifiedGTest::usage = "stratifiedGTest  "
-
-getcrosstab::usage = "getcrosstab  "
-
-minLDSaving::usage = "minLDSaving  "
-
-calGTest::usage = "calGTest  "
-
-calcrosstab::usage = "calcrosstab  "
-
-calGTestStat::usage = "calGTestStat  "
-
-calcrosstabcorr::usage = "calcrosstabcorr  "
-
-minrfSegregateBin::usage = "minrfSegregateBin  "
-
-minGroupSize::usage = "minGroupSize  "
-
+minLDSaving::usage = "minLDSaving " 
 
 Begin["`Private`"] (* Begin Private Context *) 
 
@@ -767,7 +689,7 @@ calsimilarity[magicSNP_,  model_, popDesign_,epsF_, eps_,rowspan_,similartype_,o
         If[ isprint,
             starttime = SessionTime[];
         ];
-        Print["markers=",rowspan, ", ", DateString[]];
+        Print["markers=",rowspan, ", ", DateString[]];        
         (*Put[magicSNP, model, popDesign, epsF, minphredscore,maxfoundererror, foundergenocallbound, 
                                 isfounderinbred,isfounderdepth, isoffspringdepth, isprint,"tempmap.txt"];*)
         {morganrate,snpid,fhaploset1, fhaploset2,fhaplorule1, fhaplorule1Rev, fhaplorule2, fhaplorule2Rev,obsgeno, samplefamilies, priortranset, ismaleX} = 
@@ -1262,8 +1184,9 @@ magicPairwiseSimilarity[inputmagicSNP_?(ListQ[#] || StringQ[#] &),inputmodel_Str
         ];
         {isfounderdepth, isoffspringdepth} = checkOptionValue[magicSNP, isfounderdepth, isoffspringdepth,isfounderinbred, isprint];
         (*Put[magicSNP, model, popDesign, epsF, eps,lodtype,outputfile,precisiongoal, accuracygoal, itmax,lodbound,
-                    minphredscore, maxfoundererror, foundergenocallbound,isfounderinbred, isfounderdepth, isoffspringdepth,isprint,"temp.txt"];
-        Abort[];*)
+                    minphredscore, maxfoundererror, foundergenocallbound,isfounderinbred, isfounderdepth, isoffspringdepth,isprint,"temp.txt"];*)
+        (*Abort[];*)        
+        (*Put[magicSNP, popDesign, isfounderinbred, isfounderdepth,isoffspringdepth,"tempibd.txt"];*)
         If[ ToLowerCase[model]==="jointmodel",
             ibdprob = calmagicibd[magicSNP, popDesign, isfounderinbred, isfounderdepth,isoffspringdepth];
             model = If[ ibdprob>0.85,
@@ -1276,7 +1199,7 @@ magicPairwiseSimilarity[inputmagicSNP_?(ListQ[#] || StringQ[#] &),inputmodel_Str
                                                                                                  "(<=0.85)!"
                                                                                              ]];
             ];
-        ];
+        ];        
         If[ isparallel,
             parallelsimilarity[magicSNP, model, popDesign, epsF, eps, lodtype,outputfile, precisiongoal, accuracygoal, itmax, ldbound,lodbound, 
                         minphredscore, maxfoundererror, foundergenocallbound, isfounderinbred,isfounderdepth, isoffspringdepth, isprint],
@@ -2165,7 +2088,8 @@ updategrouptranrule[groupkey_, inputgrouptranrule_, seggrouptranprob_,tmin_, tma
 (*logbackwardProb[[t,ind]] =  Log[Pr(y_{t+1...T}|x_t)]; dim={nsnp,nind,nstate}*)
 groupForward[groupstartProb_, grouptranProb_, groupdataprob_] :=
     Module[ { res, forwardProb, forwardScale, ind},
-        res = Table[CtForward[groupstartProb[[ind]], grouptranProb[[All,ind]], Normal[groupdataprob[[All, ind]]]], {ind, Length[groupstartProb]}];
+    	(*Normal is required for MMA v>12, collapse in the mulitplcation of two sparse matrices*)
+        res = Table[CtForward[Normal[groupstartProb[[ind]]], Normal[grouptranProb[[All,ind]]], Normal[groupdataprob[[All, ind]]]], {ind, Length[groupstartProb]}];
         {forwardProb, forwardScale} = Transpose[#] & /@ Transpose[res];
         (*resturn res with dim={{nsnp,nind,nstate},{nsnp,nind}*)
         {forwardProb, forwardScale}
@@ -2221,7 +2145,199 @@ calgroupcondlogl[fwprob_, logbwprob_] :=
         Log[MapThread[#1.#2 &, {fwprob, Exp[logbwprob - ls]}]] + ls
     ]        
     
-updateforwardbackward[t_, snporder_, groupkey_, grouptranrule_, dataprobset_, 
+calgrouplogl[t_, forwardProb_, forwardlogl_, logbackwardProb_] :=
+    Total[calgroupcondlogl[forwardProb[[t]], logbackwardProb[[t]]]] + forwardlogl[[t]]    
+
+initForward[groupkey_, groupstartrule_, snporder_, dataprobset_] :=
+    Module[ {tmax, forwardProb, forwardlogl, grouptranrule, forwardScale},
+        tmax = Length[snporder];
+        forwardProb = Table[Missing[], {tmax}];
+        forwardlogl = Table[Missing[], {tmax}];
+        grouptranrule = {};
+        {forwardProb[[{1}]], forwardScale} = groupForward[groupkey, groupstartrule, 
+        	grouptranrule, snporder[[{1}, 1]] /. dataprobset];
+        forwardlogl[[{1}]] = Accumulate[Total[Log[forwardScale], {2}]];
+        {forwardProb, forwardlogl}
+    ]
+  
+updateforward[fun_, tmin_, tmax_, snporder_, groupkey_, groupstartrule_, 
+  grouptranrule_, dataprobset_, forwardProb_, forwardlogl_] :=
+    Module[ {segstartprob, leftlogl, segtranprob, seg, segdataprob, 
+      newsegforwardprob, newsegforwardscale, fwprob, fwlogl},
+        If[ tmin == 1,
+            segstartprob = groupkey /. groupstartrule;
+            leftlogl = 0,
+            segstartprob = MapThread[#1 . #2 &, {forwardProb[[tmin - 1]], 
+               getgrouptranprob[groupkey, grouptranrule, tmin - 1]}];
+            leftlogl = forwardlogl[[tmin - 1]]
+        ];
+        (*Print["fw1: leftlogl=",leftlogl];*)
+        segtranprob = fun[getgrouptranprob[groupkey, grouptranrule, tmin, tmax - 1]];
+        seg = Range[tmin, tmax];
+        segdataprob = snporder[[fun[seg], 1]] /. dataprobset;        
+        {newsegforwardprob, newsegforwardscale} = groupForward[segstartprob, segtranprob, segdataprob];        
+        fwprob = forwardProb;
+        fwlogl = forwardlogl;
+        fwprob[[tmin ;; tmax]] = newsegforwardprob;
+        fwlogl[[tmin ;; tmax]] = 
+         leftlogl + Accumulate[Total[Log[newsegforwardscale], {2}]];
+        {fwprob, fwlogl}
+    ]
+
+updatebackward[tmin_, tmax_, snporder_, groupkey_, grouptranrule_, 
+  dataprobset_, logbackwardProb_] :=
+    Module[ {segtranprob, segdataprob, logbwprob},
+        segtranprob = getgrouptranprob[groupkey, grouptranrule, tmin, tmax - 1];
+        segdataprob = snporder[[tmin ;; tmax, 1]] /. dataprobset;
+        logbwprob = logbackwardProb;
+        logbwprob[[tmin ;; tmax]] = groupBackward[segtranprob, segdataprob, logbackwardProb[[tmax]]];
+        logbwprob
+    ]  
+
+
+gettmax[tmin_, snpneighbor_, snporder_, isleftneighbor_] :=
+    Module[ {nsnp, tmax, indice, pos},
+        nsnp = Length[snporder];
+        If[ nsnp - tmin <= 2,
+            tmax = nsnp,
+            indice = Lookup[snpneighbor, snporder[[tmin, 1]]];
+            indice[[2]] = indice[[2]] /. snporder;
+            pos = Flatten[Position[indice[[2]], _?(# > tmin &)]];
+            If[ pos === {},
+                Return[None]
+            ];
+            tmax = RandomChoice[indice[[All, pos]]];
+            If[ isleftneighbor,
+                If[ RandomReal[] < 0.5,
+                    tmax -= 1
+                ]
+            ];
+        ];
+        tmax
+    ]
+          
+segmentRefineLocal[inputsnporder_, inputdeltd_, groupkey_, groupstartrule_, 
+  inputgrouptranrule_, dataprobset_, snpneighbor_, windowsize_, temperature_, inputaction_] :=
+    Module[ {snporder = inputsnporder, deltd = inputdeltd, 
+      grouptranrule = inputgrouptranrule, nsnp, realwindowsize, accept, 
+      forwardProb, forwardlogl, logbackwardProb, fwtt, bwtt, logl, fun, 
+      action, isneighbor, isrightneighbor, isleftneighbor, bwtt2, t, tmin, tmax,
+       newfwprob, newfwlogl, cond, seg, newlogl, tempprob},
+        nsnp = Length[snporder];
+        realwindowsize =  accept = Table[0, {nsnp}];
+        {forwardProb, forwardlogl} = initForward[groupkey, groupstartrule, snporder, dataprobset];
+        logbackwardProb =  groupBackward[groupkey, grouptranrule, snporder[[All, 1]] /. dataprobset, Automatic];
+        fwtt = 1; (*only fw at t = 1 ... fwtt was caculated, the rest is missing*)
+        bwtt = 1; (*only bw at t= = bwtt, ..., nsnp, was calculated, the rest is missing*)       
+        logl = calgrouplogl[1, forwardProb, forwardlogl, logbackwardProb];
+        action = ToLowerCase[inputaction];
+        fun = Switch[action,
+          "reverse" | "reverseneighbor" | "reverseleftneighbor" | "reverserightneighbor", Reverse[#] &,
+          "rotateleft" | "rotateleftneighbor", RotateLeft[#, 1] &,
+          "rotateright" | "rotaterightneighbor", RotateRight[#, 1] &,
+          _, Print["segmentRefine: unknown segment refine operator ", action];
+             Abort[];
+          ];
+        isneighbor =  MatchQ[action,  "reverseneighbor" | "reverserightneighbor" | 
+           "rotaterightneighbor" | "reverseleftneighbor" | "rotateleftneighbor"];
+        isrightneighbor =  MatchQ[action, "reverserightneighbor" | "rotaterightneighbor"];
+        isleftneighbor =  MatchQ[action, "reverseleftneighbor" | "rotateleftneighbor"];
+        t = 1;
+        While[t < nsnp,
+         tmin = t;
+         If[ isrightneighbor,
+             If[ RandomReal[] < 0.5,
+                 tmin += 1
+             ]
+         ];
+         If[ tmin >= nsnp,
+             Break[]
+         ];
+         If[ isneighbor,
+             tmax = gettmax[tmin, snpneighbor, snporder, isleftneighbor];
+             If[ tmax == None,
+                 t++;
+                 Continue[]
+             ],
+             tmax = Min[tmin + windowsize - 1, nsnp]
+         ];
+         If[ tmin >= tmax,
+             t++;
+             Continue[]
+         ];
+         (*Print["i=",i, ",action=", action, ", {fwtt,bwtt,tmin,tmax}=",{fwtt,bwtt,tmin,tmax}];*)
+         If[ fwtt < tmin - 1,
+             {forwardProb, forwardlogl} = updateforward[Identity, fwtt, tmin - 1, snporder, groupkey, 
+               groupstartrule, grouptranrule, dataprobset, forwardProb, forwardlogl];
+             fwtt  = tmin - 1
+         ];
+         If[ bwtt > tmax,
+             logbackwardProb =  updatebackward[tmax, bwtt, snporder, groupkey, grouptranrule, 
+               dataprobset, logbackwardProb];
+             bwtt = tmax
+         ];
+         {newfwprob, newfwlogl} = updateforward[fun, tmin, tmax, snporder, groupkey, groupstartrule,
+            grouptranrule, dataprobset, forwardProb, forwardlogl];
+         newlogl = calgrouplogl[tmax, newfwprob, newfwlogl, logbackwardProb];
+         If[ temperature < 10^(-5.),
+             cond = newlogl > logl,
+             cond = RandomReal[] < Min[1, Exp[(newlogl - logl)/temperature]]
+         ];
+         If[ cond,
+             seg = Range[tmin, tmax];
+             snporder[[seg, 1]] = snporder[[fun[seg], 1]];
+             deltd[[Most[seg]]] = fun[deltd[[Most[seg]]]];
+             tempprob = fun[getgrouptranprob[groupkey, grouptranrule, tmin, tmax - 1]];
+             grouptranrule = updategrouptranrule[groupkey, grouptranrule, tempprob, tmin, tmax - 1];
+             logl = newlogl;
+             forwardProb = newfwprob;
+             forwardlogl = newfwlogl;
+             fwtt = tmax;
+             bwtt2 = Min[tmax, nsnp - 1];
+             logbackwardProb[[bwtt;;bwtt2]] = Missing[];             
+             bwtt = bwtt2 + 1;
+             accept[[t]] = True,
+             accept[[t]] = False;
+         ];
+         realwindowsize[[t]] = tmax - tmin + 1;
+         t += 1;
+         ];
+        accept = DeleteCases[accept, 0];
+        realwindowsize = DeleteCases[realwindowsize, 0];        
+        If[ fwtt < nsnp,
+             {forwardProb, forwardlogl} = updateforward[Identity, fwtt, nsnp, snporder, groupkey, 
+               groupstartrule, grouptranrule, dataprobset, forwardProb, forwardlogl];
+             If[ (logl - Last[forwardlogl]) > 10^(-2.),
+             	Print["segmentRefine: wrong logl=", logl, ", or Last[forwardlogl]=", Last[forwardlogl], "!"];
+             	Abort[]
+             ];
+        ];
+        {snporder, deltd, grouptranrule, realwindowsize, accept, logl}
+    ]
+          
+updatemarkerorder[inputsnporder_, inputdeltd_, actionls_,samplelabel_, 
+  continuedmarkovprocess_, dataprobset_, snpneighbor_,meanwindowsize_, temperature_] :=
+    Module[ {snporder = inputsnporder, deltd = inputdeltd, grouptranrule2, i, 
+     acceptls, loglls, windowsizels, realwindowsizels,groupkey, groupstartrule, grouptranrule},
+        windowsizels = RandomInteger[TruncatedDistribution[{1, Infinity}, PoissonDistribution[3 meanwindowsize/4]],1];
+        windowsizels = Join[windowsizels,RandomInteger[TruncatedDistribution[{2, Infinity}, PoissonDistribution[meanwindowsize]],Length[actionls]-1]];        
+        {groupkey, groupstartrule, grouptranrule} = togroupstarttranrule[samplelabel, continuedmarkovprocess, deltd];
+        acceptls = loglls = realwindowsizels = Table[0,{ Length[actionls]}];
+        Do[
+         (*Put[snporder, deltd, forwardProb, forwardlogl,logbackwardProb,groupkey, groupstartrule, grouptranrule, dataprobset, snpneighbor,windowsize, temperature,action, "templocal.txt"];*)
+         {snporder, deltd, grouptranrule, realwindowsizels[[i]],acceptls[[i]], loglls[[i]]}  = segmentRefineLocal[snporder, deltd, groupkey, groupstartrule, 
+   			grouptranrule, dataprobset, snpneighbor, windowsizels[[i]], temperature, actionls[[i]]];   		 
+         If[ RandomReal[]<0.1,         	          	
+             grouptranrule2 = Last[togroupstarttranrule[samplelabel, continuedmarkovprocess, deltd]];
+             If[ grouptranrule!=grouptranrule2,
+                 Print["wrong update of grouptranrule!"];
+                 Abort[];
+             ];
+         ], {i, Length[actionls]}];
+        {snporder, deltd, realwindowsizels,acceptls, loglls}
+	]
+	            
+(*updateforwardbackward[t_, snporder_, groupkey_, grouptranrule_, dataprobset_, 
   inputforindicator_, inputforwardProb_,inputforwardlogl_, inputbackindicator_, inputlogbackwardProb_] :=
     Module[ {forindicator, forwardProb,fwscale,forwardlogl,backindicator, logbackwardProb, tchange, 
         tmin, tmax, segtranprob, segdataprob, segstartprob},
@@ -2255,13 +2371,15 @@ segmentRefineLocal[inputsnporder_, inputdeltd_,inputforwardProb_, inputforwardlo
     Module[ {tempprob,snporder = inputsnporder, deltd = inputdeltd,forwardProb = inputforwardProb,forwardlogl = inputforwardlogl,
         logbackwardProb = inputlogbackwardProb,grouptranrule = inputgrouptranrule,action,forindicator,backindicator,nsnp,seg,accept,
         realwindowsize,t,tmin,tmax,indice,pos,isneighbor,isrightneighbor,isleftneighbor,isinnerneighbor,logl,logl2, leftlogl,newlogl,
-        segstartprob,segtranprob, segdataprob, newsegforwardprob,newsegforwardscale, cond,fun},
+        segstartprob,segtranprob, segdataprob, newsegforwardprob,newsegforwardscale, cond,fun},        
         nsnp = Length[snporder];
         realwindowsize = accept = Table[0, {nsnp}];
         backindicator = Table[1, {nsnp}];
         forindicator = 1-Boole[MissingQ[#]&/@forwardProb];
         logl = Last[forwardlogl];
         action = ToLowerCase[inputaction];
+        (*actionls={"ReverseLeftNeighbor","RotateLeftNeighbor","ReverseRightNeighbor",
+        	"RotateRightNeighbor","Reverse","RotateLeft","RotateRight"}*)
         fun = Switch[action,
             "reverse"|"reverseneighbor"|"reverseinnerneighbor"|"reverseleftneighbor"|"reverserightneighbor", Reverse[#]&,
             "rotateleft"|"rotateleftneighbor",RotateLeft[#,1]&,
@@ -2306,18 +2424,21 @@ segmentRefineLocal[inputsnporder_, inputdeltd_,inputforwardProb_, inputforwardlo
              t++;
              Continue[]
          ];
-         (*Print["{t,tmin,tmax}=",{t,tmin,tmax},";memoryinuse=",MemoryInUse[]];*)
+         (*Print["hereseg1 {t,tmin,tmax}=",{t,tmin,tmax},";memoryinuse=",MemoryInUse[]];*)
          {forindicator, forwardProb, forwardlogl, backindicator,logbackwardProb} = updateforwardbackward[tmax, snporder, 
-             groupkey,grouptranrule, dataprobset,forindicator, forwardProb,forwardlogl,backindicator, logbackwardProb];
+             groupkey,grouptranrule, dataprobset,forindicator, forwardProb,forwardlogl,backindicator, logbackwardProb];      
          If[ MissingQ[forwardProb[[tmax]]],
              Print["tmax=",tmax,";forindicator=",forindicator, ";forwardProb=",MissingQ[#]&/@forwardProb]
+         ];
+          If[ MissingQ[logbackwardProb[[tmax]]],
+             Print["tmax=",tmax,";backindicator=",backindicator, ";logbackwardProb=",MissingQ[#]&/@logbackwardProb]
          ];
          logl2 = Total[calgroupcondlogl[forwardProb[[tmax]], logbackwardProb[[tmax]]]] +forwardlogl[[tmax]];
          If[ (logl-logl2)>10^(-5.),
              Print["segmentRefineLocal: inconsistent log likelihoods: ", {logl, logl2}];
              Abort[]
          ];
-         (*Print["here2,log2=",logl2];*)
+         (*Print["hereseg2,log2=",logl2];*)
          seg = Range[tmin, tmax];
          If[ tmin == 1,
              segstartprob = groupkey/.groupstartrule;
@@ -2328,17 +2449,20 @@ segmentRefineLocal[inputsnporder_, inputdeltd_,inputforwardProb_, inputforwardlo
          (*segtranprob = fun[grouptranprob[[Most[seg]]]];*)
          segtranprob = fun[getgrouptranprob[groupkey, grouptranrule, tmin,tmax-1]];
          segdataprob = snporder[[fun[seg],1]]/.dataprobset;
+         Print["hereseg2.1,{t,tmin,tmax}=",{t,tmin,tmax}];         
          {newsegforwardprob, newsegforwardscale} = groupForward[segstartprob, segtranprob, segdataprob];
+         Print["hereseg2.2"];
+         If[ MissingQ[newsegforwardprob[[-1]]], Print["wrong newseg forprob"]];
          newlogl = Total[calgroupcondlogl[newsegforwardprob[[-1]],logbackwardProb[[tmax]]]] + Total[Log[Flatten[newsegforwardscale]]]+leftlogl;
-         (*Print["here2,newlogl=",newlogl];*)
+         (*Print["hereseg3,newlogl=",newlogl];*)
          If[ temperature < 10^(-5.),
              cond = newlogl > logl,
              cond = RandomReal[] < Min[1, Exp[(newlogl - logl)/temperature]]
-         ];
+         ];         
          If[ cond,
              accept[[t]] = True;
-             backindicator[[;; tmax - 1]] = 0;
-             logbackwardProb[[;; tmax - 1]] = Missing[];
+             backindicator[[;; tmax-1]] = 0;
+             logbackwardProb[[;; tmax-1]] = Missing[];
              snporder[[seg, 1]] = snporder[[fun[seg], 1]];
              deltd[[Most[seg]]] = fun[deltd[[Most[seg]]]];
              (*grouptranprob[[Most[seg]]] = fun[grouptranprob[[Most[seg]]]];*)
@@ -2355,11 +2479,8 @@ segmentRefineLocal[inputsnporder_, inputdeltd_,inputforwardProb_, inputforwardlo
              ],
              accept[[t]] = False;
          ];
-         realwindowsize[[t]] = tmax-tmin+1;
-         (*to save memory*)
-         logbackwardProb[[;; t]] = Missing[];
-         t+=1;
-         (*t+=RandomInteger[{1, Max[1,Round[(tmax - t)/5]]}];*)
+         realwindowsize[[t]] = tmax-tmin+1;                  
+         t+=1;         
         ];
         accept = DeleteCases[accept,0];
         realwindowsize = DeleteCases[realwindowsize,0];
@@ -2374,6 +2495,48 @@ segmentRefineLocal[inputsnporder_, inputdeltd_,inputforwardProb_, inputforwardlo
         ];
         {snporder, deltd,forwardProb, forwardlogl, grouptranrule,realwindowsize,accept, logl}
     ] 
+
+          
+updatemarkerorder[inputsnporder_, inputdeltd_, actionls_,samplelabel_, 
+  continuedmarkovprocess_, dataprobset_, snpneighbor_,meanwindowsize_, temperature_] :=
+    Module[ {acceptls, loglls, snporder = inputsnporder, grouptranrule2,
+     deltd = inputdeltd, forwardProb, forwardlogl,i, windowsize, action,
+     logbackwardProb, windowsizels, realwindowsizels,groupkey, groupstartrule, grouptranrule},
+     	(*Print["here3.1"];*)
+        acceptls = loglls = Table[0, {Length[actionls]}];
+        windowsizels = RandomInteger[TruncatedDistribution[{1, Infinity}, PoissonDistribution[3 meanwindowsize/4]],1];
+        windowsizels = Join[windowsizels,RandomInteger[TruncatedDistribution[{2, Infinity}, PoissonDistribution[meanwindowsize]],Length[actionls]-1]];
+        (*windowsizels = RandomInteger[TruncatedDistribution[{1, Infinity}, PoissonDistribution[meanwindowsize]],Length[actionls]];*)
+        {groupkey, groupstartrule, grouptranrule} = togroupstarttranrule[samplelabel, continuedmarkovprocess, deltd];
+        (*Print["here3.2"];*)
+        {forwardProb, forwardlogl, logbackwardProb} = 
+         groupForwardBackward[groupkey, groupstartrule, grouptranrule, snporder[[All,1]]/.dataprobset];
+        realwindowsizels = Table[0,{ Length[actionls]}];
+        Do[
+         Print["here3.5, Improving ordering by ", actionls[[i]],";memoryinuse=",MemoryInUse[]];
+         windowsize = windowsizels[[i]];
+         action = actionls[[i]];
+         Put[snporder, deltd, forwardProb, forwardlogl,logbackwardProb,groupkey, groupstartrule, grouptranrule, dataprobset, snpneighbor,windowsize, temperature,action, "templocal.txt"];                  
+         {snporder, deltd, forwardProb, forwardlogl, grouptranrule, realwindowsizels[[i]],acceptls[[i]], loglls[[i]]} = 
+          segmentRefineLocal[snporder, deltd, forwardProb, forwardlogl, 
+              logbackwardProb,groupkey, groupstartrule, grouptranrule, dataprobset, snpneighbor,windowsizels[[i]], temperature,actionls[[i]]];
+         Print["herelocal1"];
+         forwardProb[[2;;]] = Missing[];
+         forwardlogl[[2 ;;]] = Missing[];
+         If[ RandomReal[]<0.1,
+         	 (*Print["herelocal1.5"];*)         	
+             grouptranrule2 = Last[togroupstarttranrule[samplelabel, continuedmarkovprocess, deltd]];
+             If[ grouptranrule!=grouptranrule2,
+                 Print["wrong update of grouptranrule!"];
+                 Abort[];
+             ];
+         ];
+         Print["herelocal2"];  
+         logbackwardProb = groupBackward[groupkey, grouptranrule, snporder[[All,1]]/.dataprobset,Automatic];
+         0, {i, Length[actionls]}];
+        {snporder, deltd, realwindowsizels,acceptls, loglls}
+	]
+*)    
         
 updatemarkerdistanceEM[model_,snps_, inputdeltd_, samplelabel_, continuedmarkovprocess_, dataprobset_, 
     samplemapR_, ischX_, offspringgender_] :=
@@ -2588,37 +2751,7 @@ updatedistancescaleBrent[snps_, inputsnpdeltd_, samplelabel_, continuedmarkovpro
         {{oldlogl, nowlogl}, snpdeltd}
     ]
 *)    
-          
-updatemarkerorder[inputsnporder_, inputdeltd_, actionls_,samplelabel_, 
-  continuedmarkovprocess_, dataprobset_, snpneighbor_,meanwindowsize_, temperature_] :=
-    Module[ {acceptls, loglls, snporder = inputsnporder, grouptranrule2,
-     deltd = inputdeltd, forwardProb, forwardlogl,i, 
-     logbackwardProb, windowsizels, realwindowsizels,groupkey, groupstartrule, grouptranrule},
-        acceptls = loglls = Table[0, {Length[actionls]}];
-        windowsizels = RandomInteger[TruncatedDistribution[{1, Infinity}, PoissonDistribution[3 meanwindowsize/4]],1];
-        windowsizels = Join[windowsizels,RandomInteger[TruncatedDistribution[{2, Infinity}, PoissonDistribution[meanwindowsize]],Length[actionls]-1]];
-        (*windowsizels = RandomInteger[TruncatedDistribution[{1, Infinity}, PoissonDistribution[meanwindowsize]],Length[actionls]];*)
-        {groupkey, groupstartrule, grouptranrule} = togroupstarttranrule[samplelabel, continuedmarkovprocess, deltd];
-        {forwardProb, forwardlogl, logbackwardProb} = 
-         groupForwardBackward[groupkey, groupstartrule, grouptranrule, snporder[[All,1]]/.dataprobset];
-        realwindowsizels = Table[0,{ Length[actionls]}];
-        Do[
-         (*Print["Improving ordering by ", actionls[[i]],";memoryinuse=",MemoryInUse[]];*)
-         {snporder, deltd, forwardProb, forwardlogl, grouptranrule, realwindowsizels[[i]],acceptls[[i]], loglls[[i]]} = 
-          segmentRefineLocal[snporder, deltd, forwardProb, forwardlogl, 
-              logbackwardProb,groupkey, groupstartrule, grouptranrule, dataprobset, snpneighbor,windowsizels[[i]], temperature,actionls[[i]]];
-         forwardProb[[2;;]] = Missing[];
-         If[ RandomReal[]<0.1,
-             grouptranrule2 = Last[togroupstarttranrule[samplelabel, continuedmarkovprocess, deltd]];
-             If[ grouptranrule!=grouptranrule2,
-                 Print["wrong update of grouptranrule!"];
-                 Abort[];
-             ];
-         ];
-         logbackwardProb = groupBackward[groupkey, grouptranrule, snporder[[All,1]]/.dataprobset,Automatic];
-         0, {i, Length[actionls]}];
-        {snporder, deltd, realwindowsizels,acceptls, loglls}
-    ]
+
                  
 updatePhasing[magicSNP_, model_, popDesign_, epsF_, eps_, ischrX_,snps_, snpdeltd_, minphredscore_,foundercallthreshold_,
    isfounderinbred_, isfounderdepth_, isoffspringdepth_, boolparent_,booloff_,imputingbound_,errorgenobound_] :=
@@ -2874,8 +3007,8 @@ withingroupRefine[{groupindex_,runindex_,kernelid_},outputfile_,refineinputlist_
         ];
         itmax = calitmax[inittemperature, coolingratio, freeze, itmaxfreeze];
         loglhis = Table[0,{itmax}];
-        Do[
-         (*Print["groupindex=",groupindex,"it=",it,"; phashing"];*)
+        (*Print["{groupindex,runindex,kernelid}=",{groupindex,runindex,kernelid}];*)
+        Do[         
          meanwindowsize = meanwindowsize0 + 1/2 temperature;
          If[ temperature<=freeze,
              imputestepsize = 5;
@@ -2896,30 +3029,25 @@ withingroupRefine[{groupindex_,runindex_,kernelid_},outputfile_,refineinputlist_
                  minphredscore, foundercallthreshold,isfounderinbred, isfounderdepth, isoffspringdepth, boolparent,booloff,imputingbound,errorgenobound];];
              dataprobset = caldataprobset[imputedsubmagicsnp, magicSNP[[2,2;;]],snporder[[All, 1]], model, epsF, eps, ischrX, 
                  minphredscore, isfounderinbred, isfounderdepth, isoffspringdepth];
-         ]; 
-         (*Print["del: update dis; MemoryInUse=",MemoryInUse[]];*)
+         ];
          If[ temperature<=freeze,
              {{loglbefore,logldis},snpdeltd} = updatemarkerdistanceBrent[snporder[[All, 1]], snpdeltd, samplelabel,continuedmarkovprocess, dataprobset,priorchrlength];
              acceptdis =  "BrentMethod",
              {{loglbefore,logldis},snpdeltd,acceptdis} = updatemarkerdistanceMC[snporder[[All, 1]], snpdeltd, samplelabel,continuedmarkovprocess, dataprobset,priorchrlength,temperature];
          ];
-         (*Print["{Iteration,Temperature,ParentImpute&Phasing,ErrorDetect,OffspringImpute}=",{it,temperature, boolparent,booloff&&errorgenobound<1,booloff&&imputingbound<1}];
-         Put[imputedsubmagicsnp,loglbefore,logldis,dataprobset,samplelabel,continuedmarkovprocess,magicSNP, model, popDesign, epsF, eps, 
-             ischrX,snporder,snpdeltd, minphredscore, foundercallthreshold,isfounderinbred, isfounderdepth,"tempprob.txt"];
-         Abort[];*)
-         (*Print["groupindex=",groupindex,"it=",it,"; ordering"];*)
-         (*Print["del: update order; MemoryInUse=",MemoryInUse[]];*)
+         (*Print["groupindex=",groupindex,"it=",it,"; ordering"];*)                  
+         (*Put[snporder, snpdeltd, actionls, samplelabel, continuedmarkovprocess, dataprobset, snpneighbor, meanwindowsize,temperature,"temporder.txt"];*)         
          If[ Length[summary]==3,
              {snporder, snpdeltd, windowsizels, acceptls, loglls} = 
                   updatemarkerorder[snporder, snpdeltd, actionls, samplelabel, continuedmarkovprocess, dataprobset, snpneighbor, meanwindowsize,temperature],
              loglls = Table[logldis,{Length[windowsizels]}];
-         ];
+         ];  
          Write[outstream, {it, temperature, snporder, snpdeltd,acceptdis,logldis,windowsizels,acceptls,loglls}];
          (*compare logl in iterations with same chromosome directions*)
          If[ it>=3&& temperature<=freeze&&Abs[Last[loglls]-loglhis[[it-2]]] < deltloglbound,
              count++,
              count = 0
-         ];         
+         ];                 
          (*Print["groupindex=",groupindex,"it=",it,"; display"];*)
          summary = iterationsummary[groupindex,runindex,kernelid,starttime,inputsnpid,refmap,temperature,freeze,it,snporder,snpdeltd,actionls,windowsizels,acceptls,loglls,
              loglbefore,acceptdis,logldis];
@@ -3016,6 +3144,35 @@ fillmagicsnp[magicSNP_, refinemap_] :=
         ];
         newmagicsnp
     ]
+    
+deljumpend[skeletonmap_, maxdelfrac_: 0.02, jumpdis_: 50] := 
+ Module[{delset, ls, maxdel, pos, temp,k},
+  delset = {};
+  ls = SplitBy[skeletonmap[[2 ;;]], #[[2]] &];
+  Do[
+   maxdel = Max[2, 1 + Round[Length[ls[[k]]]*maxdelfrac/2]];
+   pos = Flatten[Position[Differences[ls[[k]][[;; maxdel, 3]]] - jumpdis, _?Positive]];
+   If[pos =!= {},
+    delset = Join[delset, ls[[k]][[;; pos[[-1]]]]];
+    ls[[k]] = Drop[ls[[k]], pos[[-1]]];
+    ls[[k]][[All, 3]] = ls[[k]][[All, 3]] - ls[[k]][[1, 3]];
+    ls[[k]][[All, 4]] = Join[{"NA"}, Differences[ls[[k]][[All, 3]]]];
+    ];
+   temp = Reverse[ls[[k]]];
+   pos = Flatten[Position[Abs[Differences[temp[[;; maxdel, 3]]]] - jumpdis, _?Positive]];
+   If[pos =!= {},
+    delset = Join[delset, temp[[;; pos[[-1]]]]];
+    ls[[k]] = Reverse[Drop[temp, pos[[-1]]]];
+    ls[[k]][[All, 3]] = ls[[k]][[All, 3]] - ls[[k]][[1, 3]];
+    ls[[k]][[All, 4]] = Join[{"NA"}, Differences[ls[[k]][[All, 3]]]];
+    ], {k, Length[ls]}];
+  If[Length[delset] > 0,
+   delset[[All, 2]] = "ungrouped";
+   delset[[All, 3 ;; 4]] = "NA";
+   Join[skeletonmap[[{1}]], Flatten[ls, 1], delset],
+   skeletonmap
+   ]
+  ]    
   
 (*not imputing missing offspring genotypes. 
 By default, always imputing missing parnet genotypes*)
@@ -3035,40 +3192,44 @@ Options[magicMapRefine] =
         
 magicMapRefine[skeletonmap_?(ListQ[#] || StringQ[#] &),inputbinning_,  magicSNP_?(ListQ[#] || StringQ[#] &), 
     model_String, popDesign_?(ListQ[#] || StringQ[#] &), options : OptionsPattern[]] :=
-    Module[ {opts,binning = inputbinning,outputid, inittemperature, freeze,mapexpandtemp,refinemapfiles,refinemapfiles2,mapfile},    	
+    Module[ {opts,binning = inputbinning,outputid, inittemperature, freeze,mapexpandtemp,refinemapfiles,refinemapfiles2,mapfile,refinemap},    	
     	If[Quiet[Head[options]] === List,
     		opts=options,
     		opts={options}
-    	];
-    	(*Print["options = ",opts];*)
+    	];    	
     	If[MissingQ[binning],
-    		Return[magicMapRefine[skeletonmap, magicSNP, model, popDesign,Sequence@@opts]] 
-    	];
-        If[ StringQ[binning],
-            If[ !FileExistsQ[binning],
-                Print["File ", binning," does not exist!"];
-                Return[$Failed]
-            ];
-            binning = Import[binning,"CSV"];
-        ];
-        {outputid, inittemperature, freeze} = OptionValue@{outputFileID,initTemperature, freezingTemperature};        
-        If[ inittemperature <= freeze,
-            mapfile = magicMapExpand[skeletonmap,binning, FilterRules[opts, Options[magicMapExpand]]];            
-            refinemapfiles = magicMapRefine[mapfile, magicSNP, model, popDesign,Sequence@@opts],
-            (*inittemperature > freeze*)
-            mapexpandtemp = Max[inittemperature/2,freeze];
-            refinemapfiles = magicMapRefine[skeletonmap, magicSNP, model, popDesign,
-                freezingTemperature -> mapexpandtemp,
-                maxFreezeIteration -> 0,
-                outputFileID -> outputid<>"_skeleton", 
-                FilterRules[opts, Except[outputFileID|maxFreezeIteration|freezingTemperature]]];
-            mapfile = magicMapExpand[refinemapfiles[[1]],binning, outputFileID -> "tempmap"];
-            refinemapfiles2 = magicMapRefine[mapfile, magicSNP, model, popDesign,
-            	initTemperature -> mapexpandtemp, 
-            	FilterRules[opts, Except[initTemperature]]];
-            refinemapfiles = Join[refinemapfiles2,refinemapfiles];
-            DeleteFile[mapfile]
-        ];
+    		refinemapfiles = magicMapRefine[skeletonmap, magicSNP, model, popDesign,Sequence@@opts],     	
+	        If[ StringQ[binning],
+	            If[ !FileExistsQ[binning],
+	                Print["File ", binning," does not exist!"];
+	                Return[$Failed]
+	            ];
+	            binning = Import[binning,"CSV"];
+	        ];
+	        {outputid, inittemperature, freeze} = OptionValue@{outputFileID,initTemperature, freezingTemperature};	                
+	        If[ inittemperature <= freeze,
+	            mapfile = magicMapExpand[skeletonmap,binning, FilterRules[opts, Options[magicMapExpand]]];            
+	            refinemapfiles = magicMapRefine[mapfile, magicSNP, model, popDesign,Sequence@@opts],
+	            (*inittemperature > freeze*)
+	            Print["inittemperature=",inittemperature," with skeleton markers"];
+	            mapexpandtemp = Max[inittemperature/2,freeze];
+	            refinemapfiles = magicMapRefine[skeletonmap, magicSNP, model, popDesign,
+	                freezingTemperature -> mapexpandtemp,
+	                maxFreezeIteration -> 0,
+	                outputFileID -> outputid<>"_skeleton", 
+	                Sequence@@FilterRules[opts, Except[outputFileID|maxFreezeIteration|freezingTemperature]]];	            
+	            mapfile = magicMapExpand[refinemapfiles[[1]],binning, outputFileID -> outputid<>"_temporary"];
+	            Print["inittemperature=",mapexpandtemp," with co-segregating markers"];
+	            refinemapfiles2 = magicMapRefine[mapfile, magicSNP, model, popDesign,
+	            	initTemperature -> mapexpandtemp, 
+	            	Sequence@@FilterRules[opts, Except[initTemperature]]];	           
+	           refinemapfiles = Join[refinemapfiles2,refinemapfiles];
+	           DeleteFile[mapfile]
+	        ];       
+        ]; 
+        refinemap = Import[refinemapfiles[[1]], "CSV"];
+        refinemap = deljumpend[refinemap];        
+        csvExport[refinemapfiles[[1]],refinemap];
         refinemapfiles
     ]
     
@@ -3085,7 +3246,7 @@ magicMapRefine[inputroughmap_?(ListQ[#] || StringQ[#] &), inputmagicSNP_?(ListQ[
         {isimputefounder,imputingbound,errorgenobound,refmap,nreplicate, inittemperature, coolingratio, freeze,deltloglbound, itmaxfreeze} = 
          OptionValue@{isImputingFounder,imputingThreshold,detectingThreshold,referenceMap,nReplicateAnnealing, initTemperature, coolingRatio,
              freezingTemperature,deltLoglThreshold, maxFreezeIteration};
-        outputfiles = outputid<>#&/@{"_refine_linkagemap.csv","_refine_history.txt"};
+        outputfiles = outputid<>#&/@{"_refine_linkagemap.csv","_refine_history.txt"};        
         If[ !MemberQ[{"jointModel","indepModel","depModel"},model],
             Print["magicMapRefine: model has to take \"jointModel\", \"indepModel\", or \"depModel\".; model=",model];
             Return[$Failed]
@@ -3168,7 +3329,7 @@ magicMapRefine[inputroughmap_?(ListQ[#] || StringQ[#] &), inputmagicSNP_?(ListQ[
                 Print["magicMapRefine: file ", refmap," does not exist"];
                 Abort[];
             ];
-        ];
+        ];        
         {isfounderdepth, isoffspringdepth} = checkOptionValue[magicSNP, isfounderdepth, isoffspringdepth,isfounderinbred, False];
         If[ MemberQ[DeleteCases[roughMap[[2 ;;, 2 ;; 3]], {"ungrouped", _}][[All, 2]], "NA"],
             If[ Dimensions[roughMap][[2]] >5,
@@ -3245,8 +3406,7 @@ magicMapRefine[inputroughmap_?(ListQ[#] || StringQ[#] &), inputmagicSNP_?(ListQ[
         ];
         refinemap = formRefineMap[roughMap, refine];
         csvExport[outputfiles[[1]], refinemap];
-        (*magicSNP = formRefineMagicSNP[refine];
-        csvExport[outputfiles[[3]], magicSNP];*)
+        (*Put[roughMap,refine,refinemap,"tempmap.txt"];*)
         If[ isprint,
             Print["# iterations = ", SplitBy[refine[[All, {1,2,-1}]],#[[;;2]]&][[All, All, -1]]];
             Print["Done! Finished date =",DateString[], ". \tTime elapsed in magicMapRefine = ", Round[SessionTime[] - starttime,0.1], " Seconds."];
@@ -3393,7 +3553,7 @@ magicMap[inputmagicSNP_?(ListQ[#] || StringQ[#] &), model_String, popDesign_?(Li
             Print["-------------------------------------------------------Refine LinkageMap-------------------------------------------------------------"];
         ];
         (*Print["skeletonmapfile, rfbinfile, magicsnpfile, model, popDesign=",{skeletonmapfile, rfbinfile, magicsnpfile, model, popDesign}];*)
-        (*Put[skeletonmapfile, rfbinfile, magicsnpfile, model, popDesign,{opts},"tempmap.txt"];*)        
+        (*Put[skeletonmapfile, rfbinfile, magicsnpfile, model, popDesign,{opts},"tempmap.txt"];*)
         refinemapfiles = magicMapRefine[skeletonmapfile, rfbinfile, magicsnpfile, model, popDesign, FilterRules[{opts}, Options[magicMapRefine]]];
         If[ isprint,
             Print["--------------------------------------------------------Export finalMap--------------------------------------------------------------"];

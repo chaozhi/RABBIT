@@ -489,7 +489,7 @@ Options[magicSNPtoVCF] = {
     }
 
 magicSNPtoVCF[inputmagicSNP_?(ListQ[#] || StringQ[#] &),OptionsPattern[]] :=
-    Module[ {magicsnp = inputmagicSNP, outputfile,target,isphased,recomrate,outputid,nfounder, isfounderGBS, isoffspringGBS,noff,nsnp, data, rule, vcfheader,genoformat},
+    Module[ {magicsnp = inputmagicSNP, phasehead,outputfile,target,isphased,recomrate,outputid,nfounder, isfounderGBS, isoffspringGBS,noff,nsnp, data, rule, vcfheader,genoformat},
         {recomrate,target,isphased,outputid} = OptionValue[{recombinationRate,tranformTarget,isPhased,outputFileID}];
         If[ outputid=!="",
             outputfile = outputid <> ".vcf",
@@ -547,11 +547,12 @@ magicSNPtoVCF[inputmagicSNP_?(ListQ[#] || StringQ[#] &),OptionsPattern[]] :=
         data[[2 ;;, 4]] = "A";
         data[[2 ;;, 5]] = "G";
         data[[2 ;;, ;; 3]] = Map[ToString, data[[2 ;;, ;; 3]], {2}];
-        vcfheader = {"##fileformat=VCFv4.1", "##source=magicImpute", 
+        phasehead = If[isphased, "##phasing=all","##phasing=none"];
+        vcfheader = {"##fileformat=VCFv4.3","##fileDate="<>StringDelete[DateString["ISODate"],"-"], "##source=RABBIT", phasehead,
           "##FORMAT=<ID=AD,Number=.,Type=Integer,Description=\"Allelic depths for the ref and alt alleles in the order listed\">", 
           "##FORMAT=<ID=GT,Number=1,Type=String,Description=\"Genotype\">"};
         data = Join[vcfheader, data];
-        Export[outputfile,data, "TSV"]
+        Export[outputfile,data, "TSV","TextDelimiters"->None]
     ]
     
 getvcfsampleName[vcffile_String] :=

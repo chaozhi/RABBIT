@@ -6,7 +6,7 @@
 (* :Mathematica Version: 9.0.1.0 *)
 (* :Description: A package of standard algoirthms for hidden markov model, including some related visualization functions*)
 
-BeginPackage["ContinuousTimeHmm`",{"MagicDefinition`"}]
+BeginPackage["ContinuousTimeHmm`"]
 (* Exported symbols added here with SymbolName::usage *) 
 
 Unprotect @@ Names["ContinuousTimeHmm`*"];
@@ -117,14 +117,16 @@ CtBackward[tranProbSeq_, dataProbSeq_, forwardScale_] :=
 (*logbackwardProb[[t=T]] = logbackwardInitial (=0 by default)*)
 (*logbackwardProb[[t]] =  Log[Pr(y_{t+1...T}|x_t)/Pr(y_{t+1...T|y_{1...t})]*)
 CtLogBackward[tranProbSeq_, dataProbSeq_,logbackwardInitial_:Automatic] :=
-    Module[ {nSeq = Length[dataProbSeq],logbackwardProb,max,prob,t,temp},
+    Module[ {nSeq = Length[dataProbSeq],logbackwardProb,max,prob,t,temp},    	
+    	Off[General::munfl];
         logbackwardProb = Table[0, {nSeq}];
         logbackwardProb[[-1]] = If[logbackwardInitial===Automatic, Table[0,{Length[tranProbSeq[[-1]]]}],logbackwardInitial];
         Do[
          max = Max[logbackwardProb[[t + 1]]];
          prob = Exp[logbackwardProb[[t + 1]]-max];
          temp = Log[tranProbSeq[[t]].(dataProbSeq[[t + 1]] prob)] + max;         
-         logbackwardProb[[t]] = temp /. Indeterminate -> 1.1*Min[DeleteCases[temp, Indeterminate]], {t, nSeq - 1, 1, -1}];
+         logbackwardProb[[t]] = temp /. Indeterminate -> (Min[DeleteCases[temp, Indeterminate]]-20.0), {t, nSeq - 1, 1, -1}];
+        On[General::munfl];
         logbackwardProb
     ]    
     
