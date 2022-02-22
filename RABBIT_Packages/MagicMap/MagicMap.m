@@ -70,7 +70,6 @@ plotHeatMapGUI::usage = "plotHeatMapGUI[pairwisedatafile, mapfile] returns a gra
 
 nConnectedComponent::usage = "nConnectedComponent is an option to specify the number of connected components except of mini-components"
 
-
 dupebinMarker::usage = "dupebinMarker is an option to specify if markers are going to be binned"
 
 magicMapExpand::usage = "magicMapExpand[skeletonmap,binning] adds binnned markers into the skeleton map." 
@@ -92,6 +91,29 @@ delStrongCrossLink::usage = "delStrongCrossLink "
 minrfSegregateBin::usage = "minrfSegregateBin "
 
 minLDSaving::usage = "minLDSaving " 
+
+(*updatePhasing::usage = ""
+
+togroupstarttranrule::usage = ""
+
+groupForwardBackward::usage = ""
+
+groupForward::usage = ""
+
+updatemarkerdistanceMC::usage = ""
+
+calcurrentlogl::usage = ""
+
+groupBackward::usage = ""
+
+getSimilarity::usage = ""
+
+adjConnectedComponents::usage = ""
+
+getNeighborLodMtx::usage = ""
+
+fractiontosimilarity::usage = ""*)
+
 
 Begin["`Private`"] (* Begin Private Context *) 
 
@@ -1288,7 +1310,8 @@ fractiontosimilarity[rfmtx_, maxrf_] :=
         ];
         aa = (aa-Min[aa])/(Max[aa]-Min[aa]);
         (*to comare loc when fraction is the same, using temp=aa+lod/Max[lod] 10^(-6)*)
-        Round[aa, 10^(-5.)]
+        (*Round[aa, 10^(-5.)], it works in MMA12.0, but does not work in MMA13.0*)
+         Map[Round[#, 10^(-5.)] &, aa, {2}]
     ]
   
 
@@ -1620,7 +1643,7 @@ magicMapConstruct[pairwisedatafile_?FileExistsQ, ngroup_Integer?Positive,opts : 
             ]*)
             0,
             maxnconn = Max[1,Min[Round[maxnconn],ngroup]];
-        ];
+        ];        
         {computedtype,isfounderinbred,minldsaving,minlodsaving, morganrate, nmissing,snpid, rfmtx, linklodmtx, cormtx,indeplodmtx} = readPairwiseDatafile[pairwisedatafile,FilterRules[{opts}, Options[readPairwiseDatafile]]];
         minld = minldsaving;
         computedtype = ToLowerCase[computedtype];
@@ -1659,9 +1682,9 @@ magicMapConstruct[pairwisedatafile_?FileExistsQ, ngroup_Integer?Positive,opts : 
                 Print["magicMapConstruct: file ", refmap," does not exist"];
                 Abort[];
             ];
-        ];
+        ];        
         (*Spectral clustering*)
-        (*Put[{clusterlodtype, indeplodmtx,linklodmtx, rfmtx, maxrf, minlodsaving, minlodclustering, miniclustersize,maxnconn},"tempbrent.txt"];*)
+        (*Put[clusterlodtype, indeplodmtx,cormtx,linklodmtx, rfmtx, maxrf, minld,minlodsaving, minlodclustering, miniclustersize,maxnconn,"tempbrent.txt"];*)                
         minlodclustering = findminlodBrent[clusterlodtype, indeplodmtx,cormtx,linklodmtx, rfmtx, maxrf, minld,minlodsaving, minlodclustering, miniclustersize,maxnconn];
         similarity = getSimilarity[clusterlodtype, indeplodmtx,cormtx,linklodmtx, rfmtx, maxrf, minld,minlodclustering,Infinity,miniclustersize];
         (*Put[similarity,ngroup,"tempgroup.txt"];*)
@@ -1676,7 +1699,7 @@ magicMapConstruct[pairwisedatafile_?FileExistsQ, ngroup_Integer?Positive,opts : 
             Print[Style["magicMapConstruct warning: the number " <> ToString[Count[Flatten[eigenval], _?(# < 10^(-10) &)]] <> 
                   " of clusters determined by multiplicity of zero eigenvalue > input #linkagegroup " <> ToString[ngroup] <> "!" <> 
                   " Try smaller option value of minLodClustering!", Red]];
-        ];
+        ];        
         linkagegroups = relabelLinkagegroup[snpid,linkagegroups,refmap];
         If[ isprint,
             Print["Size of "<>ToString[Length[linkagegroups]]<>" groups = ", Length[#] & /@ linkagegroups," and #ungrouped markers = ", Length[singletons]," after spectral clustering!",
@@ -1690,7 +1713,7 @@ magicMapConstruct[pairwisedatafile_?FileExistsQ, ngroup_Integer?Positive,opts : 
             If[ isprint&&k!=Length[singletons],
                 Print["Size of "<>ToString[Length[linkagegroups]]<>" groups = ", Length[#] & /@ linkagegroups," and #ungrouped markers = ", Length[singletons]," after removing markers whose strongest neighbors are not in the same group!"];
             ];
-        ];         
+        ];
         (*Spectral ordering*)
         If[ minlodordering===Automatic || MemberQ[minlodordering,Automatic],
         	minlodordering0 = If[TrueQ[minlodordering===Automatic],Table[Automatic, {ii,Length[linkagegroups]}],minlodordering];
@@ -2096,8 +2119,8 @@ groupForward[groupstartProb_, grouptranProb_, groupdataprob_] :=
     ]
     
 groupForward[groupkey_, groupstartrule_, grouptranrule_,groupdataprob_] :=
-    Module[ { res, forwardProb, forwardScale, ind},
-        res = Table[CtForward[groupkey[[ind]]/.groupstartrule, groupkey[[ind]]/.grouptranrule, Normal[groupdataprob[[All, ind]]]], {ind, Length[groupkey]}];
+    Module[ { res, forwardProb, forwardScale, ind},        
+        res = Table[CtForward[Normal[groupkey[[ind]] /. groupstartrule], Normal[groupkey[[ind]] /. grouptranrule],Normal[groupdataprob[[All, ind]]]], {ind, Length[groupkey]}];
         {forwardProb, forwardScale} = Transpose[#] & /@ Transpose[res];
         (*resturn res with dim={{nsnp,nind,nstate},{nsnp,nind}*)
         {forwardProb, forwardScale}
@@ -2111,7 +2134,7 @@ groupBackward[grouptranProb_, groupdataprob_,grouplogbackinit_] :=
                       grouplogbackinit
                   ];
         (*resturn res with dim={nsnp,nind,nstate}*)
-        Transpose[Table[CtLogBackward[grouptranProb[[All,ind]],Normal[groupdataprob[[All, ind]]],loginit[[ind]]], {ind, nind}]]
+        Transpose[Table[CtLogBackward[Normal[grouptranProb[[All,ind]]],Normal[groupdataprob[[All, ind]]],loginit[[ind]]], {ind, nind}]]
     ]     
 
 groupBackward[groupkey_, grouptranrule_, groupdataprob_,grouplogbackinit_] :=
@@ -2122,7 +2145,7 @@ groupBackward[groupkey_, grouptranrule_, groupdataprob_,grouplogbackinit_] :=
                       grouplogbackinit
                   ];
         (*resturn res with dim={nsnp,nind,nstate}*)
-        Transpose[Table[CtLogBackward[groupkey[[ind]]/.grouptranrule,Normal[groupdataprob[[All, ind]]],loginit[[ind]]], {ind, nind}]]
+        Transpose[Table[CtLogBackward[Normal[groupkey[[ind]]/.grouptranrule],Normal[groupdataprob[[All, ind]]],loginit[[ind]]], {ind, nind}]]
     ] 
     
 groupForwardBackward[groupkey_, groupstartrule_, grouptranrule_,groupdataprob_] :=
@@ -2586,7 +2609,8 @@ updatemarkerdistanceMC[snps_, snpdeltd_, samplelabel_, continuedmarkovprocess_, 
          groupForwardBackward[groupkey, groupstartrule, grouptranrule, snps/.dataprobset];
         (*Print["grouptranrule,continuedmarkovprocess,forwardProb, forwardScale, forwardlogl, logbackwardProb=",
             ByteCount[#]&/@{grouptranrule,continuedmarkovprocess,forwardProb, forwardlogl, logbackwardProb}];
-        Print["fw-end",DateString[],"MemoryInUse=",MemoryInUse[]];*)
+        *)
+        (*Print["fw-end",DateString[],"MemoryInUse=",MemoryInUse[]];*)
         (*Put[deltd,snps, snpdeltd, samplelabel,continuedmarkovprocess, dataprobset,priorchrlength,temperature,"tempgroup.txt"];
         Abort[];*)
         loglhistory = Table[0, {Length[forwardlogl]}];
@@ -2952,7 +2976,7 @@ withingroupRefine[{groupindex_,runindex_,kernelid_},outputfile_,refineinputlist_
         continuedmarkovprocess, maxfraction, samplemapR, offspringgender, nfounder, loglhis,meanwindowsize, outstream, imputestepsize = 3,
         actionls, logldis, acceptdis,loglbefore,logl = -Infinity,windowsizels, acceptls, loglls, summary,it},
         checkul = SystemOptions["CheckMachineUnderflow"];
-        SetSystemOptions["CheckMachineUnderflow" -> False];
+        (*SetSystemOptions["CheckMachineUnderflow" -> False];*)
         {initorder, initdeltd,snpneighborhood, inputsnpid,refmap,inittemperature, coolingratio, freeze,deltloglbound,itmaxfreeze, 
                 magicSNP, model, popDesign, epsF, eps, ischrX,minphredscore,foundercallthreshold, 
                 isimputefounder, isfounderinbred,isfounderdepth, isoffspringdepth,imputingbound,errorgenobound} = refineinputlist;
@@ -3021,21 +3045,25 @@ withingroupRefine[{groupindex_,runindex_,kernelid_},outputfile_,refineinputlist_
          booloff = (imputingbound<1||errorgenobound<1)&&(Mod[it,imputestepsize] == 1||freeze coolingratio<=temperature<=freeze);*)
          boolparent = isimputefounder2&&(Mod[it,imputestepsize] == 1);
          booloff = (imputingbound<1||errorgenobound<1)&&(Mod[it,imputestepsize] == 1);
+         (*Print["1groupindex=",groupindex,"it=",it,"; phasing"];*)
          If[ it==1||boolparent||booloff,
              If[ groupindex==runindex==1,
                  PrintTemporary["{Iteration,Temperature,ParentImpute&Phasing,ErrorDetect,OffspringImpute}=",{it,temperature, boolparent,booloff&&errorgenobound<1,booloff&&imputingbound<1}];
-             ];
+             ];             
+             (*Put[magicSNP, model, popDesign, epsF, eps, ischrX,snporder[[All, 1]], snpdeltd, 
+                 minphredscore, foundercallthreshold,isfounderinbred, isfounderdepth, isoffspringdepth, boolparent,booloff,imputingbound,errorgenobound,"tempphase.txt"];*)
              Quiet[imputedsubmagicsnp = updatePhasing[magicSNP, model, popDesign, epsF, eps, ischrX,snporder[[All, 1]], snpdeltd, 
-                 minphredscore, foundercallthreshold,isfounderinbred, isfounderdepth, isoffspringdepth, boolparent,booloff,imputingbound,errorgenobound];];
+                 minphredscore, foundercallthreshold,isfounderinbred, isfounderdepth, isoffspringdepth, boolparent,booloff,imputingbound,errorgenobound];];             
              dataprobset = caldataprobset[imputedsubmagicsnp, magicSNP[[2,2;;]],snporder[[All, 1]], model, epsF, eps, ischrX, 
-                 minphredscore, isfounderinbred, isfounderdepth, isoffspringdepth];
+                 minphredscore, isfounderinbred, isfounderdepth, isoffspringdepth];             
          ];
+         (*Print["1.5groupindex=",groupindex,"it=",it,"; spacing"];*)
          If[ temperature<=freeze,
              {{loglbefore,logldis},snpdeltd} = updatemarkerdistanceBrent[snporder[[All, 1]], snpdeltd, samplelabel,continuedmarkovprocess, dataprobset,priorchrlength];
              acceptdis =  "BrentMethod",
-             {{loglbefore,logldis},snpdeltd,acceptdis} = updatemarkerdistanceMC[snporder[[All, 1]], snpdeltd, samplelabel,continuedmarkovprocess, dataprobset,priorchrlength,temperature];
+             {{loglbefore,logldis},snpdeltd,acceptdis} = updatemarkerdistanceMC[snporder[[All, 1]], snpdeltd, samplelabel,continuedmarkovprocess, dataprobset,priorchrlength,temperature];             
          ];
-         (*Print["groupindex=",groupindex,"it=",it,"; ordering"];*)                  
+         (*Print["2groupindex=",groupindex,"it=",it,"; ordering"];*)             
          (*Put[snporder, snpdeltd, actionls, samplelabel, continuedmarkovprocess, dataprobset, snpneighbor, meanwindowsize,temperature,"temporder.txt"];*)         
          If[ Length[summary]==3,
              {snporder, snpdeltd, windowsizels, acceptls, loglls} = 
@@ -3048,7 +3076,7 @@ withingroupRefine[{groupindex_,runindex_,kernelid_},outputfile_,refineinputlist_
              count++,
              count = 0
          ];                 
-         (*Print["groupindex=",groupindex,"it=",it,"; display"];*)
+         (*Print["3groupindex=",groupindex,"it=",it,"; display"];*)
          summary = iterationsummary[groupindex,runindex,kernelid,starttime,inputsnpid,refmap,temperature,freeze,it,snporder,snpdeltd,actionls,windowsizels,acceptls,loglls,
              loglbefore,acceptdis,logldis];
          If[ Length[summary]==3,

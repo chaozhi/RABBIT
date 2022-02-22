@@ -635,7 +635,7 @@ setNAMpedinfo[families_, nself_] :=
     ]
 
 toJuliagenofile[mmagenofile_, juliagenofile_,isphased_:False] :=
-    Module[ {magicgeno, nf, rule,ls,gset},
+    Module[ {magicgeno, nf, rule,ls,gset,format,offformat,res},
         magicgeno = Import[mmagenofile];
         nf = magicgeno[[1, 2]];
         magicgeno = Transpose[magicgeno[[2 ;;]]];
@@ -653,6 +653,8 @@ toJuliagenofile[mmagenofile_, juliagenofile_,isphased_:False] :=
             	rule = Thread[gset[[4 ;; 8]] -> {"1|1", "1|2", "2|1", "2|2", "N|N"}];
             	rule = Join[rule,{"1N"->"1|N","N1"->"N|1","2N"->"2|N","N2"->"N|2"}];
             	magicgeno[[2 ;;, 4 ;;]] = magicgeno[[2 ;;, 4 ;;]] /. rule;
+            	offformat = "GT_phased",
+            	offformat = "GT_unphased"
             ];
         ];
         (*reseting for gender*)
@@ -662,7 +664,10 @@ toJuliagenofile[mmagenofile_, juliagenofile_,isphased_:False] :=
         magicgeno[[1, nf + 4 ;;]] = StringReplace[magicgeno[[1, nf + 4 ;;]], "ProgenyLine" -> "Offspring"];
         rule = If[isphased, {1 -> "1|Y", 2 -> "2|Y", "N" -> "N|Y"}, {1 -> "1Y", 2 -> "2Y", "N" -> "NY"}];
         magicgeno[[2 ;;, 4 + nf ;;]] = magicgeno[[2 ;;, 4 + nf ;;]] /. rule;
-        csvExport[juliagenofile, magicgeno]
+        format = Table[{"GT_haplo",offformat},{Length[magicgeno]}];
+        format[1] = {"founderformat","offspringformat"};
+        res = Join[magicgeno[[All,;;3]],format,magicgeno[[All,4;;]],2];
+        csvExport[juliagenofile, res]
     ]
      
 toJuliapedinfo[founders_, mmapedfile_] :=

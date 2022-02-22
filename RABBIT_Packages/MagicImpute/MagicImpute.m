@@ -29,10 +29,9 @@ genoErrorPattern::usage = "genoErrorPattern[obsmagicsnp, estmagicsnp,truemagicsn
 
 plotErrorPatternGUI::usage = "plotErrorPatternGUI[obsmagicsnp, estmagicsnp,truemagicsnp] plots and summarizes the status of each genoetype estimation. The three arguments correspond to observed data, estimated genotypes, and true genotypes, respectively. There are 6 labeled statuses: \"TrueCorrect\" (genotype errors that are changed correctly), \"TrueDetect\"(genotype errors that are changed wrongly), \"FalseNegative\" (genotype errors that are not detected), \"FalsePositive\" (Non genotype errors that are wrongly corrected), and \"FalseImpute\" (wrongly imputed genotypes). \n plotErrorPatternGUI[obsmagicsnp, estmagicsnp] plots and summarizes the results with three possible statuses: \"NonImputation\" (missing genoytypes are not imputed), \"Imputation\" (missing genoytypes are imputed), and \"Correction\" (observed genoytypes are changed). "
 
-parentForwardCalculation::usage = "parentForwardCalculation  "
+(*parentForwardCalculation::usage = "parentForwardCalculation  "
 
-parentBackwardMaximize::usage = "parentBackwardMaximize  "
-
+parentBackwardMaximize::usage = "parentBackwardMaximize  "*)
 
 
 Begin["`Private`"]
@@ -182,20 +181,20 @@ magicImputeFounder[magicSNP_, model_, epsF_, eps_, popDesign_,minphredscore_,max
 	                <> " Seconds. \t Start imputing founder linkagegroup " <> ToString[ch]<>" out of "<>ToString[Length[founderHaplo]]];	                
 	                Print["#markers: ", Length[fhaploset],". #phases per locus: " <> ToString[Round[Mean[Length[#] & /@ fhaploset],0.01]]," out of "<>ToString[2^(nFounder (1+Boole[!isfounderinbred]))]];
 	            ];	            
-	            nn = Round[Length[fhaploset]/2];	            	            
+	            nn = Round[Length[fhaploset]/2];
 	            (*Put[model,samplelabel, markovprocess, fhaploset, chrobsgeno, 
 	               epsF2, eps, minphredscore, isoffspringdepth, ismaleX,isprint,"imputetemp.txt"];
 	            Abort[];*)
 	            {fwphaseprob, fworigprob, fwphaseindex} = parentForwardCalculation[model,samplelabel, markovprocess, fhaploset, chrobsgeno, 
 	               epsF2, eps, minphredscore, isoffspringdepth, ismaleX,isprint];
 	            (*Put[fwphaseprob, fworigprob, fwphaseindex,model,samplelabel, markovprocess, fhaploset, chrobsgeno, epsF2, eps, minphredscore, isoffspringdepth, ismaleX,isprint,"imputetemp2.txt"];
-	            Abort[];*)            
+	            Abort[];*)
 	            backtmin = If[ isextrareverse,
 	                           nn+1,
 	                           1
 	                       ];	                     
 	            {fwphase,fwphaseprob} = Most[parentBackwardMaximize[fwphaseprob, fworigprob, isdepModel,ismaleX,samplelabel, markovprocess,backtmin,isprint]];	            	            
-	            fhaploset = MapThread[#1[[#2]] &, {fhaploset,fwphaseindex}];
+	            fhaploset = MapThread[#1[[#2]] &, {fhaploset,fwphaseindex}];	            
 	            If[ isprint,
 	                PrintTemporary["Mean number of phases per locus after forward calculation: " <> ToString[Round[Mean[Length[#] & /@ fwphaseindex],0.01]]," out of "<>ToString[2^(nFounder (1+Boole[!isfounderinbred]))]];
 	            ];
@@ -208,10 +207,10 @@ magicImputeFounder[magicSNP_, model_, epsF_, eps_, popDesign_,minphredscore_,max
 	                (*reverse chromosome direction*)
 	                revmarkovprocess = markovprocess;	                	
 	                revmarkovprocess[[All, 2, 2]] = Reverse[#] & /@ revmarkovprocess[[All, 2, 2]];
-	                revmarkovprocess[[All, 2, 2]] = Map[Transpose, revmarkovprocess[[All, 2, 2]], {2}];
+	                revmarkovprocess[[All, 2, 2]] = Map[Transpose, revmarkovprocess[[All, 2, 2]], {2}];	                
 	                {revphaseprob, revorigprob, revphaseindex} = parentForwardCalculation[model,samplelabel, revmarkovprocess, 
 	                    Reverse[fhaploset2], Reverse[chrobsgeno], epsF2, eps, minphredscore, isoffspringdepth, ismaleX,isprint];
-	                (*Put[fhaploset,revphaseindex,revphaseprob, revorigprob, isdepModel,ismaleX, samplelabel, revmarkovprocess,"tempphase0_"<>ToString[$KernelID]<>".txt"];*)	                	
+	                (*Put[fhaploset,revphaseindex,revphaseprob, revorigprob, isdepModel,ismaleX, samplelabel, revmarkovprocess,"tempphase0_"<>ToString[$KernelID]<>".txt"];*)
 	                {phase,revphaseprob} = Most[parentBackwardMaximize[revphaseprob, revorigprob, isdepModel,ismaleX, samplelabel, revmarkovprocess,Length[fhaploset]+1-nn,isprint]];
 	                {revphaseindex,phase,revphaseprob} = Reverse[#]&/@{revphaseindex,phase,revphaseprob};
 	                ClearAll[revorigprob];
